@@ -10,7 +10,17 @@ class Page extends MY_Controller {
 
 	public function index()
 	{
-        $this->_render('login');
+        $this->login();
 	}
+
+    public function login()
+    {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $auth = $this->input->post();
+
+        } else {
+            $this->_render('login');
+        }
+    }
 
 }

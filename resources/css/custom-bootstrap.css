@@ -20,7 +20,7 @@ input {
 }
 
 input:focus {
-    border-color: #1F6946 !important;
+    border-color: black !important;
 }
 
 .form-group label {
@@ -28,9 +28,9 @@ input:focus {
 }
 
 .btn-danero {
-    background-color: #00AD82;
+    background-color: indianred;
     color: white;
-    box-shadow: 0 3px 0 0 #1F6946 !important;
+    box-shadow: 0 3px 0 0 darkred !important;
 }
 
 .btn {
@@ -39,22 +39,16 @@ input:focus {
 
 .btn-danero:hover {
     color: white;
-    background-color: seagreen;
-}
-
-.btn-danger {
-    box-shadow: 0 3px 0 0 darkred !important;
+    background-color: #BC474E;
 }
 
 .btn-danero:active {
-    background: seagreen;
+    background: #BC474E;
     box-shadow: none;
-    margin-bottom: -3px;
-    margin-top: 3px;
 }
 
 .btn-danero:focus {
-    background: seagreen;
+    background: #BC474E;
     color: white !important;
 }
 
