@@ -83,3 +83,14 @@ defined('EXIT_USER_INPUT')     OR define('EXIT_USER_INPUT', 7); // invalid user 
 defined('EXIT_DATABASE')       OR define('EXIT_DATABASE', 8); // database error
 defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
+
+/*
+|--------------------------------------------------------------------------
+| Custom
+|--------------------------------------------------------------------------
+*/
+defined('DB_USERNAME')       OR define('DB_USERNAME', 'jrdncchr_directmail');
+defined('DB_PASSWORD')       OR define('DB_PASSWORD', 'danero1120');
+defined('DB_DATABASE')       OR define('DB_DATABASE', 'jrdncchr_directmail');
+
+defined('ICON_PATH')         OR define('ICON_PATH', 'resources/images/icon/');

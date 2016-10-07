@@ -1,23 +1,22 @@
-@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,600,900,400italic,600italic,700italic,900italic,300,300italic);
+@import url(https://fonts.googleapis.com/css?family=Montserrat:400,700);
 
 * {
-    font-family: 'Source Sans Pro', sans-serif;
-    font-size: 24px;
+    font-family: "Montserrat", sans-serif;
+    font-smoothing: antialiased;
+    font-size: 14px;
     font-weight: lighter !important;
 }
+
 body {
-    background: white; /* fallback for old browsers */
-    /*background: -webkit-linear-gradient(to left, white , #EEFFFF); *//* Chrome 10-25, Safari 5.1-6 */
-    /*background: linear-gradient(to left, white , #EEFFFF); *//* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-
-
+    background: white;
 }
-a:focus, button:focus {
+
+a:focus, button:focus, a:hover, a:active {
+    text-decoration: none !important;
     outline: 0 !important;
 }
-
-a:hover {
-    text-decoration: none !important;
+.center {
+    margin: 0 auto;
 }
 
 .normal {
@@ -30,17 +29,33 @@ a:hover {
 
 .danero-h2 {
     font-size: 34px;
-    font-weight: bold !important;
+    font-weight: 100 !important;
 }
 
 h3 {
-    font-weight: 500 !important;
+    text-align: center;
+    font-size: 20px;
+    font-weight: lighter !important;
 }
 
 .logo {
-    color: #BC474E;
-    font-weight: bold !important;
-    font-size: 60px;
+    text-align: center;
+    font-size: 3em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: indianred;
+    text-shadow: 0 1px 2px rgba(black,.15);
+}
+
+input {
+    border-radius: 0 !important;
+    background-color: #FDFDFD !important;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.2), 0 -1px 1px #FFF, 0 1px 0 #FFF !important;
+}
+input:focus {
+    border-color: black !important;
+    background-color : white !important;
 }
 
 /* Sidebar */
