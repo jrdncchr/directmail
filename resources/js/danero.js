@@ -41,6 +41,9 @@ function numberWithCommas(x) {
 var toast;
 function loading(type, message) {
     toastr.clear(toast);
+    if (toast) {
+        toast.remove();
+    }
     if (type === "success") {
         toast = toastr.success(message);
     } else if (type === "info") {

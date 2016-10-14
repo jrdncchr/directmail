@@ -28,6 +28,7 @@ class MY_Controller extends CI_Controller
         if ($logged) {
             $this->_checkAuth();
         }
+        $this->_initializeSecrets();
         $this->data['user'] = $this->user;
         $this->data['title'] = $this->title;
         $this->data['description'] = $this->description;
@@ -44,6 +45,21 @@ class MY_Controller extends CI_Controller
         $data['head'] = $this->load->view('templates/head', $data, true);
         $data['content'] = $this->load->view($view, $data, true);
         $this->load->view('templates/skeleton', $data);
+    }
+
+    public function _renderL($view)
+    {
+        $data = $this->data;
+        $data['css'] = $this->css;
+        $data['js'] = $this->js;
+        $data['bower'] = $this->bower;
+        $data['head'] = $this->load->view('templates/logged/head', $data, true);
+
+        $this->load->model('module_model');
+        $data['modules'] = $this->module_model->get();
+        $data['nav'] = $this->load->view('templates/logged/nav', $data, true);
+        $data['content'] = $this->load->view($view, $data, true);
+        $this->load->view('templates/logged/skeleton', $data);
     }
 
     public function _renderA($view)
@@ -65,6 +81,15 @@ class MY_Controller extends CI_Controller
             redirect(base_url());
         }
         $this->user = $user;
+    }
+
+    public function _initializeSecrets()
+    {
+        $this->load->model('global_model');
+        $secrets = $this->global_model->get_secret();
+        foreach ($secrets as $s) {
+            defined($s->k) OR define($s->k, $s->v);
+        }
     }
 
 }

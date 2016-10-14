@@ -15,6 +15,7 @@
         </div>
 
         <div id="page-content-wrapper">
+            <?php $this->load->view('blocks/user_button'); ?>
             <section class="container-fluid">
                 <?php echo $content; ?>
             </section>

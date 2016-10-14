@@ -8,33 +8,28 @@ var Validator = function() {
 
         form.find('input, select, textarea').each(function() {
             var e = $(this);
+
             if(!e.val()) {
                 // validate required field
                 if(e.hasClass('required')) {
                     _this.inputErrors.required.push(e);
                 }
             } else {
-                _this.removeInputError(e, 'required');
                 // validate email
                 if(e.hasClass('email')) {
                     if(!_this.validateEmail(e.val())) {
                         _this.inputErrors.email.push(e);
-                    } else {
-                        _this.removeInputError(e, 'email');
                     }
                 }
                 // validate url
                 if(e.hasClass('url')) {
                     if(!_this.validateUrl(e.val())) {
                         _this.inputErrors.url.push(e);
-                    } else {
-                        _this.removeInputError(e, 'url');
                     }
                 }
             }
             _this.displayInputError(e, false);
         });
-
         var result = _this.checkInputErrors(form);
         return result.success;
 
@@ -65,15 +60,6 @@ var Validator = function() {
         }
         _this.displayAlertError(form, !result.success, result.message);
         return result;
-    };
-
-    this.removeInputError = function(e, type) {
-        var _this = this;
-        $.each(_this.inputErrors[type], function(i) {
-            if(_this.inputErrors[type][i] === e || _this.inputErrors[type][i].attr('id') == e.attr('id')) {
-                _this.inputErrors[type].splice(i, 1);
-            }
-        });
     };
 
     this.displayInputError = function(e, show) {

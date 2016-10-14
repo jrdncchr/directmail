@@ -4,9 +4,9 @@
             <h1 class="text-center logo">Direct Mail</h1>
             <br />
             <img src="<?php echo base_url() . 'resources/images/icon/handshake.png'?>" class="img img-responsive center" width="200" />
-            <p class="lead text-success">
-                You have successfully registered with client <span class="bold"><?php echo $client->name; ?></span>.
-                Please confirm your email and wait for your account to be activated by your client.
+            <p class="lead">
+                You have successfully registered with company <span class="bold"><?php echo $company->name; ?></span>.
+                Please confirm your email and wait for your account to be activated by your company.
             </p>
             <a href="<?php echo base_url() . 'login'?>">Return to Login</a>
         </div>
