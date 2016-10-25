@@ -23,6 +23,8 @@
 
     </div>
 
+    <?php $this->load->view('templates/logged/global'); ?>
+
     <div class="push"></div>
 </div>
 

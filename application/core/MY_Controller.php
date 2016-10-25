@@ -5,7 +5,9 @@ if (!defined('BASEPATH'))
 
 class MY_Controller extends CI_Controller
 {
-    protected $user;
+    protected $logged_user;
+    protected $list_category_permissions;
+    protected $module_permissions;
 
     // Page resources
     protected $js = array();
@@ -24,16 +26,65 @@ class MY_Controller extends CI_Controller
     function __construct($logged = false)
     {
         parent::__construct();
-        $this->user = $this->session->userdata("user");
+        $this->logged_user = $this->session->userdata('user');
         if ($logged) {
             $this->_checkAuth();
+
+            $initialized_secrets = $this->session->userdata('initialized_secrets');
+            if (!$initialized_secrets) {
+                $this->_initializeSecrets();
+            }
+
+            $this->_initializePermissions();
+
+            $this->data['logged_user'] = $this->logged_user;
         }
-        $this->_initializeSecrets();
-        $this->data['user'] = $this->user;
+
         $this->data['title'] = $this->title;
         $this->data['description'] = $this->description;
         $this->data['keywords'] = $this->keywords;
         $this->data['author'] = $this->author;
+    }
+
+    public function _initializeSecrets()
+    {
+        $this->load->model('global_model');
+        $secrets = $this->global_model->get_secret();
+        foreach ($secrets as $s) {
+            defined($s->k) OR define($s->k, $s->v);
+        }
+        $this->session->set_userdata('initialized_secrets', true);
+    }
+
+    public function _initializePermissions()
+    {
+        $this->load->model('role_model');
+        $module_permissions = $this->session->userdata('module_permissions');
+        if (!$module_permissions) {
+            $this->load->model('role_model');
+            $module_permissions = $this->role_model->get_module_permissions($this->logged_user->role_id);
+            $module_permissions = $this->_objectToArrayById($module_permissions);
+            $this->session->set_userdata('module_permissions', $module_permissions);
+        }
+        $this->module_permissions = $module_permissions;
+        $this->data['sb_module_permissions'] = $module_permissions;
+
+        $list_category_permissions = $this->session->userdata('list_category_permissions');
+        if (!$list_category_permissions) {
+            foreach ($module_permissions as $m) {
+                if ($m->code == "list") {
+                    if ($m->retrieve_action == 1) {
+                        $list_category_permissions = $this->role_model->get_list_category_permissions($this->logged_user->role_id, $this->logged_user->company_id);
+                        $list_category_permissions = $this->_objectToArrayById($list_category_permissions);
+                        $this->session->set_userdata('list_category_permissions', $list_category_permissions);
+                    }
+                    break;
+                }
+
+            }
+        }
+        $this->list_category_permissions = $list_category_permissions;
+        $this->data['sb_list_category_permissions'] = $list_category_permissions;
     }
 
     public function _render($view)
@@ -83,13 +134,13 @@ class MY_Controller extends CI_Controller
         $this->user = $user;
     }
 
-    public function _initializeSecrets()
+    public function _objectToArrayById($data)
     {
-        $this->load->model('global_model');
-        $secrets = $this->global_model->get_secret();
-        foreach ($secrets as $s) {
-            defined($s->k) OR define($s->k, $s->v);
+        $newArray = [];
+        foreach ($data as $d) {
+            $newArray[$d->_id] = $d;
         }
+        return $newArray;
     }
 
 }

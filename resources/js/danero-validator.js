@@ -71,10 +71,20 @@ var Validator = function() {
     };
 
     this.displayAlertError = function(form, show, message) {
+        $('.notice').removeClass('alert alert-danger').html("").hide();
         if(show) {
-            form.find('.notice').addClass('alert alert-danger').html("<i class='fa fa-exclamation-circle'></i> " + message).show();
+            form.find('.notice').addClass('alert alert-danger alert-dismissible').html("<i class='fa fa-exclamation-circle'></i> " + message).show();
         } else {
             form.find('.notice').removeClass('alert alert-danger').html("").hide();
+        }
+    };
+
+    this.displayAlertSuccess = function(form, show, message) {
+        $('.notice').removeClass('alert alert-success').html("").hide();
+        if(show) {
+            form.find('.notice').addClass('alert alert-success alert-dismissible').html("<i class='fa fa-check-circle'></i> " + message).show();
+        } else {
+            form.find('.notice').removeClass('alert alert-success').html("").hide();
         }
     };
 

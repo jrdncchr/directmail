@@ -6,7 +6,7 @@ class Auth extends MY_Controller {
     function __construct()
     {
         parent::__construct();
-        if ($this->user !== null) {
+        if ($this->logged_user !== null) {
             redirect(base_url() . 'dashboard');
         }
     }

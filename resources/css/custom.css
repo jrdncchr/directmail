@@ -50,7 +50,7 @@ h2 {
     text-shadow: 0 1px 2px grey;
 }
 
-input, textarea {
+input, textarea, select {
     border-radius: 0 !important;
     background-color: #FDFDFD !important;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.2), 0 -1px 1px #FFF, 0 1px 0 #FFF !important;
@@ -113,9 +113,9 @@ input:focus, textarea:focus {
 #page-content-wrapper {
     width: 100%;
     position: absolute;
-    padding: 0;
     margin: 0;
     padding-left: 30px !important;
+    padding-right: 0 !important;
 }
 
 #wrapper.toggled #page-content-wrapper {
@@ -124,6 +124,10 @@ input:focus, textarea:focus {
 }
 
 @media(min-width:768px) {
+    #page-content-wrapper {
+        padding-left: 30px !important;
+    }
+
     #wrapper {
         padding-left: 260px;
     }
@@ -267,10 +271,6 @@ td {
     font-size: 16px !important;
 }
 
-#toast-container > div {
-    width: 400px;
-}
-
 .table tbody tr {
     background-color: aliceblue !important;
 }
@@ -280,6 +280,9 @@ td {
     cursor: pointer;
 }
 
+.toast {
+    border-radius: 0 !important;
+}
 /*
     Checkbox
 */
@@ -287,9 +290,11 @@ td {
 .control {
     display: block;
     position: relative;
-    padding-left: 30px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     cursor: pointer;
+    padding-left: 30px;
+    font-weight: normal !important;
+    font-size: 16px;
 }
 .control input {
     position: absolute;

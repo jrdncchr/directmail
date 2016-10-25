@@ -54,19 +54,24 @@ class User_model extends CI_Model {
                 return $result;
             }
 
+            $user->company = $this->db->get_where('company', array('id' => $user->company_id))->row();
             $result = array('success' => true);
             $this->session->set_userdata('user', $user);
         }
         return $result;
     }
 
-    public function register($info)
+    public function register($info, $manually_added = false)
     {
         $result = array('success' => false);
 
-        if ($info['password'] != $info['confirm_password']) {
-            $result['message'] = "Passwords did not match.";
-            return $result;
+        if (!$manually_added) {
+            if ($info['password'] != $info['confirm_password']) {
+                $result['message'] = "Passwords did not match.";
+                return $result;
+            }
+        } else {
+            $info['password'] = generate_random_str(10);
         }
 
         $exist = $this->get(array('email' => $info['email'], 'deleted' => 0), false);
@@ -81,7 +86,9 @@ class User_model extends CI_Model {
                 'first_name'    => $info['first_name'],
                 'last_name'     => $info['last_name'],
                 'birth_date'    => $info['birth_date'],
-                'company_id'     => $info['company_id']
+                'contact_no'    => $info['contact_no'],
+                'company_id'    => $info['company_id'],
+                'role_id'       => isset($info['role_id']) ? $info['role_id'] : ''
             )
         );
         $user_id = $this->db->insert_id();
@@ -98,12 +105,16 @@ class User_model extends CI_Model {
         );
 
         $this->load->library('email_library');
-        $this->email_library->send_email_confirmation(array(
+        $email_data = array(
             'to' => $info['email'],
             'name' => $info['first_name'],
             'company' => $info['company_name'],
             'confirmation_key' => $confirmation_key
-        ));
+        );
+        if ($manually_added) {
+            $email_data['password'] = $info['password'];
+        }
+        $this->email_library->send_email_confirmation($email_data);
 
         $result['success'] = true;
         $result['user_id'] = $user_id;
@@ -124,12 +135,29 @@ class User_model extends CI_Model {
         return $result;
     }
 
+    public function change_password($user_id, $new_password)
+    {
+        $result['success'] = false;
+        $salt = generate_random_str(20);
+        $password = crypt($new_password, $salt);
+        $this->db->where('user_id', $user_id);
+        if ($this->db->update('user_secret', array('password' => $password))) {
+            $result['success'] = true;
+        } else {
+            $result['message'] = 'Something went wrong.';
+        }
+        return $result;
+    }
+
     /*
      * Default CRUD
      */
     public function get($where = array(), $list = true)
     {
-        $result = $this->db->get_where('user', $where);
+        $where['u.deleted'] = 0;
+        $this->db->select('u.*, r.name as role_name');
+        $this->db->join('roles r', 'r.id = u.role_id', 'left');
+        $result = $this->db->get_where('user u', $where);
         return $list ? $result->result() : $result->row();
     }
 

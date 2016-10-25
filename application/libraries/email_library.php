@@ -35,8 +35,11 @@ class Email_Library {
         $email['subject'] = "Direct Mail - Email Confirmation";
         $email['content'] = "<p>Hi " . $data['name'] . ", </p>";
         $email['content'] .= "<p>Welcome to Direct Mail, you are now registered with your company <b>" . $data['company'] . "</b>. </p>";
+        if (isset($data['password'])) {
+            $email['content'] .= "<p>Your password is: " . $data['password'] . "</p>";
+        }
         $email['content'] .= "<p>Please confirm your account by clicking the link below: </p>";
-        $email['content'] .= "<a href='" . base_url() . "auth/confirm_email/" . $data['confirmation_key'] . "'>Confirm Account</a>";
+        $email['content'] .= "<a href='" . base_url() . "auth/confirm/" . $data['confirmation_key'] . "'>Confirm Account</a>";
         $email['to'] = $data['to'];
         $this->send_email($email);
     }

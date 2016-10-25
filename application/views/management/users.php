@@ -1,19 +1,22 @@
 <div id="app">
-    <h2>Roles</h2>
+    <h2>Users</h2>
     <ol class="breadcrumb">
         <li><a>Management</a></li>
-        <li><a class="active">Roles</a></li>
+        <li><a class="active">Users</a></li>
     </ol>
 
     <div class="row">
         <div class="col-sm-12">
-            <a href="<?php echo base_url() . 'management/roles/form'; ?>" class="btn btn-sm btn-default" style="margin-bottom: 20px;"><i class="fa fa-plus-circle"></i> Add Role</a>
+            <a href="<?php echo base_url() . 'management/users/form'; ?>" class="btn btn-sm btn-default" style="margin-bottom: 20px;"><i class="fa fa-plus-circle"></i> Add User</a>
             <div class="table-responsive" style="width: 100%;">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover" width="100%">
                     <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Description</th>
+                        <th width="15%">Role</th>
+                        <th width="25%">Email</th>
+                        <th width="25%">Name</th>
+                        <th width="15%">Contact No.</th>
+                        <th width="20%">Date Joined</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -27,11 +30,11 @@
 
 <script>
     var dt;
-    var actionUrl = "<?php echo base_url() . 'management/roles'; ?>";
+    var actionUrl = "<?php echo base_url() . 'management/users'; ?>";
 
     $(function() {
         $('#sidebar-management-link').addClass('active');
-        $('#sidebar-management-roles-link').addClass('active');
+        $('#sidebar-management-users-link').addClass('active');
         $('#sidebar-management').addClass('in');
 
         dt = $('table').dataTable({
@@ -44,8 +47,11 @@
                 "data": {action: "list"}
             },
             columns: [
+                { data: "role_name" },
+                { data: "email" },
                 { data: "name" },
-                { data: "description" },
+                { data: "contact_no" },
+                { data: "date_created" },
                 { data: "id", visible: false }
             ],
             "fnDrawCallback": function (oSettings) {
@@ -57,7 +63,7 @@
                 });
             },
             "language": {
-                "emptyTable": "No roles yet."
+                "emptyTable": "There are no users, please contact Direct Mail"
             }
         });
     });

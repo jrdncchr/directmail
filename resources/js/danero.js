@@ -7,12 +7,6 @@ $(function() {
     activateTooltips();
 
     toastr.options = {
-        iconClasses: {
-            error: 'alert-error',
-            info: 'alert-info',
-            success: 'alert-success',
-            warning: 'alert-warning'
-        },
         positionClass: "toast-bottom-right"
     };
 });
@@ -51,4 +45,20 @@ function loading(type, message) {
     } else if (type === "danger") {
         toast = toastr.error(message);
     }
+}
+
+function showConfirmModal(config) {
+    var modal = $('#global-confirm-modal');
+    modal.find('.modal-title').html(config.title);
+    modal.find('.modal-body').html(config.body);
+    modal.find('.btn-main').on('click', config.callback);
+    modal.modal({
+        show: true,
+        backdrop: 'static',
+        keyboard: false
+    });
+}
+
+function hideConfirmModal() {
+    $('#global-confirm-modal').hide();
 }
