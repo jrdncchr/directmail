@@ -93,45 +93,70 @@
                                     </label></th>
                             </tr>
                             </thead>
+                            <tbody></tbody>
+                        </table>
+                        <table class="table" style="margin-bottom: 0 !important;" v-for="permission in module_permissions">
                             <tbody>
-                            <tr v-for="permission in module_permissions">
-                                <td>
-                                    <div v-if="permission.parent_id == 0">
-                                        {{ permission.name }}
-                                    </div>
-                                    <div v-else>
-                                       <span style="padding-left: 50px;">&rightarrow; {{ permission.name }}</span>
-                                    </div>
-                                </td>
-                                <td style="text-align: center !important;">
+                            <tr>
+                                <td width="30%">{{ permission.name }}</td>
+                                <td width="15%">
                                     <label class="control control--checkbox">
                                         <input type="checkbox" v-model="permission.retrieve_action" />
                                         <div class="control__indicator"></div>
                                     </label>
                                 </td>
-                                <td>
+                                <td width="15%">
                                     <label class="control control--checkbox">
                                         <input type="checkbox" v-model="permission.create_action" />
                                         <div class="control__indicator"></div>
                                     </label>
                                 </td>
-                                <td>
+                                <td width="15%">
                                     <label class="control control--checkbox">
                                         <input type="checkbox" v-model="permission.update_action" />
                                         <div class="control__indicator"></div>
                                     </label>
                                 </td>
-                                <td>
+                                <td width="15%">
                                     <label class="control control--checkbox">
                                         <input type="checkbox" v-model="permission.delete_action" />
                                         <div class="control__indicator"></div>
                                     </label>
                                 </td>
                             </tr>
+                            <tr v-if="permission.children.length" v-for="child in permission.children">
+                                <td width="30%" style="padding-left: 50px !important;">&rightarrow; {{ child.name }}</td>
+                                <td width="15%">
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" v-model="child.retrieve_action" />
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                </td>
+                                <td width="15%">
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" v-model="child.create_action" />
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                </td>
+                                <td width="15%">
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" v-model="child.update_action" />
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                </td>
+                                <td width="15%">
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" v-model="child.delete_action" />
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
+
                     </div>
                 </div>
+
             </div>
 
             <div class="panel panel-default">
@@ -173,32 +198,60 @@
                                     </label></th>
                             </tr>
                             </thead>
+                            <tbody></tbody>
+                        </table>
+                        <table class="table" style="margin-bottom: 0 !important;" v-for="permission in list_category_permissions">
                             <tbody>
-                            <tr v-for="permission in list_category_permissions">
-                                <td>
-                                    {{ permission.name }}
-                                </td>
-                                <td style="text-align: center !important;">
+                            <tr>
+                                <td width="30%">{{ permission.name }}</td>
+                                <td width="15%">
                                     <label class="control control--checkbox">
                                         <input type="checkbox" v-model="permission.retrieve_action" />
                                         <div class="control__indicator"></div>
                                     </label>
                                 </td>
-                                <td>
+                                <td width="15%">
                                     <label class="control control--checkbox">
                                         <input type="checkbox" v-model="permission.create_action" />
                                         <div class="control__indicator"></div>
                                     </label>
                                 </td>
-                                <td>
+                                <td width="15%">
                                     <label class="control control--checkbox">
                                         <input type="checkbox" v-model="permission.update_action" />
                                         <div class="control__indicator"></div>
                                     </label>
                                 </td>
-                                <td>
+                                <td width="15%">
                                     <label class="control control--checkbox">
                                         <input type="checkbox" v-model="permission.delete_action" />
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr v-if="permission.children.length" v-for="child in permission.children">
+                                <td width="30%" style="padding-left: 50px !important;">&rightarrow; {{ child.name }}</td>
+                                <td width="15%">
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" v-model="child.retrieve_action" />
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                </td>
+                                <td width="15%">
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" v-model="child.create_action" />
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                </td>
+                                <td width="15%">
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" v-model="child.update_action" />
+                                        <div class="control__indicator"></div>
+                                    </label>
+                                </td>
+                                <td width="15%">
+                                    <label class="control control--checkbox">
+                                        <input type="checkbox" v-model="child.delete_action" />
                                         <div class="control__indicator"></div>
                                     </label>
                                 </td>
@@ -310,7 +363,19 @@
                     } else if (action == 'create') {
                         data.module_permissions[i].create_action = data.module_permissions_all.create;
                     }
-
+                    if (data.module_permissions[i].children.length) {
+                        for (var y in data.module_permissions[i].children) {
+                            if (action == 'retrieve') {
+                                data.module_permissions[i].children[y].retrieve_action = data.module_permissions_all.retrieve;
+                            } else if (action == 'remove') {
+                                data.module_permissions[i].children[y].delete_action = data.module_permissions_all.remove;
+                            } else if (action == 'update') {
+                                data.module_permissions[i].children[y].update_action = data.module_permissions_all.update;
+                            } else if (action == 'create') {
+                                data.module_permissions[i].children[y].create_action = data.module_permissions_all.create;
+                            }
+                        }
+                    }
                 }
             },
             checkAllListCategory: function(action) {
@@ -324,13 +389,26 @@
                     } else if (action == 'create') {
                         data.list_category_permissions[i].create_action = data.list_category_permissions_all.create;
                     }
-
+                    if (data.list_category_permissions[i].children.length) {
+                        for (var y in data.list_category_permissions[i].children) {
+                            if (action == 'retrieve') {
+                                data.list_category_permissions[i].children[y].retrieve_action = data.list_category_permissions_all.retrieve;
+                            } else if (action == 'remove') {
+                                data.list_category_permissions[i].children[y].delete_action = data.list_category_permissions_all.remove;
+                            } else if (action == 'update') {
+                                data.list_category_permissions[i].children[y].update_action = data.list_category_permissions_all.update;
+                            } else if (action == 'create') {
+                                data.list_category_permissions[i].children[y].create_action = data.list_category_permissions_all.create;
+                            }
+                        }
+                    }
                 }
             }
         }
     });
 
     $(function() {
+        console.log(data.list_category_permissions);
         $('#sidebar-management-link').addClass('active');
         $('#sidebar-management-roles-link').addClass('active');
         $('#sidebar-management').addClass('in');

@@ -30,8 +30,10 @@
                     <?php endforeach; ?>
                 <?php else: ?>
                     <?php foreach ($m->children as $child): ?>
-                        <?php if ($sb_module_permissions[$child->id]->retrieve_action): ?>
-                        <a id="sidebar-<?php echo $child->code; ?>-link" href="<?php echo base_url() . $child->link; ?>"><?php echo $child->name; ?></a>
+                        <?php if (isset($sb_module_permissions[$child->id])): ?>
+                            <?php if ($sb_module_permissions[$child->id]->retrieve_action): ?>
+                            <a id="sidebar-<?php echo $child->code; ?>-link" href="<?php echo base_url() . $child->link; ?>"><?php echo $child->name; ?></a>
+                            <?php endif; ?>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>

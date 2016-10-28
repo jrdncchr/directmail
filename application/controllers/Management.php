@@ -57,7 +57,7 @@ class Management extends MY_Controller {
                             array('id' => $id, 'company_id' => $this->logged_user->company_id), false);
                         $this->data['role'] = $role;
                         $this->data['module_permissions'] = $this->role_model->get_module_permissions($role->id);
-                        $this->data['list_category_permissions'] = $this->role_model->get_list_category_permissions($role->id, $this->logged_user->company_id);
+                        $this->data['list_category_permissions'] = $this->role_model->get_category_with_list_permission($role->id, $this->logged_user->company_id);
                         $this->_renderL('management/roles_form');
                     } else {
                         $this->_renderL('management/roles_form');
