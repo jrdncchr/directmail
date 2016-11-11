@@ -47,11 +47,19 @@ function loading(type, message) {
     }
 }
 
+/**
+ * @param  {[array = title, body, callback]}
+ * @return {[void]}
+ */
 function showConfirmModal(config) {
     var modal = $('#global-confirm-modal');
     modal.find('.modal-title').html(config.title);
     modal.find('.modal-body').html(config.body);
-    modal.find('.btn-main').on('click', config.callback);
+    if (undefined !== config.callback) {
+        modal.find('.btn-main').on('click', config.callback);
+    } else {
+        modal.find('.btn-main').hide();
+    }
     modal.modal({
         show: true,
         backdrop: 'static',

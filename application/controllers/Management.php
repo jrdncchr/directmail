@@ -57,14 +57,15 @@ class Management extends MY_Controller {
                             array('id' => $id, 'company_id' => $this->logged_user->company_id), false);
                         $this->data['role'] = $role;
                         $this->data['module_permissions'] = $this->role_model->get_module_permissions($role->id);
-                        $this->data['list_category_permissions'] = $this->role_model->get_category_with_list_permission($role->id, $this->logged_user->company_id);
+                        $this->data['list_category_permissions'] = $this->role_model
+                            ->get_category_with_list_permission($role->id, $this->logged_user->company_id);
                         $this->_renderL('management/roles_form');
                     } else {
                         $this->_renderL('management/roles_form');
                     }
                     break;
                 default:
-                    show_404();
+                    $this->show_404();
             }
         }
     }
@@ -112,12 +113,12 @@ class Management extends MY_Controller {
                     }
                     break;
                 default:
-                    show_404();
+                    $this->show_404();
             }
         }
     }
 
-    public function users($sub = 'index', $id = 0)
+    public function users($sub = 'index', $id = 0, $user_page = "")
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
             $result = array('success' => false);
@@ -154,6 +155,18 @@ class Management extends MY_Controller {
                     $result = $this->user_model->change_password($user_id, $new_password);
                     echo json_encode($result);
                     break;
+                case 'save_module_permissions' :
+                    $user_id = $this->input->post('user_id');
+                    $module_permissions = $this->input->post('module_permissions');
+                    $result = $this->user_model->save_module_permissions($user_id, $module_permissions);
+                    echo json_encode($result);
+                    break;
+                case 'save_list_category_permissions' :
+                    $user_id = $this->input->post('user_id');
+                    $list_category_permissions = $this->input->post('list_category_permissions');
+                    $result = $this->user_model->save_list_category_permissions($user_id, $list_category_permissions);
+                    echo json_encode($result);
+                    break;
                 default :
                     echo json_encode($result);
             }
@@ -171,7 +184,13 @@ class Management extends MY_Controller {
                             array('u.id' => $id, 'u.company_id' => $this->logged_user->company_id), false);
                         if ($user) {
                             $this->data['user'] = $user;
-                            $this->_renderL('management/users_form');
+                            if ($user_page == "permissions") {
+                                $this->data['module_permissions'] = $this->user_model->get_module_permissions($user->id);
+                                $this->data['list_category_permissions'] = $this->user_model->get_category_with_list_permission($user->id, $this->logged_user->company_id);
+                                $this->_renderL('management/users_permissions');
+                            } else {
+                                $this->_renderL('management/users_form');
+                            }
                         } else {
                             show_404();
                         }
@@ -180,7 +199,7 @@ class Management extends MY_Controller {
                     }
                     break;
                 default:
-                    show_404();
+                    $this->show_404();
             }
         }
     }

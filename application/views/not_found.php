@@ -7,7 +7,11 @@
             <p class="lead">
                 Page not found!
             </p>
+            <?php if (isset($logged_user)): ?>
+            <a href="<?php echo base_url() . 'dashboard'?>">Return to Dashboard</a>
+            <?php else: ?>
             <a href="<?php echo base_url() . 'login'?>">Return to Login</a>
+            <?php endif; ?>
         </div>
     </div>
 </div>

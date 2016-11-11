@@ -138,17 +138,17 @@ class Role_model extends CI_Model {
     /*
      * roles_list_category_permission
      */
-    public function get_list_category_permissions($role_id, $category_id)
+    public function get_list_category_permissions($role_id, $company_id)
     {
         $this->db->select('lc.id as _id, lc.name, lc.description, lc.active, rlcp.*');
         $this->db->join('roles_list_category_permission rlcp', 'rlcp.list_category_id = lc.id AND rlcp.role_id = ' . $role_id, 'left');
-        $this->db->where('lc.active', 1);
+        $this->db->where(array('lc.active' => 1, 'lc.deleted' => 0));
         $permission = $this->db->get('list_category lc')->result();
         if ($permission) {
             return $permission;
         } else {
-            $this->_create_new_list_category_permissions_for_new_role($role_id, $category_id);
-            return $this->get_list_category_permissions($role_id, $category_id);
+            $this->_create_new_list_category_permissions_for_new_role($role_id, $company_id);
+            return $this->get_list_category_permissions($role_id, $company_id);
         }
     }
 
@@ -174,7 +174,7 @@ class Role_model extends CI_Model {
                 $this->db->where('id', $lcp['id']);
                 $this->db->update('roles_list_category_permission', $permission);
             } else {
-                $permission['list_category_id'] = $lcp['lc_id'];
+                $permission['list_category_id'] = $lcp['_id'];
                 $permission['role_id'] = $role_id;
                 $this->db->insert('roles_list_category_permission', $permission);
             }
@@ -190,17 +190,17 @@ class Role_model extends CI_Model {
     /*
      * roles_list_permission
      */
-    public function get_list_permissions($role_id, $category_id)
+    public function get_list_permissions($role_id, $company_id)
     {
         $this->db->select('l.id as _id, l.name, l.active, l.list_category_id, rlp.*');
         $this->db->join('roles_list_permission rlp', 'rlp.list_id = l.id AND rlp.role_id = ' . $role_id, 'left');
-        $this->db->where('l.active', 1);
+        $this->db->where(array('l.deleted' => 0, 'l.active' => 1));
         $permission = $this->db->get('list l')->result();
         if ($permission) {
             return $permission;
         } else {
-            $this->_create_new_list_permissions_for_new_role($role_id, $category_id);
-            return $this->get_list_permissions($role_id, $category_id);
+            $this->_create_new_list_permissions_for_new_role($role_id, $company_id);
+            return $this->get_list_permissions($role_id, $company_id);
         }
     }
 

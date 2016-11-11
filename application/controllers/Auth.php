@@ -80,6 +80,7 @@ class Auth extends MY_Controller {
 
     public function not_found()
     {
+        $this->output->set_status_header('404');
         $this->_render('not_found');
     }
 

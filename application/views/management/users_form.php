@@ -3,7 +3,7 @@
     <ol class="breadcrumb">
         <li><a>Management</a></li>
         <li><a href="<?php echo base_url() . 'management/users'; ?>">Users</a></li>
-        <li><a class="active"><?php echo isset($user) ? 'Edit User' : 'Create New User'; ?></a></li>
+        <li><a class="active"><?php echo isset($user) ? $user->first_name . ' ' . $user->last_name : 'Create New User'; ?></a></li>
     </ol>
 
     <div class="row">
@@ -25,14 +25,40 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label for="role">* Role</label>
-                                <select class="form-control required" id="role" v-model="form.user_details.role_id">
-                                    <option value="">Select Role</option>
+                                <select class="form-control" id="role" v-model="form.user_details.role_id">
+                                    <option value="0">No Role</option>
                                     <?php foreach ($roles as $role): ?>
                                         <option value="<?php echo $role->id; ?>"><?php echo $role->name; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>
+                        <?php if (isset($user)): ?>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label>User Permission</label>
+                                <a href="<?php echo base_url() . 'management/users/form/' . $user->id . '/permissions'; ?>" class="btn btn-default btn-block btn-xs">
+                                    <i class="fa fa-key"></i>
+                                    Manage User Permission
+                                </a>
+                            </div>
+
+                        </div>
+                        <?php else: ?>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>User Permission</label>
+                                    <p class="text-info" style="font-size: 14px;">
+                                        <i class="fa fa-key"></i>
+                                        Save the user first to manage user permission.
+                                    </p>
+                                </div>
+
+                            </div>
+                        <?php endif; ?>
+
+                    </div>
+                    <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label for="email">* Email Address</label>
@@ -40,6 +66,14 @@
                                        class="form-control email required"
                                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" maxlength="100"
                                        title="Please enter your valid email address." />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="contact_no">* Contact No.</label>
+                                <input name="contact_no" type="text" v-model="form.user_details.contact_no"
+                                       class="form-control required" required maxlength="20"
+                                       title="Enter your contact number." />
                             </div>
                         </div>
                     </div>
@@ -61,25 +95,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="contact_no">* Contact No.</label>
-                                <input name="contact_no" type="text" v-model="form.user_details.contact_no"
-                                       class="form-control required" required maxlength="20"
-                                       title="Enter your contact number." />
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="birth_date">* Birth date</label>
-                                <input name="birth_date" id="birth_date" type="date" v-model="form.user_details.birth_date"
-                                       class="form-control datepicker-here required" required maxlength="45"
-                                       title="Enter your birth date." data-language='en' data-date-format="yyyy-mm-dd" readonly  />
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
@@ -129,14 +144,13 @@
                 first_name: <?php echo isset($user) ? json_encode($user->first_name) : json_encode(''); ?>,
                 last_name: <?php echo isset($user) ? json_encode($user->last_name) : json_encode(''); ?>,
                 contact_no: <?php echo isset($user) ? json_encode($user->contact_no) : json_encode(''); ?>,
-                birth_date: <?php echo isset($user) ? json_encode($user->birth_date) : json_encode(''); ?>,
                 role_id: <?php echo isset($user) ? json_encode($user->role_id) : json_encode(''); ?>
             },
             password: {
                 new_password: '',
                 confirm_password: ''
             }
-        },
+        }
     };
 
     var vm = new Vue({
@@ -151,7 +165,7 @@
                     $.post(actionUrl, { action: 'save', form: data.form.user_details }, function(res) {
                         validator.displayAlertSuccess(userForm, true, 'Saving user details successful!');
                         if (res.success && data.form.user_details.id == '') {
-                            window.location = actionUrl + "/form/" + res.id;
+                            window.location = actionUrl + "/form/" + res.user_id;
                         } else if(!res.success) {
                             validator.displayAlertError(userForm, true, res.message);
                         }
@@ -163,7 +177,11 @@
                 if (validator.validateForm(passwordForm)) {
                     if (data.form.password.new_password == data.form.password.confirm_password) {
                         loading("info", "Changing password...");
-                        $.post(actionUrl, { action: 'change_password', form: data.form.password }, function(res) {
+                        $.post(actionUrl, { 
+                            action: 'change_password', 
+                            user_id: data.form.user_details.id,
+                            new_password: data.form.password.new_password 
+                        }, function(res) {
                             if (res.success) {
                                 validator.displayAlertSuccess(passwordForm, true, 'Change password successful!');
                                 data.form.password.new_password = '';

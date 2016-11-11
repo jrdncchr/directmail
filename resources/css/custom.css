@@ -32,7 +32,6 @@ a:focus, button:focus, a:hover, a:active {
 }
 
 h3 {
-    text-align: center;
     font-size: 20px;
     font-weight: lighter !important;
 }
@@ -249,12 +248,12 @@ td, th, tr {
 th {
     background: #BD3738;  /* Darken header a bit */
     color: ghostwhite;
-    font-size: 16px;
+    font-size: 15px;
     padding: 8px !important;
 }
 
 td {
-    font-size: 16px;
+    font-size: 14px;
     padding: 8px !important;
 }
 

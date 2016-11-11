@@ -8,8 +8,9 @@
     <div class="row">
         <div class="col-sm-10 col-sm-offset-1" style="padding-top: 20px;">
             <h1 class="text-center logo">Direct Mail</h1>
+            <h2 class="text-center">Registration</h2>
             <br />
-            <h3>Registration</h3>
+            <h3>User Information</h3>
             <div class="notice"><?php echo $this->session->flashdata('message'); ?></div>
             <form id="register-form" action="<?php echo base_url() . 'auth/register/' . $company->company_key; ?>"
                   method="post" onsubmit="return validateRegisterForm();">
@@ -60,15 +61,10 @@
                                        value="<?php echo isset($info) ? $info['contact_no'] : ''; ?>" />
                             </div>
                         </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="birth_date">* Birth date</label>
-                                <input name="birth_date" id="birth_date" type="text" class="form-control datepicker-here required"
-                                       required maxlength="45" title="Enter your birth date." data-language='en' data-date-format="yyyy-mm-dd"
-                                       value="<?php echo isset($info) ? $info['birth_date'] : ''; ?>" readonly  />
-                            </div>
-                        </div>
                     </div>
+                </div>
+                <h3>Password</h3>
+                <div class="well">
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">

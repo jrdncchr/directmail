@@ -3,7 +3,7 @@
         Direct Mail
     </a>
     <?php foreach ($modules as $m): ?>
-    <?php if ($sb_module_permissions[$m->id]->retrieve_action): ?>
+    <?php if ($mc->_checkModulePermission($m->id, 'retrieve')): ?>
     <div class="panel panel-sidebar" id="panel-sidebar">
         <?php if (sizeof($m->children) > 0 || $m->code == "list") { ?>
         <a role="button" data-toggle="collapse" data-parent="#panel-sidebar" href="#sidebar-<?php echo $m->code; ?>" aria-expanded="true" aria-controls="sidebar-<?php echo $m->code; ?>">
@@ -23,18 +23,19 @@
         <div id="sidebar-<?php echo $m->code; ?>" class="panel-collapse collapse" role="tabpanel">
             <div class="panel-body">
                 <?php if ($m->code == "list"): ?>
-                    <?php foreach ($sb_list_category_permissions as $lcp): ?>
-                        <?php if ($lcp->retrieve_action == 1): ?>
-                            <a id="sidebar-list-category-<?php echo $lcp->id; ?>-link" href="<?php echo base_url() . 'lists/category/' . $lcp->id;?>"><?php echo $lcp->name; ?></a>
+                    <?php foreach ($list_category_permissions as $lcp): ?>
+                        <?php if ($mc->_checkListCategoryPermission($lcp->_id, 'retrieve')): ?>
+                            <a id="sidebar-list-category-<?php echo $lcp->_id; ?>-link" href="<?php echo base_url() . 'lists/category/' . $lcp->_id;?>"><?php echo $lcp->name; ?></a>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <?php foreach ($m->children as $child): ?>
-                        <?php if (isset($sb_module_permissions[$child->id])): ?>
-                            <?php if ($sb_module_permissions[$child->id]->retrieve_action): ?>
-                            <a id="sidebar-<?php echo $child->code; ?>-link" href="<?php echo base_url() . $child->link; ?>"><?php echo $child->name; ?></a>
-                            <?php endif; ?>
-                        <?php endif; ?>
+                        <a id="sidebar-<?php echo $child->code; ?>-link" href="<?php echo base_url() . $child->link; ?>"><?php echo $child->name; ?></a>
+<!--                        --><?php //if (isset($sb_module_permissions[$child->id])): ?>
+<!--                            --><?php //if ($sb_module_permissions[$child->id]->retrieve_action): ?>
+<!--                            -->
+<!--                            --><?php //endif; ?>
+<!--                        --><?php //endif; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>

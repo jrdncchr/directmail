@@ -1,7 +1,8 @@
 {
 	"require": {
 		"php": ">=5.2.4",
-        "sendgrid/sendgrid": "~5.0.4"
+        "sendgrid/sendgrid": "~5.0.4",
+		"fzaninotto/faker": "^1.6"
 	},
 	"suggest": {
 		"paragonie/random_compat": "Provides better randomness in PHP 5.x"

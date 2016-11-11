@@ -56,10 +56,17 @@ ol.breadcrumb a.active {
 .panel {
     border-radius: 0 !important;
 }
+.panel-heading {
+    border-radius: 0 !important;
+}
 
 /*.panel-default .panel-heading {*/
     /*background: aliceblue;*/
 /*}*/
+
+.text-success {
+    font-size: 14px !important;
+}
 
 .btn-success {
     background: green;
@@ -69,7 +76,7 @@ ol.breadcrumb a.active {
 
 .btn-default {
     background: white;
-    box-shadow: 0 2px 0 0 #c2c2c2 !important;
+    box-shadow: 0 3px 0 0 #c2c2c2 !important;
 }
 
 .btn-danger {
@@ -88,4 +95,30 @@ ol.breadcrumb a.active {
 
 .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
     background-color: #FCE8EA;
+}
+
+.nav-tabs li a {
+    font-size: 15px;
+     border-radius: 0 !important;
+     color: #bd3738;
+}
+
+.nav-tabs li.active a:hover {
+    cursor: pointer;
+}
+
+.tab-pane {
+    background: white;
+    padding: 20px;
+    padding-top: 25px;
+    border: 1px solid #ddd;
+    border-top: none;
+}
+
+.tab-content {
+    margin-bottom: 25px;
+}
+
+code {
+    font-size: 12px;
 }

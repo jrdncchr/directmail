@@ -16,48 +16,17 @@
     }
 </style>
 <div id="app">
-    <h2><?php echo isset($role) ? 'Edit Role' : 'Create New Role'; ?></h2>
+    <h2>User Permission</h2>
     <ol class="breadcrumb">
         <li><a>Management</a></li>
-        <li><a href="<?php echo base_url() . 'management/roles'; ?>">Roles</a></li>
-        <li><a class="active"><?php echo isset($role) ? 'Edit Role' : 'Create New Role'; ?></a></li>
+        <li><a href="<?php echo base_url() . 'management/users'; ?>">Users</a></li>
+        <li><a href="<?php echo base_url() . 'management/users/form/' . $user->id; ?>"><?php echo $user->first_name . ' ' . $user->last_name; ?></a></li>
+        <li><a class="active">User Permission</a></li>
     </ol>
 
     <div class="row">
         <div class="col-sm-12">
-            <?php if (isset($role)): ?>
-            <button class="btn btn-default btn-xs" style="margin-bottom: 10px;" v-on:click="deleteRole"><i class="fa fa-trash-o"></i> Delete Role</button>
-            <?php else: ?>
-            <div class="alert alert-info"><i class="fa fa-info-circle"></i> Save the Role Details first in order to modify the Role Permission.</div>
-            <?php endif; ?>
-            <div id="role-details-form">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Role Details
-                        <button class="btn btn-default btn-xs pull-right" v-on:click="saveRoleDetails"><i class="fa fa-save"></i> Save</button>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="notice"></div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="name">* Name</label>
-                                    <input name="name" type="text" class="form-control" required
-                                           title="Role Name" v-model="role_details.name" />
-                                </div>
-                            </div>
-                            <div class="col-sm-8">
-                                <div class="form-group">
-                                    <label for="description">* Description</label>
-                                    <input name="description" type="text" class="form-control" required
-                                           title="Role Description" v-model="role_details.description" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <?php if (isset($role)): ?>
+            <h3><?php echo $user->first_name . ' ' . $user->last_name; ?></h3>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Page Permissions
@@ -265,7 +234,6 @@
                     </div>
                 </div>
             </div>
-            <?php endif; ?>
         </div>
     </div>
     <br />
@@ -273,14 +241,10 @@
 </div>
 
 <script>
-    var actionUrl = "<?php echo base_url() . 'management/roles'; ?>";
+    var actionUrl = "<?php echo base_url() . 'management/users'; ?>";
 
     var data = {
-        role_details: {
-            id: <?php echo isset($role) ?  json_encode($role->id) : json_encode(''); ?>,
-            name: <?php echo isset($role) ?  json_encode($role->name) : json_encode(''); ?>,
-            description: <?php echo isset($role) ?  json_encode($role->description) : json_encode(''); ?>
-        },
+        user_id : <?php echo json_encode($user->id) ?>,
         module_permissions_all : {
             retrieve: 0,
             remove: 0,
@@ -301,28 +265,15 @@
         el: "#app",
         data: data,
         methods: {
-            saveRoleDetails: function() {
-                var roleDetailsForm = $('#role-details-form');
-                if(validator.validateForm(roleDetailsForm)) {
-                    loading("info", "Saving role details...");
-                    $.post(actionUrl, { action: 'save_role_details', form: data.role_details }, function(res) {
-                        loading('success', 'Save successful!');
-                        if (res.success && data.role_details.id == '') {
-                            window.location = actionUrl + "management/roles/form/" + res.id;
-                        }
-                    }, 'json');
-                }
-            },
             saveModulePermissions: function() {
                 loading("info", "Saving role page permissions...");
                 $.post(actionUrl, {
                     action: 'save_module_permissions',
-                    role_id: data.role_details.id,
+                    user_id: data.user_id,
                     module_permissions: data.module_permissions
                 }, function(res) {
-                    loading('success', 'Save successful!');
-                    if (res.success && data.role_details.id == '') {
-                        window.location = actionUrl + "management/roles/form/" + res.id;
+                    if (res.success) {
+                        loading('success', 'Save successful!');
                     }
                 }, 'json');
             },
@@ -330,31 +281,13 @@
                 loading("info", "Saving list category permissions...");
                 $.post(actionUrl, {
                     action: 'save_list_category_permissions',
-                    role_id: data.role_details.id,
+                    user_id: data.user_id,
                     list_category_permissions: data.list_category_permissions
                 }, function(res) {
-                    loading('success', 'Save successful!');
-                    if (res.success && data.role_details.id == '') {
-                        window.location = actionUrl + "management/roles/form/" + res.id;
+                    if (res.success) {
+                        loading('success', 'Save successful!');
                     }
                 }, 'json');
-            },
-            deleteRole: function() {
-                showConfirmModal({
-                    title: 'Delete Role',
-                    body: 'Are you sure to delete this role?',
-                    callback: function() {
-                        loading("info", "Deleting role...");
-                        $.post(actionUrl, { action: 'delete', role_id: data.role_details.id }, function(res) {
-                            if (res.success) {
-                                hideConfirmModal();
-                                window.location = actionUrl;
-                            } else {
-                                loading('danger', res.message);
-                            }
-                        }, 'json');
-                    }
-                });
             },
             checkAllModule: function(action) {
                 for (var i in data.module_permissions) {
@@ -413,7 +346,7 @@
 
     $(function() {
         $('#sidebar-management-link').addClass('active');
-        $('#sidebar-management-roles-link').addClass('active');
+        $('#sidebar-management-users-link').addClass('active');
         $('#sidebar-management').addClass('in');
     });
 </script>

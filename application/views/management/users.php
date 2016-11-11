@@ -38,7 +38,7 @@
         $('#sidebar-management').addClass('in');
 
         dt = $('table').dataTable({
-            "order": [[ 0, "asc" ]],
+            "order": [[ 4, "asc" ]],
             "bDestroy": true,
             "filter": true,
             "ajax": {
@@ -47,7 +47,11 @@
                 "data": {action: "list"}
             },
             columns: [
-                { data: "role_name" },
+                { data: "role_name",
+                    render: function(data, type, row) {
+                        return data ? data : "No Role";
+                    }
+                },
                 { data: "email" },
                 { data: "name" },
                 { data: "contact_no" },

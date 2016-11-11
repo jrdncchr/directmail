@@ -7,7 +7,9 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <a href="<?php echo base_url() . 'lists/category/' . $list_category->id . '/add'; ?>" class="btn btn-sm btn-default" style="margin-bottom: 20px;"><i class="fa fa-plus-circle"></i> Add a list</a>
+            <?php if ($mc->_checkListCategoryPermission($list_category->_id, 'create')): ?>
+                <a href="<?php echo base_url() . 'lists/info/new'; ?>" class="btn btn-sm btn-default" style="margin-bottom: 20px;"><i class="fa fa-plus-circle"></i> Add a list</a>
+            <?php endif; ?>
             <div class="table-responsive" style="width: 100%;">
                 <table class="table table-bordered table-hover" width="100%">
                     <thead>
@@ -26,7 +28,7 @@
 <script>
     var dt;
     var actionUrl = "<?php echo base_url() . 'lists/category'; ?>";
-    var sidebarListCategoryId = "<?php echo 'sidebar-list-category-' . $list_category->id . '-link'; ?>";
+    var sidebarListCategoryId = "<?php echo 'sidebar-list-category-' . $list_category->_id . '-link'; ?>";
 
     $(function() {
         $('#sidebar-list-link').addClass('active');
@@ -42,7 +44,7 @@
                 "url": actionUrl,
                 "data":  {
                     action: "list",
-                    list_category_id: <?php echo json_encode($list_category->id); ?>
+                    list_category_id: <?php echo json_encode($list_category->_id); ?>
                 }
             },
             columns: [
@@ -59,7 +61,16 @@
                 $('table tbody tr').on('click', function () {
                     var pos = table.fnGetPosition(this);
                     var data = table.fnGetData(pos);
-//                    window.location = baseUrl + 'lists/index/' + data.id;
+                    $.post(actionUrl, {action: 'check_list_permission', list_id: data.id}, function(res) {
+                        if (res.success) {
+                            window.location = baseUrl + "lists/info/" + data.id;
+                        } else {
+                            showConfirmModal({
+                                title: "Permission Denied",
+                                body: "You don't have permission for this list."
+                            });
+                        }
+                    }, 'json');
                 });
             },
             "language": {
