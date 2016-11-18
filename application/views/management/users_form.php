@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-sm-12">
             <?php if (isset($user)): ?>
-            <button class="btn btn-default btn-xs" style="margin-bottom: 10px;" v-on:click="deleteUser"><i class="fa fa-trash-o"></i> Delete User</button>
+            <button class="btn btn-xs" style="margin-bottom: 10px;" v-on:click="deleteUser"><i class="fa fa-trash-o"></i> Delete User</button>
             <?php else: ?>
             <div class="alert alert-info"><i class="fa fa-question-circle"></i> Password will be sent to the email address after saving.</div>
             <?php endif; ?>
@@ -17,7 +17,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     User Details
-                    <button class="btn btn-default btn-xs pull-right" v-on:click="saveUserDetails"><i class="fa fa-save"></i> Save</button>
+                    <button class="btn btn-main btn-xs pull-right" v-on:click="saveUserDetails"><i class="fa fa-save"></i> Save</button>
                 </div>
                 <div class="panel-body" id="user-form">
                     <div class="notice"></div>
@@ -103,7 +103,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Change Password
-                    <button class="btn btn-default btn-xs pull-right" v-on:click="changePassword"><i class="fa fa-save"></i> Save</button>
+                    <button class="btn btn-main btn-xs pull-right" v-on:click="changePassword"><i class="fa fa-save"></i> Save</button>
                 </div>
                 <div class="panel-body" id="password-form">
                     <div class="notice"></div>

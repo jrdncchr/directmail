@@ -6,6 +6,7 @@ class Management extends MY_Controller {
     function __construct()
     {
         parent::__construct(true);
+        $this->data['page_title'] = "Management";
     }
 
     public function roles($sub = "index", $id = 0)

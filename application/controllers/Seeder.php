@@ -2,17 +2,53 @@
 
 class Seeder extends CI_Controller {
 
+    public function user($count = 20) 
+    {
+        if (is_cli()) {
+            $this->load->model('user_model');
+            $this->user_model->truncate();
+            $admin = array(
+                'id' => 2,
+                'email' => 'directmail@gmail.com',
+                'first_name' => 'Jordan',
+                'last_name' => 'Cachero',
+                'contact_no' => '09162553791',
+                'company_id' => 1,
+                'role_id' => 3,
+                'deleted' => 0,
+                'confirmed' => 1
+            );
+            $this->user_model->add_test_user($admin);
+
+            $faker = Faker\Factory::create();
+            for ($i = 0; $i < $count; $i++) {
+                $user = array(
+                    'email' => $faker->email,
+                    'first_name' => $faker->firstName,
+                    'last_name' => $faker->lastName,
+                    'contact_no' => $faker->phoneNumber,
+                    'company_id' => 1,
+                    'role_id' => 0,
+                    'deleted' => 0,
+                    'confirmed' => 1
+                );
+                $this->user_model->add_test_user($user);
+            }
+        }
+    }
+
     public function property($count = 100)
     {
         if (is_cli()) {
             $this->load->model('property_model');
             $this->property_model->truncate();
+            $this->property_model->truncate_comment();
 
             $faker = Faker\Factory::create();
             for ($i = 0; $i < $count; $i++) {
                 $property = array(
                     'list_id' => rand(1, 3),
-                    'status' => 'active',
+                    'status' => 'pending',
                     'funeral_home' => $faker->address,
                     'deceased_first_name' => $faker->firstName,
                     'deceased_middle_name' => $faker->lastName,
@@ -43,9 +79,20 @@ class Seeder extends CI_Controller {
                     'start_quarterly_mail' => rand(0, 1),
                     'elligible_letter_mailings' => rand(0, 1),
                     'elligible_postcard_mailings' => rand(0, 1),
-                    'added_by' => rand(1, 50)
+                    'created_by' => rand(1, 50)
                 );
-                $this->property_model->save($property);
+                $result = $this->property_model->save($property);
+
+                for ($x = 0; $x < rand(3, 10); $x++) {
+                    $comment = array(
+                        'property_id' => $result['id'],
+                        'type' => 'comment',
+                        'user_id' => rand(2, 22),
+                        'comment' => $faker->sentence,
+                        'date_created' => $faker->dateTimeThisMonth()->format('Y-m-d H:i:s')
+                    );
+                    $this->property_model->save_comment($comment);
+                }
             }
         }
     }

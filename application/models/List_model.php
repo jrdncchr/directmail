@@ -49,6 +49,16 @@ class List_model extends CI_Model {
         return array('success' => true, 'id' =>  $list['id']);
     }
 
+    public function delete($list_id)
+    {
+        $result = array('success' => false);
+        $this->db->where('id', $list_id);
+        if ($this->db->update('list', array('deleted' => 1))) {
+            $result['success'] = true;
+        };
+       return $result;
+    }
+
     public function check_list_name_exists($list_name, $company_id) 
     {
         $exist = $this->db->get_where('list', 
@@ -59,11 +69,6 @@ class List_model extends CI_Model {
                 'active' => 1
             ));
         return $exist->num_rows() > 0 ? true : false;
-    }
-
-    public function delete($id)
-    {
-        return $this->save(array('id' => $id, 'deleted' => 1));
     }
 
     /*

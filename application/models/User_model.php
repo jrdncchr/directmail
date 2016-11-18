@@ -148,6 +148,28 @@ class User_model extends CI_Model {
         return $result;
     }
 
+    public function add_test_user($user)
+    {
+        $this->db->insert('user', $user);
+        $user_id = $this->db->insert_id();
+
+        $salt = generate_random_str(20);
+        $password = crypt('jordan', $salt);
+        $confirmation_key = generate_random_str(100);
+        $this->db->insert('user_secret',
+            array(
+                'user_id'           => $user_id,
+                'password'          => $password,
+                'confirmation_key'  => $confirmation_key
+            )
+        );
+    }
+
+    public function truncate()
+    {
+        $this->db->truncate('user');
+    }
+
     /*
      * Default CRUD
      */

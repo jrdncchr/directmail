@@ -6,8 +6,8 @@
     </ol>
 
     <div class="row">
-        <div class="col-sm-12">
-            <a href="<?php echo base_url() . 'management/roles/form'; ?>" class="btn btn-sm btn-default" style="margin-bottom: 20px;"><i class="fa fa-plus-circle"></i> Add Role</a>
+        <div class="col-sm-12 panel-white">
+            <a href="<?php echo base_url() . 'management/roles/form'; ?>" class="btn btn-xs btn-default" style="margin-bottom: 20px;"><i class="fa fa-plus-circle"></i> Add Role</a>
             <div class="table-responsive" style="width: 100%;">
                 <table class="table table-bordered table-hover">
                     <thead>

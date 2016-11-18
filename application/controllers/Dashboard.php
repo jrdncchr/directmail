@@ -6,6 +6,7 @@ class Dashboard extends MY_Controller {
     function __construct()
     {
         parent::__construct(true);
+        $this->data['page_title'] = "Dashboard";
     }
 
 	public function index()

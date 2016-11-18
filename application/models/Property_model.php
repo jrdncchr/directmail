@@ -40,6 +40,7 @@ class Property_model extends CI_Model {
 
     public function save($property)
     {
+        $property['last_update'] = date('Y-m-d H:i:s');
         if (isset($property['id']) && $property['id'] > 0) {
             $this->db->where('id', $property['id']);
             $this->db->update('property', $property);
@@ -60,4 +61,33 @@ class Property_model extends CI_Model {
         $this->db->truncate('property');
     }
 
+    public function save_comment($comment)
+    {
+        $this->db->insert('property_comment', $comment);
+        $comment['id'] = $this->db->insert_id();
+        return array('success' => true, 'id' =>  $comment['id']);
+    }
+
+    public function get_comment($where = array(), $list = true)
+    {
+        $this->db->select('pc.*, u.first_name, u.last_name');
+        $this->db->join('user u', 'u.id = pc.user_id', 'left');
+        $this->db->order_by('date_created', 'desc');
+        $result = $this->db->get_where('property_comment pc', $where);
+        return $list ? $result->result() : $result->row();
+    }
+
+    public function truncate_comment()
+    {
+        $this->db->truncate('property_comment');
+    }
+
+    public function get_pending_properties($company_id) 
+    {
+        $this->db->select('p.*, l.name as list_name');
+        $this->db->join('list l', 'l.id = p.list_id');
+        $this->db->where(array('l.company_id' => $company_id, 'p.status' => 'pending'));
+        $result = $this->db->get('property p');
+        return $result->result();
+    }
 } 

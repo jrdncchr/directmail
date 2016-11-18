@@ -18,7 +18,7 @@
 }
 
 .btn {
-    /*box-shadow: 0 3px 0 0 #c0c0c0;*/
+    box-shadow: 0 3px 0 0 #c0c0c0;
     border-radius: 0;
     font-weight: normal !important;
     font-size: 20px;
@@ -59,12 +59,20 @@ ol.breadcrumb a.active {
 .panel-heading {
     border-radius: 0 !important;
 }
+.panel-white {
+    padding: 25px 15px;
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    border-radius: 0 !important;
+    background: white;
+}
 
 /*.panel-default .panel-heading {*/
     /*background: aliceblue;*/
 /*}*/
 
-.text-success {
+.text-success, .text-danger, .text-warning {
     font-size: 14px !important;
 }
 

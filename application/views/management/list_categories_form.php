@@ -9,13 +9,13 @@
     <div class="row">
         <div class="col-sm-12">
             <?php if (isset($list_category)): ?>
-            <button class="btn btn-default btn-xs" style="margin-bottom: 10px;" v-on:click="deleteListCategory"><i class="fa fa-trash-o"></i> Delete List Category</button>
+            <button class="btn btn-xs" style="margin-bottom: 10px;" v-on:click="deleteListCategory"><i class="fa fa-trash-o"></i> Delete List Category</button>
             <?php endif; ?>
             <div id="list-category-form">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         List Category Details
-                        <button class="btn btn-default btn-xs pull-right" v-on:click="save"><i class="fa fa-save"></i> Save</button>
+                        <button class="btn btn-main btn-xs pull-right" v-on:click="save"><i class="fa fa-save"></i> Save</button>
                     </div>
                     <div class="panel-body">
                         <div class="row">

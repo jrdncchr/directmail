@@ -70,3 +70,7 @@ function showConfirmModal(config) {
 function hideConfirmModal() {
     $('#global-confirm-modal').hide();
 }
+
+function capitalize(str) {
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}

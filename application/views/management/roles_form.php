@@ -26,7 +26,7 @@
     <div class="row">
         <div class="col-sm-12">
             <?php if (isset($role)): ?>
-            <button class="btn btn-default btn-xs" style="margin-bottom: 10px;" v-on:click="deleteRole"><i class="fa fa-trash-o"></i> Delete Role</button>
+            <button class="btn btn-xs" style="margin-bottom: 10px;" v-on:click="deleteRole"><i class="fa fa-trash-o"></i> Delete Role</button>
             <?php else: ?>
             <div class="alert alert-info"><i class="fa fa-info-circle"></i> Save the Role Details first in order to modify the Role Permission.</div>
             <?php endif; ?>
@@ -34,7 +34,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Role Details
-                        <button class="btn btn-default btn-xs pull-right" v-on:click="saveRoleDetails"><i class="fa fa-save"></i> Save</button>
+                        <button class="btn btn-main btn-xs pull-right" v-on:click="saveRoleDetails"><i class="fa fa-save"></i> Save</button>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -61,7 +61,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Page Permissions
-                    <button class="btn btn-default btn-xs pull-right" v-on:click="saveModulePermissions"><i class="fa fa-save"></i> Save</button>
+                    <button class="btn btn-main btn-xs pull-right" v-on:click="saveModulePermissions"><i class="fa fa-save"></i> Save</button>
                 </div>
                 <div class="panel-body" style="padding-top: 0; padding-bottom: 0;">
                     <div class="row">
@@ -166,7 +166,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     List Category Permissions
-                    <button class="btn btn-default btn-xs pull-right" v-on:click="saveListCategoryPermissions"><i class="fa fa-save"></i> Save</button>
+                    <button class="btn btn-main btn-xs pull-right" v-on:click="saveListCategoryPermissions"><i class="fa fa-save"></i> Save</button>
                 </div>
                 <div class="panel-body" style="padding-top: 0; padding-bottom: 0;">
                     <div class="row">

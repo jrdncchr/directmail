@@ -6,6 +6,7 @@ class Lists extends MY_Controller {
     function __construct()
     {
         parent::__construct(true);
+        $this->data['page_title'] = "Lists";
     }
 
     public function category($id = 0, $sub = "index")
@@ -38,7 +39,7 @@ class Lists extends MY_Controller {
                     case 'index' :
                         if ($this->_checkListCategoryPermission($id, 'retrieve')) {
                             $this->data['list_category'] = $this->list_category_permissions[$id];
-                            $this->_renderL('lists/index');
+                            $this->_renderL('lists/category');
                             return;
                         }
                         break;
@@ -83,6 +84,10 @@ class Lists extends MY_Controller {
                         $list['active'] = 1;
                     }
                     $result = $this->list_model->save($list);
+                    break;
+                case 'delete_list' :
+                    $list_id = $this->input->post('list_id');
+                    $result = $this->list_model->delete($list_id);
                     break;
                 case 'save_paragraphs' :
                     $list_id = $this->input->post('list_id');
@@ -166,18 +171,47 @@ class Lists extends MY_Controller {
         }
     }
 
-    public function property($list_id, $sub = "info", $property_id = 0) 
+    public function property($list_id = 0, $sub = "info", $property_id = 0) 
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
             $action = $this->input->post('action');
             switch ($action) {
                 case 'save_property':
+                    $this->load->model('property_model');
+                    $property = $this->input->post('form');
+                    $property['created_by'] = $this->logged_user->id;
+                    $result = $this->property_model->save($property);
+                    echo json_encode($result);
+                    break;
+                case 'delete_property':
+                    $this->load->model('property_model');
+                    $id = $this->input->post('id');
+                    $result = $this->property_model->delete($id);
+                    echo json_encode($result);
+                    break;
+                case 'save_comment':
+                    $this->load->model('property_model');
+                    $comment = array(
+                        'property_id' => $this->input->post('property_id'),
+                        'comment' => $this->input->post('comment'),
+                        'user_id' => $this->logged_user->id,
+                        'type' => 'comment'
+                    );
+                    $result = $this->property_model->save_comment($comment);
+                    echo json_encode($result);
+                    break;
+                case 'get_comments':
+                    $this->load->model('property_model');
+                    $property_id = $this->input->post('property_id');
+                    $result = $this->property_model->get_comment(array('property_id' => $property_id));
+                    echo json_encode($result);
                     break;
                 default:
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));
             }
         } else {
             switch ($sub) {
+                case 'new':
                 case 'info':
                     if ($this->_checkListPermission($list_id, 'retrieve')) {
                         // list
@@ -190,9 +224,12 @@ class Lists extends MY_Controller {
                         $this->data['list_category'] = $this
                             ->list_category_permissions[$this->data['list']->list_category_id];
                         // Property
-                        $this->load->model('property_model');
-                        $this->data['property'] = $this->property_model->get(
-                            array('p.id' => $property_id, 'p.list_id' => $list_id), false);
+                        if ($property_id > 0) {
+                            $this->load->model('property_model');
+                            $this->data['property'] = $this->property_model->get(
+                                array('p.id' => $property_id, 'p.list_id' => $list_id), false);
+                            $this->data['comments'] = $this->property_model->get_comment(array('property_id' => $property_id));
+                        }
                         $this->_renderL('lists/property');
                         return;
                     }

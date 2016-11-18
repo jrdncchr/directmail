@@ -241,9 +241,9 @@ class MY_Controller extends CI_Controller
         $data['css'] = $this->css;
         $data['js'] = $this->js;
         $data['bower'] = $this->bower;
-        $data['head'] = $this->load->view('templates/head', $data, true);
+        $data['head'] = $this->load->view('layouts/head', $data, true);
         $data['content'] = $this->load->view($view, $data, true);
-        $this->load->view('templates/skeleton', $data);
+        $this->load->view('layouts/skeleton', $data);
     }
 
     public function _renderL($view)
@@ -252,13 +252,13 @@ class MY_Controller extends CI_Controller
         $data['css'] = $this->css;
         $data['js'] = $this->js;
         $data['bower'] = $this->bower;
-        $data['head'] = $this->load->view('templates/logged/head', $data, true);
+        $data['head'] = $this->load->view('layouts/logged/head', $data, true);
 
         $this->load->model('module_model');
         $data['modules'] = $this->module_model->get();
-        $data['nav'] = $this->load->view('templates/logged/nav', $data, true);
+        $data['nav'] = $this->load->view('layouts/logged/nav', $data, true);
         $data['content'] = $this->load->view($view, $data, true);
-        $this->load->view('templates/logged/skeleton', $data);
+        $this->load->view('layouts/logged/skeleton', $data);
     }
 
     public function _renderA($view)
@@ -267,10 +267,10 @@ class MY_Controller extends CI_Controller
         $data['css'] = $this->css;
         $data['js'] = $this->js;
         $data['bower'] = $this->bower;
-        $data['head'] = $this->load->view('templates/admin/head', $data, true);
-        $data['nav'] = $this->load->view('templates/admin/nav', $data, true);
+        $data['head'] = $this->load->view('layouts/admin/head', $data, true);
+        $data['nav'] = $this->load->view('layouts/admin/nav', $data, true);
         $data['content'] = $this->load->view('admin/' . $view, $data, true);
-        $this->load->view('templates/admin/skeleton', $data);
+        $this->load->view('layouts/admin/skeleton', $data);
     }
 
     public function show_404()
