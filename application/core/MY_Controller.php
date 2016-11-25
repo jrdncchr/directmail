@@ -155,6 +155,25 @@ class MY_Controller extends CI_Controller
         return false;
     }
 
+    public function _checkModulesChildPermission($parent_id, $child_id, $action)
+    {
+        $action .= "_action";
+        if (isset($this->module_permissions[$parent_id])) {
+        	$child_module = null;
+        	foreach ($this->module_permissions[$parent_id]->children as $child) {
+        		if ($child->_id == $child_id) {
+        			$child_module = $child;
+        		}
+        	}
+        	if ($child_module) {
+        		if (filter_var($child_module->$action, FILTER_VALIDATE_BOOLEAN)) {
+	                return true;
+	            }	
+        	}
+        }
+        return false;
+    }
+
     public function _checkListCategoryPermission($id, $action)
     {
         $action .= "_action";

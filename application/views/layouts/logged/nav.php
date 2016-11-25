@@ -23,6 +23,14 @@
         <div id="sidebar-<?php echo $m->code; ?>" class="panel-collapse collapse" role="tabpanel">
             <div class="panel-body">
                 <?php if ($m->code == "list" || $m->code == "templates"): ?>
+
+            		<?php if ($m->code == "templates"): ?>
+            			<?php foreach ($m->children as $child): ?>
+	                        <a id="sidebar-<?php echo $child->code; ?>-link" href="<?php echo base_url() . $child->link; ?>"><?php echo $child->name; ?></a>
+	                    <?php endforeach; ?>
+	                    <span class="dropdown-header" style="color: #F2CB57">List Templates</span>
+        			<?php endif; ?>
+
                     <?php foreach ($list_category_permissions as $lcp): ?>
                         <?php if ($mc->_checkListCategoryPermission($lcp->_id, 'retrieve')): ?>
                             <?php if ($m->code == "list"): ?>

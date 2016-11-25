@@ -133,4 +133,69 @@ class Templates extends MY_Controller {
         }
     }
 
+    public function mail($sub = 'index', $id = 0)
+    {
+    	if ($this->_checkModulesChildPermission(MODULE_TEMPLATES_ID, MODULE_MAIL_TEMPLATES_ID, 'retrieve')) {
+    		if ($this->input->server('REQUEST_METHOD') == 'POST') {
+	            $result = array('success' => false);
+	            $action = $this->input->post('action');
+	            $this->load->model('template_model');
+	            switch ($action) {
+	            	case 'list' :
+	                    $templates = $this->template_model->get(
+	                    	array('company_id' => $this->logged_user->company_id));
+	                    echo json_encode(array('data' => $templates));
+	                    break;
+	                case 'save_mail_template' :
+	                    $mail_template = $this->input->post('mail_template');
+	                    if (!isset($mail_template['id'])) {
+	                        $mail_template['created_by'] = $this->logged_user->id;
+	                        $mail_template['company_id'] = $this->logged_user->company_id;
+	                    }
+	                    $result = $this->template_model->save($mail_template);
+	                    break;
+	            }
+	            if ($action != 'list') {
+	                echo json_encode($result);   
+	            }
+	        } else {
+	            switch ($sub) {
+	                case 'index' :
+	                    $this->_renderL('templates/mail_list');
+	                    return;
+                    case 'form' :
+                        $this->_renderL('templates/mail_form');
+                        return;
+	                break;
+	            }
+	            $this->show_404();
+	        }
+    	} else {
+    		$this->show_404();
+    	}
+    }
+
+    public function test() 
+    {
+		$template_path = FCPATH . 'resources\templates\template1.docx';
+    	$templateProcessor = new PhpOffice\PhpWord\TemplateProcessor($template_path);
+		$test = $templateProcessor->setValue('Name', 'John Doe');
+		$templateProcessor->setValue(array('City', 'Street'), array('Detroit', '12th Street'));
+
+		header("Content-Description: File Transfer");
+		header('Content-Disposition: attachment; filename=template.docx');
+		header('Content-Type: application/octet-stream');
+
+		$templateProcessor->saveAs('php://output');
+    }
+
+    public function test2()
+    {
+    	$html = '
+    		<p>${name}</p>
+    	';
+    	$this->load->model('template_model');
+    	$this->template_model->generate_document_by_html($html, 'test123');
+    }
+
 }

@@ -48,7 +48,7 @@
                 <button v-on:click="saveProperty" class="btn btn-xs btn-main" style="margin-bottom: 20px;">
                     <i class="fa fa-save"></i> Save Property</button>
                 <div class="notice"></div>
-                <div class="panel panel-default">
+                <div class="panel panel-default" v-if="list.show_deceased == 1">
                     <div class="panel-heading">Deceased</div>
                     <div class="panel-body">
                         <div class="row">
@@ -61,8 +61,8 @@
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
-                                    <label for="d_middle_name">* Middle Name</label>
-                                    <input name="d_middle_name" type="text" class="form-control required" required
+                                    <label for="d_middle_name">Middle Name</label>
+                                    <input name="d_middle_name" type="text" class="form-control"
                                            title="Middle Name" v-model="property.deceased_middle_name" />
                                 </div>
                             </div>
@@ -109,7 +109,7 @@
                     </div>
                 </div>
 
-                <div class="panel panel-default">
+                <div class="panel panel-default" v-if="list.show_pr == 1">
                     <div class="panel-heading">PR</div>
                     <div class="panel-body">
                         <div class="row">
@@ -122,8 +122,8 @@
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
-                                    <label for="pr_middle_name">* Middle Name</label>
-                                    <input name="pr_middle_name" type="text" class="form-control required" required
+                                    <label for="pr_middle_name">Middle Name</label>
+                                    <input name="pr_middle_name" type="text" class="form-control"
                                            title="Middle Name" v-model="property.pr_middle_name" />
                                 </div>
                             </div>
@@ -170,7 +170,7 @@
                     </div>
                 </div>
 
-                <div class="panel panel-default">
+                <div class="panel panel-default" v-if="list.show_attorney == 1">
                     <div class="panel-heading">Attorney</div>
                     <div class="panel-body">
                         <div class="row">
@@ -194,8 +194,8 @@
                        <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <label for="a_second_address">* Second Address</label>
-                                    <input name="a_second_address" type="text" class="form-control required" required
+                                    <label for="a_second_address">Second Address</label>
+                                    <input name="a_second_address" type="text" class="form-control"
                                            title="Address" v-model="property.attorney_second_address" />
                                 </div>
                             </div>
@@ -226,7 +226,7 @@
                     </div>
                 </div>
 
-                <div class="panel panel-default">
+                <div class="panel panel-default" v-if="list.show_mail == 1">
                     <div class="panel-heading">Mail</div>
                     <div class="panel-body">
                         <div class="row">

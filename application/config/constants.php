@@ -94,3 +94,9 @@ defined('DB_PASSWORD')       OR define('DB_PASSWORD', 'danero1120');
 defined('DB_DATABASE')       OR define('DB_DATABASE', 'jrdncchr_directmail');
 
 defined('ICON_PATH')         OR define('ICON_PATH', 'resources/images/icon/');
+
+
+defined('MAIL_TEMPLATES_PATH') OR define('MAIL_TEMPLATES_PATH', FCPATH . 'resources\templates');
+
+defined('MODULE_TEMPLATES_ID')	OR define('MODULE_TEMPLATES_ID', 8);
+defined('MODULE_MAIL_TEMPLATES_ID')	OR define('MODULE_MAIL_TEMPLATES_ID', 29);

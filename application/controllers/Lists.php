@@ -80,9 +80,9 @@ class Lists extends MY_Controller {
                     $list = $this->input->post('list');
                     if (!isset($list['id'])) {
                         $list['created_by'] = $this->logged_user->id;
-                        $list['company_id'] = $this->logged_user->company_id;
                         $list['active'] = 1;
                     }
+                    $list['company_id'] = $this->logged_user->company_id;
                     $result = $this->list_model->save($list);
                     break;
                 case 'delete_list' :

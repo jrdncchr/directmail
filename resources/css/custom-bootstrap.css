@@ -130,3 +130,12 @@ ol.breadcrumb a.active {
 code {
     font-size: 12px;
 }
+
+.list-group-item, .list-group-item:first-child, .list-group-item:last-child {
+	border-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-top-left-radius: 0 !important;
+    font-size: 14px;
+}

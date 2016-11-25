@@ -16,18 +16,48 @@
                     <label for="name">* List Name</label>
                      <input name="name" type="text" class="form-control required" required
                            title="List Name" v-model="list.name" />
-                        <?php if (($list->id > 0 && $mc->_checkListPermission($list->id, 'update')) ||
-                            ($list->id == 0 && $mc->_checkListCategoryPermission($list_category->_id, 'create'))): 
-                        ?>
-                        <button v-on:click="saveList" class="btn btn-xs btn-main" style="margin-top: 10px; width: 30%;">
-                            <i class="fa fa-save"></i> Save
-                        </button>
-                         <?php endif; ?>
-                         <?php if ($mc->_checkListPermission($list->id, 'delete')): ?>
-                         <button v-on:click="deleteList" class="btn btn-xs" style="margin-top: 10px; width: 30%;">
-                            <i class="fa fa-trash"></i> Delete
-                        </button>
-                        <?php endif; ?>
+                    <?php if (($list->id > 0 && $mc->_checkListPermission($list->id, 'update')) ||
+                        ($list->id == 0 && $mc->_checkListCategoryPermission($list_category->_id, 'create'))): 
+                    ?>
+                   	<ul class="list-group" style="margin-top: 20px;">
+					  <li class="list-group-item">
+					    <label class="control control--checkbox pull-right" style="top: -2px">
+                            <input type="checkbox" v-model="list.show_deceased" />
+                            <div class="control__indicator"></div>
+                        </label>
+					    Deceased
+					  </li>
+					  <li class="list-group-item">
+					    <label class="control control--checkbox pull-right" style="top: -2px">
+                            <input type="checkbox" v-model="list.show_pr" />
+                            <div class="control__indicator"></div>
+                        </label>
+					    PR
+					  </li>
+					  <li class="list-group-item">
+					    <label class="control control--checkbox pull-right" style="top: -2px">
+                            <input type="checkbox" v-model="list.show_attorney" />
+                            <div class="control__indicator"></div>
+                        </label>
+					    Attorney
+					  </li>
+					  <li class="list-group-item">
+					    <label class="control control--checkbox pull-right" style="top: -2px">
+                            <input type="checkbox" v-model="list.show_mail" />
+                            <div class="control__indicator"></div>
+                        </label>
+					    Mail
+					  </li>
+					</ul>
+                    <button v-on:click="saveList" class="btn btn-xs btn-main" style="margin-top: 10px; width: 30%;">
+                        <i class="fa fa-save"></i> Save
+                    </button>
+                     <?php endif; ?>
+                     <?php if ($mc->_checkListPermission($list->id, 'delete')): ?>
+                     <button v-on:click="deleteList" class="btn btn-xs" style="margin-top: 10px; width: 30%;">
+                        <i class="fa fa-trash"></i> Delete
+                    </button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -56,10 +86,10 @@
                         <tr>
                             <th width="6%">ID</th>
                             <th width="8%">Status</th>
-                            <th width="27%">Deceased Address</th>
                             <th width="17%">Deceased Name</th>
-                            <th width="27%">Mail Address</th>
+                            <th width="27%">Deceased Address</th>
                             <th width="15%">Mail Name</th>
+                            <th width="27%">Mail Address</th>
                         </tr>
                         </thead>
                         <tbody></tbody>
@@ -95,7 +125,11 @@
                     loading('info', 'Saving list...');
                     var list = {
                         name : data.list.name,
-                        list_category_id: data.list_category._id
+                        list_category_id: data.list_category._id,
+                        show_deceased: data.list.show_deceased ? 1 : 0,
+                        show_pr: data.list.show_pr ? 1 : 0,
+                        show_attorney: data.list.show_attorney ? 1 : 0,
+                        show_mail: data.list.show_mail ? 1 : 0,
                     };
                     if (data.list.id > 0) {
                         list.id = data.list.id;
@@ -161,18 +195,18 @@
                         }
                     } 
                 },
-                { data: "deceased_address" },
                 { data: "deceased_last_name", render:
                     function(data, type, row) {
                         return row.deceased_last_name + " " + row.deceased_first_name + ", " + row.deceased_middle_name;
                     }
                 },
-                { data: "mail_address" },
+                { data: "deceased_address" },
                 { data: "mail_last_name", render:
                     function(data, type, row) {
                         return row.mail_last_name + " " + row.mail_first_name;
                     }
-                }
+                },
+                { data: "mail_address" },
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();
