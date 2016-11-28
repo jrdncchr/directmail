@@ -77,9 +77,11 @@
 
             <!-- Properties -->
             <div role="tabpanel" class="tab-pane active" id="properties">
+            	<?php if (($list->id > 0 && $mc->_checkListPermission($list->id, 'create'))):  ?>
                 <a href="<?php echo base_url() . 'lists/property/' . $list->id . '/new'; ?>" class="btn btn-xs btn-default" style="width: 30%;">
                     <i class="fa fa-plus-circle"></i> Add Property
                 </a>
+            	<?php endif; ?>
                 <div class="table-responsive" style="width: 100%; margin-top: 20px;">
                     <table class="table table-bordered table-hover" width="100%">
                         <thead>

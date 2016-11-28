@@ -98,5 +98,9 @@ defined('ICON_PATH')         OR define('ICON_PATH', 'resources/images/icon/');
 
 defined('MAIL_TEMPLATES_PATH') OR define('MAIL_TEMPLATES_PATH', FCPATH . 'resources\templates');
 
+// Modules TEMPLATES
 defined('MODULE_TEMPLATES_ID')	OR define('MODULE_TEMPLATES_ID', 8);
 defined('MODULE_MAIL_TEMPLATES_ID')	OR define('MODULE_MAIL_TEMPLATES_ID', 29);
+// Modules SETTINGS
+defined('MODULE_SETTINGS_ID')	OR define('MODULE_SETTINGS_ID', 18);
+defined('MODULE_ABBREVIATIONS_ID')	OR define('MODULE_ABBREVIATIONS_ID', 30);
