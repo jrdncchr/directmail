@@ -205,4 +205,24 @@ class Management extends MY_Controller {
         }
     }
 
+    public function similar_address_generator()
+    {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $result = array('success' => false);
+            $action = $this->input->post('action');
+            switch ($action) {
+                case 'get_similar_addresses' :
+                    $addr = $this->input->post('addr');
+                    $this->load->model('list_model');
+                    $similar_address = $this->list_model->get_similar_address($addr, $this->logged_user->company_id);
+                    echo json_encode($similar_address);
+                    break;
+                default :
+                    echo json_encode($result);
+            }
+        } else {
+            $this->_renderL('management/similar_address_generator');
+        }
+    }
+
 }

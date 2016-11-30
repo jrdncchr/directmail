@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 24, 2016 at 09:41 AM
+-- Generation Time: Nov 30, 2016 at 09:11 AM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 5.5.35
 
@@ -19,6 +19,31 @@ SET time_zone = "+00:00";
 --
 -- Database: `jrdncchr_directmail`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `abbreviations`
+--
+
+CREATE TABLE `abbreviations` (
+  `id` int(11) NOT NULL,
+  `abbr` varchar(20) NOT NULL,
+  `value` varchar(45) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `company_id` int(11) NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `abbreviations`
+--
+
+INSERT INTO `abbreviations` (`id`, `abbr`, `value`, `created_by`, `company_id`, `date_created`) VALUES
+(3, 'Bld', 'Building', 2, 1, '2016-11-28 08:55:01'),
+(4, 'St', 'Street', 2, 1, '2016-11-28 08:56:46'),
+(6, 'Ave', 'Avenue', 2, 1, '2016-11-28 08:58:25'),
+(7, 'Apt', 'Apartment', 2, 1, '2016-11-29 06:20:35');
 
 -- --------------------------------------------------------
 
@@ -293,7 +318,9 @@ INSERT INTO `modules` (`id`, `name`, `code`, `description`, `link`, `parent_id`,
 (24, 'List Categories', 'management-list-categories', 'Categories of Lists', 'management/list_categories', 21, 3, 1, '', '2016-10-18 08:00:47'),
 (27, 'Approval', 'approval', '', '#', 0, 4, 1, '<i class="fa fa-thumbs-up"></i>', '2016-10-12 07:38:20'),
 (28, 'Properties', 'approval-properties', '', 'approval/properties', 27, 1, 1, '', '2016-10-12 07:40:37'),
-(29, 'Mail Templates', 'mail-templates', '', 'templates/mail', 8, 1, 1, '', '2016-10-12 07:43:54');
+(29, 'Mail Templates', 'mail-templates', '', 'templates/mail', 8, 1, 1, '', '2016-10-12 07:43:54'),
+(30, 'Abbreviations', 'settings-abbreviations', '', 'settings/abbreviations', 18, 3, 1, '', '2016-10-12 07:43:54'),
+(31, 'Similar Address Generator', 'management-similar-address-generator', 'Similar Address Checker', 'management/similar_address_generator', 21, 4, 1, '', '2016-10-18 08:00:47');
 
 -- --------------------------------------------------------
 
@@ -1094,20 +1121,20 @@ CREATE TABLE `roles_module_permission` (
 --
 
 INSERT INTO `roles_module_permission` (`id`, `module_id`, `role_id`, `create_action`, `retrieve_action`, `update_action`, `delete_action`, `last_update`) VALUES
-(83, 1, 3, 1, 1, 1, 1, '2016-11-22 23:24:30'),
-(84, 2, 3, 1, 1, 1, 1, '2016-11-22 23:24:30'),
-(85, 8, 3, 1, 1, 1, 1, '2016-11-22 23:24:30'),
-(86, 14, 3, 1, 1, 1, 1, '2016-11-22 23:24:30'),
-(87, 15, 3, 1, 1, 1, 1, '2016-11-22 23:24:30'),
-(88, 16, 3, 1, 1, 1, 1, '2016-11-22 23:24:30'),
-(89, 17, 3, 1, 1, 1, 1, '2016-11-22 23:24:30'),
-(90, 18, 3, 1, 1, 1, 1, '2016-11-22 23:24:30'),
-(91, 19, 3, 1, 1, 1, 1, '2016-11-22 23:24:31'),
-(92, 20, 3, 1, 1, 1, 1, '2016-11-22 23:24:31'),
-(93, 21, 3, 1, 1, 1, 1, '2016-11-22 23:24:31'),
-(94, 22, 3, 1, 1, 1, 1, '2016-11-22 23:24:31'),
-(95, 23, 3, 1, 1, 1, 1, '2016-11-22 23:24:31'),
-(97, 24, 3, 1, 1, 1, 1, '2016-11-22 23:24:31'),
+(83, 1, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(84, 2, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(85, 8, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(86, 14, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(87, 15, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(88, 16, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(89, 17, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(90, 18, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(91, 19, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(92, 20, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(93, 21, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(94, 22, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(95, 23, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(97, 24, 3, 1, 1, 1, 1, '2016-11-30 00:30:04'),
 (100, 26, 3, 1, 1, 1, 1, '2016-11-09 00:27:10'),
 (101, 1, 4, 0, 1, 0, 0, '2016-10-31 21:35:57'),
 (102, 2, 4, 0, 1, 0, 0, '2016-10-31 21:35:57'),
@@ -1124,9 +1151,11 @@ INSERT INTO `roles_module_permission` (`id`, `module_id`, `role_id`, `create_act
 (113, 22, 4, 0, 1, 0, 0, '2016-10-31 21:35:58'),
 (114, 23, 4, 0, 1, 0, 0, '2016-10-31 21:35:58'),
 (115, 24, 4, 0, 1, 0, 0, '2016-10-31 21:35:58'),
-(116, 27, 3, 1, 1, 1, 1, '2016-11-22 23:24:30'),
-(117, 28, 3, 1, 1, 1, 1, '2016-11-22 23:24:30'),
-(118, 29, 3, 1, 1, 1, 1, '2016-11-22 23:24:30');
+(116, 27, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(117, 28, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(118, 29, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(119, 30, 3, 1, 1, 1, 1, '2016-11-30 00:30:03'),
+(120, 31, 3, 1, 1, 1, 1, '2016-11-30 00:30:04');
 
 -- --------------------------------------------------------
 
@@ -1161,6 +1190,13 @@ CREATE TABLE `templates` (
   `company_id` int(11) NOT NULL,
   `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `templates`
+--
+
+INSERT INTO `templates` (`id`, `name`, `hash`, `created_by`, `company_id`, `date_created`) VALUES
+(4, 'Sample Template', 'af9556d36c33c12e0dddf6301940cc6957b731d29a87b78bbcde46d3ab12aaec', 2, 1, '2016-11-25 08:08:00');
 
 -- --------------------------------------------------------
 
@@ -1393,6 +1429,12 @@ INSERT INTO `user_secret` (`id`, `user_id`, `password`, `confirmation_key`) VALU
 --
 
 --
+-- Indexes for table `abbreviations`
+--
+ALTER TABLE `abbreviations`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `company`
 --
 ALTER TABLE `company`
@@ -1517,6 +1559,11 @@ ALTER TABLE `user_secret`
 --
 
 --
+-- AUTO_INCREMENT for table `abbreviations`
+--
+ALTER TABLE `abbreviations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+--
 -- AUTO_INCREMENT for table `company`
 --
 ALTER TABLE `company`
@@ -1550,7 +1597,7 @@ ALTER TABLE `list_testimonial`
 -- AUTO_INCREMENT for table `modules`
 --
 ALTER TABLE `modules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 --
 -- AUTO_INCREMENT for table `property`
 --
@@ -1580,7 +1627,7 @@ ALTER TABLE `roles_list_permission`
 -- AUTO_INCREMENT for table `roles_module_permission`
 --
 ALTER TABLE `roles_module_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
 --
 -- AUTO_INCREMENT for table `secret`
 --
@@ -1590,7 +1637,7 @@ ALTER TABLE `secret`
 -- AUTO_INCREMENT for table `templates`
 --
 ALTER TABLE `templates`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `user`
 --

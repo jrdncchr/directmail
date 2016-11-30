@@ -240,4 +240,11 @@ class Lists extends MY_Controller {
         }
     }
 
+    public function check_exists() {
+        $addr = "123 Main St Apt 5";
+        $this->load->model('list_model');
+        $check = $this->list_model->get_similar_address($addr, $this->logged_user->company_id);
+        var_dump($check);exit;
+    }
+
 }

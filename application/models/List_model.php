@@ -71,6 +71,58 @@ class List_model extends CI_Model {
         return $exist->num_rows() > 0 ? true : false;
     }
 
+    public function get_similar_address($address, $company_id)
+    {
+        $abbreviations = $this->db->get_where('abbreviations', array('company_id' => $company_id))->result();
+        $similar_address = array();
+        $split_address = explode(" ", $address);
+        $address = array();
+        foreach ($split_address as $addr) {
+            $address[] = array($addr);
+        }
+        for ($i = 0; $i < sizeof($address); $i++) {
+            foreach ($abbreviations as $abbr) {
+                if ($address[$i][0] == $abbr->abbr) {
+                    $address[$i][] = $abbr->value;
+                    $address[$i][] = $abbr->abbr . ".";
+                } else if ($address[$i][0] == $abbr->value) {
+                    $address[$i][] = $abbr->abbr;
+                    $address[$i][] = $abbr->abbr . ".";
+                }
+            }
+            if (is_numeric($address[$i][0])) {
+                $address[$i][] = "#" . $address[$i][0];
+            } else if ($address[$i][0][0] == "#") {
+                $address[$i][] = ltrim($address[$i][0], "#");
+            }
+        }
+
+        $generated_address = $this->cartesian($address);
+        $similar_address = array();
+        foreach ($generated_address as $ga) {
+            $similar_address[] = implode(' ', $ga);
+        }
+        unset($similar_address[0]);
+        return $similar_address;
+    }
+
+    // http://stackoverflow.com/questions/6311779/finding-cartesian-product-with-php-associative-arrays
+    function cartesian($input) {
+        $input = array_filter($input);
+        $result = array(array());
+        foreach ($input as $key => $values) {
+            $append = array();
+            foreach($result as $product) {
+                foreach($values as $item) {
+                    $product[$key] = $item;
+                    $append[] = $product;
+                }
+            }
+            $result = $append;
+        }
+        return $result;
+    }
+
     /*
      * List Paragraph
      */
