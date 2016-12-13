@@ -59,7 +59,7 @@ class Lists extends MY_Controller {
 
     public function info($id = 0, $sub = "index")
     {
-        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+        if ($this->input->server('REQUEST_METHOD') == 'POST' && $this->input->is_ajax_request()) {
             $result = array('success' => false);
             $action = $this->input->post('action');
             $this->load->model('list_model');
@@ -166,6 +166,35 @@ class Lists extends MY_Controller {
                         }
                     }
                     break;
+                case 'bulk_import' :
+                    if ($this->_checkListPermission($id, 'create')) {
+                        // list
+                        $this->load->model('list_model');
+                        $this->data['list'] = $this->list_model->get(array(
+                                'l.id' => $id, 
+                                'l.company_id' => $this->logged_user->company_id
+                            ), false);
+                        // list category
+                        $this->data['list_category'] = $this
+                            ->list_category_permissions[$this->data['list']->list_category_id];
+                        $this->_renderL('lists/bulk_import');
+                        return;
+                    }
+                    break;
+                case 'bulk_import_result' :
+                    // list
+                    $this->load->model('list_model');
+                    $this->data['list'] = $this->list_model->get(array(
+                            'l.id' => $id, 
+                            'l.company_id' => $this->logged_user->company_id
+                        ), false);
+                    // list category
+                    $this->data['list_category'] = $this
+                        ->list_category_permissions[$this->data['list']->list_category_id];
+                    $this->data['result'] = $this->bulk_import($id);
+                    $this->_renderL('lists/bulk_import_result');
+                    return;
+                break;
             }
             $this->show_404();
         }
@@ -175,22 +204,69 @@ class Lists extends MY_Controller {
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
             $action = $this->input->post('action');
+            $this->load->model('property_model');
             switch ($action) {
                 case 'save_property':
-                    $this->load->model('property_model');
                     $property = $this->input->post('form');
                     $property['created_by'] = $this->logged_user->id;
-                    $result = $this->property_model->save($property);
+                    $property['company_id'] = $this->logged_user->company_id;
+                    if ($property['status'] == 'replacement') {
+                        $result = $this->property_model->save($property);
+                    } else {
+                        $check_property = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
+                        if ($check_property['exist']) {
+                            foreach ($check_property['properties'] as $cp) {
+                                $cp->permission = $this->_checkListPermission($cp->list_id, 'retrieve');
+                                $cp->url = base_url() . "lists/property/". $cp->list_id . "/info/" . $cp->id;
+                            }
+                            $result = $check_property;
+                            $result['success'] = false;
+                        } else {
+                            $result = $this->property_model->save($property);
+                        }
+                    }
+                    echo json_encode($result);
+                    break;
+                case 'similar_address_action' :
+                    $target_property_id = $this->input->post('target_property_id');
+                    $property = $this->input->post('property');
+                    $property['created_by'] = $this->logged_user->id;
+                    $property['company_id'] = $this->logged_user->company_id;
+
+                    $sa_action = $this->input->post('similar_address_action');
+                    if ($sa_action == 1) {
+                        $property['status'] = 'replacement';
+                        $save = $this->property_model->save($property);
+                        if ($save['success']) {
+                            $result = $this->property_model->save_replacement_approval($save['id'],
+                                $target_property_id, $this->logged_user->company_id);
+                        } else {
+                            $result = array('success' => false);
+                        }
+                    } else if ($sa_action == 2) {
+                        $old_property = array(
+                            'id' => $target_property_id,
+                            'deceased_address' => $property['deceased_address'],
+                            'company_id' => $property['company_id']
+                        );
+                        $result = $this->property_model->save($old_property);
+                    } else if ($sa_action == 3) {
+                        $delete = $this->property_model->delete($target_property_id, $this->logged_user->company_id);
+                        if ($delete['success']) {
+                            $result = $this->property_model->save($property);
+                        } else {
+                            $result = array('success' => false);
+                        }
+                    }
                     echo json_encode($result);
                     break;
                 case 'delete_property':
-                    $this->load->model('property_model');
                     $id = $this->input->post('id');
-                    $result = $this->property_model->delete($id);
+                    $status = $this->input->post('status');
+                    $result = $this->property_model->delete($id, $this->logged_user->company_id, $status);
                     echo json_encode($result);
                     break;
                 case 'save_comment':
-                    $this->load->model('property_model');
                     $comment = array(
                         'property_id' => $this->input->post('property_id'),
                         'comment' => $this->input->post('comment'),
@@ -201,9 +277,13 @@ class Lists extends MY_Controller {
                     echo json_encode($result);
                     break;
                 case 'get_comments':
-                    $this->load->model('property_model');
                     $property_id = $this->input->post('property_id');
                     $result = $this->property_model->get_comment(array('property_id' => $property_id));
+                    echo json_encode($result);
+                    break;
+                case 'check_property_exists' :
+                    $property = $this->input->post('property');
+                    $result = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
                     echo json_encode($result);
                     break;
                 default:
@@ -226,8 +306,10 @@ class Lists extends MY_Controller {
                         // Property
                         if ($property_id > 0) {
                             $this->load->model('property_model');
-                            $this->data['property'] = $this->property_model->get(
+                            $property = $this->property_model->get(
                                 array('p.id' => $property_id, 'p.list_id' => $list_id), false);
+                            $property->pr_url = base_url() . 'lists/property/' . $property->pr_list_id . '/info/' . $property->target_property_id;
+                            $this->data['property'] = $property;
                             $this->data['comments'] = $this->property_model->get_comment(array('property_id' => $property_id));
                         }
                         $this->_renderL('lists/property');
@@ -242,9 +324,100 @@ class Lists extends MY_Controller {
 
     public function check_exists() {
         $addr = "123 Main St Apt 5";
-        $this->load->model('list_model');
-        $check = $this->list_model->get_similar_address($addr, $this->logged_user->company_id);
+        $property = array(
+            'deceased_address' => '#6019 Bookly Summit Apartment 658 Lisadoside',
+            'deceased_city' => 'New Loyalfurt',
+            'deceased_state' => 'land',
+            'deceased_zipcode' => '75562'
+        );
+        $this->load->model('property_model');
+        $check = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
         var_dump($check);exit;
+    }
+
+    public function bulk_import($list_id)
+    {
+        $result = array(
+            'similars' => array(),
+            'saved' => array()
+        );
+        date_default_timezone_set('America/Los_Angeles');
+        $path = $_FILES["file"]["tmp_name"];
+
+        $objPHPExcel = PHPExcel_IOFactory::load($path);
+        $sheet = $objPHPExcel->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+        $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
+
+        $properties = array();
+        for ($row = 2; $row <= $highestRow; ++ $row) {
+            $property = array();
+            $property['row'] = $row;
+            $property['created_by'] = $this->logged_user->id;
+            $property['last_update'] = date('Y-m-d H:i:s');
+            $property['company_id'] = $this->logged_user->company_id;
+            for ($col = 0; $col < $highestColumnIndex; ++ $col) {
+                $cell = $sheet->getCellByColumnAndRow($col, $row);
+                $val = $cell->getValue();
+                switch ($col) {
+                    case 0 : $property['list_id'] = $val; break;
+                    case 1 : $property['funeral_home'] = $val; break;
+                    case 2 : $property['deceased_first_name'] = $val; break;
+                    case 3 : $property['deceased_middle_name'] = $val; break;
+                    case 4 : $property['deceased_last_name'] = $val; break;
+                    case 5 : $property['deceased_address'] = $val; break;
+                    case 6 : $property['deceased_city'] = $val; break;
+                    case 7 : $property['deceased_state'] = $val; break;
+                    case 8 : $property['deceased_zipcode'] = $val; break;
+                    case 9 : $property['pr_first_name'] = $val; break;
+                    case 10 : $property['pr_middle_name'] = $val; break;
+                    case 11 : $property['pr_last_name'] = $val; break;
+                    case 12 : $property['pr_address'] = $val; break;
+                    case 13 : $property['pr_city'] = $val; break;
+                    case 14 : $property['pr_state'] = $val; break;
+                    case 15 : $property['pr_zipcode'] = $val; break;
+                    case 16 : $property['attorney_name'] = $val; break;
+                    case 17 : $property['attorney_first_address'] = $val; break;
+                    case 18 : $property['attorney_second_address'] = $val; break;
+                    case 19 : $property['attorney_city'] = $val; break;
+                    case 20 : $property['attorney_state'] = $val; break;
+                    case 21 : $property['attorney_zipcode'] = $val; break;
+                    case 22 : $property['mail_first_name'] = $val; break;
+                    case 23 : $property['mail_last_name'] = $val; break;
+                    case 24 : $property['mail_address'] = $val; break;
+                    case 25 : $property['mail_city'] = $val; break;
+                    case 26 : $property['mail_state'] = $val; break;
+                    case 27 : $property['mail_zipcode'] = $val; break;
+                }
+            }
+            if ($property['list_id'] == $list_id) {
+                $properties[] = $property;
+            }
+        }
+
+        $this->load->model('property_model');
+        foreach ($properties as $property) {
+            $check_property = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
+            if ($check_property['exist']) {
+                foreach ($check_property['properties'] as $cp) {
+                    $cp->permission = $this->_checkListPermission($cp->list_id, 'retrieve');
+                    $cp->url = base_url() . "lists/property/". $cp->list_id . "/info/" . $cp->id;
+                }
+                $property['check'] = $check_property;
+                $result['similars'][] = $property;
+            } else {
+                $row = $property['row'];
+                unset($property['row']);
+                $save = $this->property_model->save($property);
+                if ($save['success']) {
+                    $property['row'] = $row;
+                    $property['id'] = $save['id'];
+                    $result['saved'][] = $property;
+                }
+            }
+        }
+        return $result;
     }
 
 }

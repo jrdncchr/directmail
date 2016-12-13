@@ -22,18 +22,18 @@
     <?php if ($list->id > 0): ?>
     <div class="row" style="margin-top: 20px;">
         <div class="col-sm-12">
-        <?php if(isset($property)): ?>
+        <?php if (isset($property)): ?>
         <button v-on:click="deleteProperty" class="btn btn-xs" style="margin-bottom: 15px;"><i class="fa fa-trash"></i> Delete Property</button>
         <?php endif; ?>
-
-        <?php if (isset($property)): ?>
-            <?php if ($property->status == 'pending'): ?>
-            <div class="alert alert-warning">
-                <i class="fa fa-info-circle"></i>
-                This property is still pending for approval.
-            </div>
-            <?php endif ?>
-        <?php endif; ?>
+ 
+        <div class="alert alert-warning" v-if="property && property.status === 'pending'">
+            <i class="fa fa-info-circle"></i>
+            This property is still pending for approval.
+        </div>
+        <div class="alert alert-warning" v-if="property && property.status === 'replacement'">
+            <i class="fa fa-info-circle"></i>
+            This property is saved for replacement approval for property <a target="_blank" :href="property.pr_url">{{ property.target_property_id }}</a>.
+        </div>
 
         <!-- Nav tabs -->
           <ul class="nav nav-tabs nav-justified" role="tablist">
@@ -79,7 +79,8 @@
                                 <div class="form-group">
                                     <label for="d_address">* Address</label>
                                     <input name="d_address" type="text" class="form-control required" required
-                                           title="Address" v-model="property.deceased_address" />
+                                           title="Address" v-model="property.deceased_address"
+                                           :disabled="property.status == 'replacement' ? true : false" />
                                 </div>
                             </div>
                         </div>
@@ -88,21 +89,24 @@
                                 <div class="form-group">
                                     <label for="d_city">* City</label>
                                     <input name="d_city" type="text" class="form-control required" required
-                                           title="City" v-model="property.deceased_city" />
+                                           title="City" v-model="property.deceased_city" 
+                                           :disabled="property.status == 'replacement' ? true : false" />
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label for="d_state">* State</label>
                                     <input name="d_state" type="text" class="form-control required" required
-                                           title="State" v-model="property.deceased_city" />
+                                           title="State" v-model="property.deceased_state" 
+                                           :disabled="property.status == 'replacement' ? true : false" />
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label for="d_zip_code">* Zip Code</label>
                                     <input name="d_zip_code" type="text" class="form-control required" required
-                                           title="Zip Code" v-model="property.deceased_zipcode" />
+                                           title="Zip Code" v-model="property.deceased_zipcode" 
+                                           :disabled="property.status == 'replacement' ? true : false" />
                                 </div>
                             </div>
                         </div>
@@ -335,6 +339,52 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="property-exist-modal" tabindex="-1" role="dialog" aria-labelledby="property-exist-modal-label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="comment-modal-label">Existing Similar Property</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="alert alert-warning" v-if="similar_address.length == 1">
+                                <i class="fa fa-exclamation-circle"></i>
+                                An existing similar deceased address was detected.
+                            </div>
+                            <div class="alert alert-warning" v-else>
+                                <i class="fa fa-exclamation-circle"></i>
+                                A multiple similar address was detected, please contact administrator.
+                            </div>
+                            <div class="form-group">
+                                <div class="list-group" v-for="addr in similar_address">
+                                    <a target="_blank" v-bind:href="addr.url" class="list-group-item"> {{ addr.deceased_address }} 
+                                    <code class="pull-right">{{ addr.id }}</code>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="form-group" v-if="similar_address.length == 1">
+                                <label for="m_zip_code">* What action would you like to take?</label>
+                                <select class="form-control required" v-model="similar_address_action">
+                                    <option value="1">Save property for replacement approval.</option>
+                                    <option v-show="similar_address[0].permission" value="2">Replace the address of the old property. (Delete/Unsave this property)</option>
+                                    <option v-show="similar_address[0].permission" value="3">Remove the old property and keep this new property.</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-xs pull-left" data-dismiss="modal">Close</button>
+                    <div v-if="similar_address.length == 1">
+                        <button v-on:click="similarAddressConfirmAction" type="button" class="btn btn-main btn-xs">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -342,6 +392,8 @@
     var sidebarListCategoryId = "<?php echo 'sidebar-list-category-' . $list_category->_id . '-link'; ?>";
 
     var data = {
+        similar_address: [],
+        similar_address_action: 1,
         list_category : <?php echo json_encode($list_category); ?>,
         list : <?php echo json_encode($list); ?>,
         property: {},
@@ -359,16 +411,45 @@
         methods: {
             saveProperty: function() {
                 var infoForm = $('#info');
-                if(validator.validateForm(infoForm)) {
+                if (validator.validateForm(infoForm)) {
                     data.property.list_id = data.list.id;
                     loading("info", "Saving property...");
                     $.post(actionUrl, { action: 'save_property', form: data.property }, function(res) {
-                        loading('success', 'Save successful!');
                         if (res.success && (undefined == data.property.id)) {
                             window.location = actionUrl + '/' + data.list.id + '/info/' + res.id;
+                        }  else if (!res.success) {
+                            if (res.exist) {
+                                loading('warning', 'A similar existing property is detected.');
+                                data.similar_address = res.properties;
+                                var propertyExistModal = $('#property-exist-modal');
+                                propertyExistModal.modal({
+                                    show: true,
+                                    backdrop: 'static',
+                                    keyboard: false
+                                });
+                            }
+                        } else {
+                            loading('success', 'Save successful!');
                         }
                     }, 'json');
                 }
+            },
+            similarAddressConfirmAction: function() {
+                loading("info", "Taking action, please wait...");
+                $.post(actionUrl, { action: 'similar_address_action', target_property_id: data.similar_address[0].id, property: data.property, similar_address_action: data.similar_address_action }, function(res) {
+                    if (res.success && (undefined == data.property.id)) {
+                        window.location = actionUrl + '/' + data.list.id + '/info/' + res.id;
+                    } else if (!res.success) {
+                        loading("danger", "Something went wrong.");
+                    } else {
+                        loading('success', 'Action complete.');
+                        var propertyExistModal = $('#property-exist-modal');
+                        propertyExistModal.modal('hide');
+                        if (data.similar_address_action == 1) {
+                            data.property.status = 'replacement';
+                        }
+                    }
+                }, 'json');
             },
             deleteProperty: function() {
                 showConfirmModal({
@@ -376,7 +457,7 @@
                     body: 'Are you sure to delete this property?',
                     callback: function() {
                         loading("info", "Deleting property...");
-                        $.post(actionUrl, { action: 'delete_property', id: data.property.id }, function(res) {
+                        $.post(actionUrl, { action: 'delete_property', id: data.property.id, status: data.property.status }, function(res) {
                             if (res.success) {
                                 hideConfirmModal();
                                 window.location = baseUrl + 'lists/info/' + data.list.id;

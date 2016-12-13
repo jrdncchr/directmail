@@ -49,13 +49,26 @@
 					    Mail
 					  </li>
 					</ul>
-                    <button v-on:click="saveList" class="btn btn-xs btn-main" style="margin-top: 10px; width: 30%;">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="name">* Actions</label>
+                    <button v-on:click="saveList" class="btn btn-sm btn-block btn-main">
                         <i class="fa fa-save"></i> Save
                     </button>
-                     <?php endif; ?>
-                     <?php if ($mc->_checkListPermission($list->id, 'delete')): ?>
-                     <button v-on:click="deleteList" class="btn btn-xs" style="margin-top: 10px; width: 30%;">
-                        <i class="fa fa-trash"></i> Delete
+                    <?php endif; ?>
+                    <?php if (($list->id > 0 && $mc->_checkListPermission($list->id, 'create'))):  ?>
+                    <a href="<?php echo base_url() . 'lists/property/' . $list->id . '/new'; ?>" class="btn btn-sm btn-default btn-block">
+                    <i class="fa fa-plus-circle"></i> Add Property
+                    </a>
+                    <a href="<?php echo base_url() . 'lists/info/' . $list->id . '/bulk_import'; ?>" class="btn btn-sm btn-default btn-block">
+                        <i class="fa fa-upload"></i> Bulk Import
+                    </a>
+                    <?php endif; ?>
+                    <?php if ($mc->_checkListPermission($list->id, 'delete')): ?>
+                    <button v-on:click="deleteList" class="btn btn-block btn-sm">
+                        <i class="fa fa-trash"></i> Delete List
                     </button>
                     <?php endif; ?>
                 </div>
@@ -66,7 +79,7 @@
 
     <?php if ($list->id > 0): ?>
     <div class="row" style="margin-top: 20px;">
-        <div class="col-sm-12">
+        <div class="col-sm-12" style="padding: 0;">
         <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a href="#properties" aria-controls="properties" role="tab" data-toggle="tab"><i class="fa fa-home"></i> Properties</a></li>
@@ -77,11 +90,6 @@
 
             <!-- Properties -->
             <div role="tabpanel" class="tab-pane active" id="properties">
-            	<?php if (($list->id > 0 && $mc->_checkListPermission($list->id, 'create'))):  ?>
-                <a href="<?php echo base_url() . 'lists/property/' . $list->id . '/new'; ?>" class="btn btn-xs btn-default" style="width: 30%;">
-                    <i class="fa fa-plus-circle"></i> Add Property
-                </a>
-            	<?php endif; ?>
                 <div class="table-responsive" style="width: 100%; margin-top: 20px;">
                     <table class="table table-bordered table-hover" width="100%">
                         <thead>
@@ -192,6 +200,8 @@
                             return "<span class='label label-success'>Active</span>";
                         } else if (data == "pending") {
                             return "<span class='label label-warning'>Pending</span>";
+                        } else if (data =="replacement") {
+                            return "<span class='label label-warning'>Replacement</span>";
                         } else {
                             return "<span class='label label-default'>Inactive</span>";
                         }

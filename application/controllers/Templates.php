@@ -143,7 +143,7 @@ class Templates extends MY_Controller {
 	            switch ($action) {
 	            	case 'list' :
 	                    $templates = $this->template_model->get(
-	                    	array('company_id' => $this->logged_user->company_id));
+	                    	array('t.company_id' => $this->logged_user->company_id));
 	                    echo json_encode(array('data' => $templates));
 	                    break;
 	                case 'save_mail_template' :

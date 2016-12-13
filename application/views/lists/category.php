@@ -14,7 +14,8 @@
                 <table class="table table-bordered table-hover" width="100%">
                     <thead>
                     <tr>
-                        <th width="60%">Name</th>
+                        <th width="10%">ID</th>
+                        <th width="50%">Name</th>
                         <th width="40%">Created By</th>
                     </tr>
                     </thead>
@@ -36,7 +37,7 @@
         $('#sidebar-list').addClass('in');
 
         dt = $('table').dataTable({
-            "order": [[ 0, "asc" ]],
+            "order": [[ 1, "asc" ]],
             "bDestroy": true,
             "filter": true,
             "ajax": {
@@ -48,13 +49,13 @@
                 }
             },
             columns: [
+                { data: "id" },
                 { data: "name" },
                 { data: "created_by", render:
                     function(data, type, row) {
                         return row.first_name + " " + row.last_name;
                     }
-                },
-                { data: "id", visible: false }
+                }
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();

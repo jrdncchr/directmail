@@ -18,6 +18,10 @@ a:focus, button:focus, a:hover, a:active {
     outline: 0 !important;
 }
 
+.hidden {
+    display: none;
+}
+
 .center {
     margin: 0 auto;
 }

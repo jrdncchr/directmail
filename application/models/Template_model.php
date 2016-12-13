@@ -15,7 +15,9 @@ class Template_model extends CI_Model {
      */
     public function get($where = array(), $list = true)
     {
-        $result = $this->db->get_where('templates', $where);
+        $this->db->select('t.*, u.first_name, u.last_name');
+        $this->db->join('user u', 'u.id = t.created_by', 'left');
+        $result = $this->db->get_where('templates t', $where);
         return $list ? $result->result() : $result->row();
     }
 

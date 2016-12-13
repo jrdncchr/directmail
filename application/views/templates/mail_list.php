@@ -59,16 +59,6 @@
                 $('table tbody tr').on('click', function () {
                     var pos = table.fnGetPosition(this);
                     var data = table.fnGetData(pos);
-                    $.post(actionUrl, {action: 'check_list_permission', list_id: data.id}, function(res) {
-                        if (res.success) {
-                            window.location = baseUrl + "templates/info/" + data.id;
-                        } else {
-                            showConfirmModal({
-                                title: "Permission Denied",
-                                body: "You don't have permission for this list."
-                            });
-                        }
-                    }, 'json');
                 });
             },
             "language": {

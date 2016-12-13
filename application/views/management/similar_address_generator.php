@@ -16,8 +16,9 @@
                 <label for="name">{{ similar_address.length }} similar address generated:</label>
                 <ul class="list-group">
                     <li class="list-group-item" v-for="addr in similar_address">
-                        {{ addr }}
+                        <a href="#" class="list-group-item">{{ addr }}</a>
                     </li>
+                    <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
                 </ul>
             </div>
             
