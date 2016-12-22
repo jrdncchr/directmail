@@ -22,293 +22,327 @@
     <?php if ($list->id > 0): ?>
     <div class="row" style="margin-top: 20px;">
         <div class="col-sm-12">
-        <?php if (isset($property)): ?>
-        <button v-on:click="deleteProperty" class="btn btn-xs" style="margin-bottom: 15px;"><i class="fa fa-trash"></i> Delete Property</button>
-        <?php endif; ?>
- 
-        <div class="alert alert-warning" v-if="property && property.status === 'pending'">
-            <i class="fa fa-info-circle"></i>
-            This property is still pending for approval.
-        </div>
-        <div class="alert alert-warning" v-if="property && property.status === 'replacement'">
-            <i class="fa fa-info-circle"></i>
-            This property is saved for replacement approval for property <a target="_blank" :href="property.pr_url">{{ property.target_property_id }}</a>.
-        </div>
 
-        <!-- Nav tabs -->
-          <ul class="nav nav-tabs nav-justified" role="tablist">
-            <li role="presentation" class="active"><a href="#info" aria-controls="info" role="tab" data-toggle="tab">Information</a></li>
-            <li v-show="data.property.id" role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments</a></li>
-            <li v-show="data.property.id" role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
-          </ul>
+            <div class="alert alert-warning" v-show="property && property.status === 'pending'" style="display: none;">
+                <i class="fa fa-info-circle"></i>
+                This property is still pending for approval.
+            </div>
+            <div class="alert alert-warning" v-show="property && property.status === 'replacement'" style="display: none;">
+                <i class="fa fa-info-circle"></i>
+                This property is saved for replacement approval for property <a target="_blank" :href="property.pr_url">{{ property.target_property_id }}</a>.
+            </div>
+            <?php if ($this->session->flashdata('message')): ?>
+                <div class="alert alert-success">
+                    <i class="fa fa-check-circle"></i>
+                    <?php echo $this->session->flashdata('message'); ?>
+                </div>
+            <?php endif; ?>
 
-          <div class="tab-content">
-            <!-- Information -->
-            <div role="tabpanel" class="tab-pane active" id="info">
-                <button v-on:click="saveProperty" class="btn btn-xs btn-main" style="margin-bottom: 20px;">
-                    <i class="fa fa-save"></i> Save Property</button>
-                <div class="notice"></div>
-                <div class="panel panel-default" v-if="list.show_deceased == 1">
-                    <div class="panel-heading">Deceased</div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="d_first_name">* First Name</label>
-                                    <input name="d_first_name" type="text" class="form-control required" required
-                                           title="First Name" v-model="property.deceased_first_name" />
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="d_middle_name">Middle Name</label>
-                                    <input name="d_middle_name" type="text" class="form-control"
-                                           title="Middle Name" v-model="property.deceased_middle_name" />
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="d_last_name">* Last Name</label>
-                                    <input name="d_last_name" type="text" class="form-control required" required
-                                           title="Last Name" v-model="property.deceased_last_name" />
-                                </div>
-                            </div>
+            <div style="margin-bottom: 15px;">
+                <span v-show="property.status == 'pending'" class="label label-warning" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
+                <span v-show="property.status == 'active' || property.status == 'lead'" class="label label-success" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
+                <span v-show="property.status == 'change'" class="label label-info" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
+                <span v-show="property.status == 'stop'" class="label label-danger" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
+                <span v-show="property.status == 'inactive'" class="label label-default" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
+            </div>
+
+            <!-- Nav tabs -->
+              <ul class="nav nav-tabs nav-justified" role="tablist">
+                <li role="presentation" class="active"><a href="#info" aria-controls="info" role="tab" data-toggle="tab">Information</a></li>
+                <li v-show="data.property.id" role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments</a></li>
+                <li v-show="data.property.id" role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
+              </ul>
+
+              <div class="tab-content">
+                <!-- Information -->
+                <div role="tabpanel" class="tab-pane active" id="info">
+                    <div class="notice"></div>
+                    <button v-on:click="saveProperty" class="btn btn-xs btn-main" style="margin-bottom: 20px;">
+                        <i class="fa fa-save"></i> Save Property
+                    </button>
+
+                    <?php if (isset($property) && ($property->status !== 'pending' || $mc->_checkModulePermission(MODULE_APPROVAL_ID, 'update'))): ?>
+                    <div class="form-inline pull-right" style="margin-bottom: 10px;">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-control" v-model="property.status">
+                                <option value="pending">Pending</option>
+                                <option value="active">Active</option>
+                                <option value="lead">Lead</option>
+                                <option value="change">Change</option>
+                                <option value="stop">Stop</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="d_address">* Address</label>
-                                    <input name="d_address" type="text" class="form-control required" required
-                                           title="Address" v-model="property.deceased_address"
-                                           :disabled="property.status == 'replacement' ? true : false" />
+                    </div>
+                    <?php endif; ?>
+
+
+                    <div class="panel panel-default" v-if="list.show_deceased == 1">
+                        <div class="panel-heading">Deceased</div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="d_first_name">* First Name</label>
+                                        <input name="d_first_name" type="text" class="form-control required" required
+                                               title="First Name" v-model="property.deceased_first_name" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="d_middle_name">Middle Name</label>
+                                        <input name="d_middle_name" type="text" class="form-control"
+                                               title="Middle Name" v-model="property.deceased_middle_name" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="d_last_name">* Last Name</label>
+                                        <input name="d_last_name" type="text" class="form-control required" required
+                                               title="Last Name" v-model="property.deceased_last_name" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="d_city">* City</label>
-                                    <input name="d_city" type="text" class="form-control required" required
-                                           title="City" v-model="property.deceased_city" 
-                                           :disabled="property.status == 'replacement' ? true : false" />
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="d_address">* Address</label>
+                                        <input name="d_address" type="text" class="form-control required" required
+                                               title="Address" v-model="property.deceased_address"
+                                               :disabled="property.status == 'replacement' ? true : false" />
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="d_state">* State</label>
-                                    <input name="d_state" type="text" class="form-control required" required
-                                           title="State" v-model="property.deceased_state" 
-                                           :disabled="property.status == 'replacement' ? true : false" />
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="d_city">* City</label>
+                                        <input name="d_city" type="text" class="form-control required" required
+                                               title="City" v-model="property.deceased_city" 
+                                               :disabled="property.status == 'replacement' ? true : false" />
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="d_zip_code">* Zip Code</label>
-                                    <input name="d_zip_code" type="text" class="form-control required" required
-                                           title="Zip Code" v-model="property.deceased_zipcode" 
-                                           :disabled="property.status == 'replacement' ? true : false" />
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="d_state">* State</label>
+                                        <input name="d_state" type="text" class="form-control required" required
+                                               title="State" v-model="property.deceased_state" 
+                                               :disabled="property.status == 'replacement' ? true : false" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="d_zip_code">* Zip Code</label>
+                                        <input name="d_zip_code" type="text" class="form-control required" required
+                                               title="Zip Code" v-model="property.deceased_zipcode" 
+                                               :disabled="property.status == 'replacement' ? true : false" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="panel panel-default" v-if="list.show_pr == 1">
+                        <div class="panel-heading">PR</div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="pr_first_name">* First Name</label>
+                                        <input name="pr_first_name" type="text" class="form-control required" required
+                                               title="First Name" v-model="property.pr_first_name" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="pr_middle_name">Middle Name</label>
+                                        <input name="pr_middle_name" type="text" class="form-control"
+                                               title="Middle Name" v-model="property.pr_middle_name" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="pr_last_name">* Last Name</label>
+                                        <input name="pr_last_name" type="text" class="form-control required" required
+                                               title="Last Name" v-model="property.pr_last_name" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="pr_address">* Address</label>
+                                        <input name="pr_address" type="text" class="form-control required" required
+                                               title="Address" v-model="property.pr_address" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="pr_city">* City</label>
+                                        <input name="pr_city" type="text" class="form-control required" required
+                                               title="City" v-model="property.pr_city" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="pr_state">* State</label>
+                                        <input name="pr_state" type="text" class="form-control required" required
+                                               title="State" v-model="property.pr_state" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="pr_zip_code">* Zip Code</label>
+                                        <input name="pr_zip_code" type="text" class="form-control required" required
+                                               title="Zip Code" v-model="property.pr_zipcode" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" v-if="list.show_attorney == 1">
+                        <div class="panel-heading">Attorney</div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="a_name">* Name</label>
+                                        <input name="a_name" type="text" class="form-control required" required
+                                               title="Name" v-model="property.attorney_name" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="a_first_address">* First Address</label>
+                                        <input name="a_first_address" type="text" class="form-control required" required
+                                               title="Address" v-model="property.attorney_first_address" />
+                                    </div>
+                                </div>
+                            </div>
+                           <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="a_second_address">Second Address</label>
+                                        <input name="a_second_address" type="text" class="form-control"
+                                               title="Address" v-model="property.attorney_second_address" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="a_city">* City</label>
+                                        <input name="a_city" type="text" class="form-control required" required
+                                               title="City" v-model="property.attorney_city" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="a_state">* State</label>
+                                        <input name="a_state" type="text" class="form-control required" required
+                                               title="State" v-model="property.attorney_state" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="a_zip_code">* Zip Code</label>
+                                        <input name="pr_zip_code" type="text" class="form-control required" required
+                                               title="Zip Code" v-model="property.attorney_zipcode" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default" v-if="list.show_mail == 1">
+                        <div class="panel-heading">Mail</div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="m_first_name">* First Name</label>
+                                        <input name="m_first_name" type="text" class="form-control required" required
+                                               title="First Name" v-model="property.mail_first_name" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="m_last_name">* Last Name</label>
+                                        <input name="m_last_name" type="text" class="form-control required" required
+                                               title="Last Name" v-model="property.mail_last_name" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="m_address">* Address</label>
+                                        <input name="m_address" type="text" class="form-control required" required
+                                               title="Address" v-model="property.mail_address" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="m_city">* City</label>
+                                        <input name="m_city" type="text" class="form-control required" required
+                                               title="City" v-model="property.mail_city" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="m_state">* State</label>
+                                        <input name="m_state" type="text" class="form-control required" required
+                                               title="State" v-model="property.mail_state" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="m_zip_code">* Zip Code</label>
+                                        <input name="m_zip_code" type="text" class="form-control required" required
+                                               title="Zip Code" v-model="property.mail_zipcode" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="panel panel-default" v-if="list.show_pr == 1">
-                    <div class="panel-heading">PR</div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="pr_first_name">* First Name</label>
-                                    <input name="pr_first_name" type="text" class="form-control required" required
-                                           title="First Name" v-model="property.pr_first_name" />
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="pr_middle_name">Middle Name</label>
-                                    <input name="pr_middle_name" type="text" class="form-control"
-                                           title="Middle Name" v-model="property.pr_middle_name" />
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="pr_last_name">* Last Name</label>
-                                    <input name="pr_last_name" type="text" class="form-control required" required
-                                           title="Last Name" v-model="property.pr_last_name" />
-                                </div>
-                            </div>
+                <!-- Comments -->
+                <div role="tabpanel" class="tab-pane" id="comments">
+                    <button class="btn btn-xs btn-default" style="margin-bottom: 20px;" data-toggle="modal" data-target="#comment-modal">
+                    <i class="fa fa-plus-circle"></i> Add Comment
+                    </button>
+                    <section v-if="comments">
+                        <div class="well" v-for="c in comments">
+                            <p class="comment_user"><i class="fa fa-user"></i> {{ c.first_name + ' ' + c.last_name }}</p>
+                            <p class="comment_date"><i class="fa fa-clock-o"></i> {{ c.date_created }}</p>
+                            <p>{{ c.comment }}</p>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="pr_address">* Address</label>
-                                    <input name="pr_address" type="text" class="form-control required" required
-                                           title="Address" v-model="property.pr_address" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="pr_city">* City</label>
-                                    <input name="pr_city" type="text" class="form-control required" required
-                                           title="City" v-model="property.pr_city" />
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="pr_state">* State</label>
-                                    <input name="pr_state" type="text" class="form-control required" required
-                                           title="State" v-model="property.pr_state" />
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="pr_zip_code">* Zip Code</label>
-                                    <input name="pr_zip_code" type="text" class="form-control required" required
-                                           title="Zip Code" v-model="property.pr_zipcode" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </section>
+                    <section v-else>
+                        <div class="well">No comments found.</div>
+                    </section>
                 </div>
 
-                <div class="panel panel-default" v-if="list.show_attorney == 1">
-                    <div class="panel-heading">Attorney</div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="a_name">* Name</label>
-                                    <input name="a_name" type="text" class="form-control required" required
-                                           title="Name" v-model="property.attorney_name" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="a_first_address">* First Address</label>
-                                    <input name="a_first_address" type="text" class="form-control required" required
-                                           title="Address" v-model="property.attorney_first_address" />
-                                </div>
-                            </div>
-                        </div>
-                       <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="a_second_address">Second Address</label>
-                                    <input name="a_second_address" type="text" class="form-control"
-                                           title="Address" v-model="property.attorney_second_address" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="a_city">* City</label>
-                                    <input name="a_city" type="text" class="form-control required" required
-                                           title="City" v-model="property.attorney_city" />
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="a_state">* State</label>
-                                    <input name="a_state" type="text" class="form-control required" required
-                                           title="State" v-model="property.attorney_state" />
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="a_zip_code">* Zip Code</label>
-                                    <input name="pr_zip_code" type="text" class="form-control required" required
-                                           title="Zip Code" v-model="property.attorney_zipcode" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel panel-default" v-if="list.show_mail == 1">
-                    <div class="panel-heading">Mail</div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label for="m_first_name">* First Name</label>
-                                    <input name="m_first_name" type="text" class="form-control required" required
-                                           title="First Name" v-model="property.mail_first_name" />
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label for="m_last_name">* Last Name</label>
-                                    <input name="m_last_name" type="text" class="form-control required" required
-                                           title="Last Name" v-model="property.mail_last_name" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="m_address">* Address</label>
-                                    <input name="m_address" type="text" class="form-control required" required
-                                           title="Address" v-model="property.mail_address" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="m_city">* City</label>
-                                    <input name="m_city" type="text" class="form-control required" required
-                                           title="City" v-model="property.mail_city" />
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="m_state">* State</label>
-                                    <input name="m_state" type="text" class="form-control required" required
-                                           title="State" v-model="property.mail_state" />
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="m_zip_code">* Zip Code</label>
-                                    <input name="m_zip_code" type="text" class="form-control required" required
-                                           title="Zip Code" v-model="property.mail_zipcode" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- History -->
+                <div role="tabpanel" class="tab-pane" id="history">
+                   
                 </div>
 
             </div>
 
-            <!-- Comments -->
-            <div role="tabpanel" class="tab-pane" id="comments">
-                <button class="btn btn-xs btn-default" style="margin-bottom: 20px;" data-toggle="modal" data-target="#comment-modal">
-                <i class="fa fa-plus-circle"></i> Add Comment
-                </button>
-                <section v-if="comments">
-                    <div class="well" v-for="c in comments">
-                        <p class="comment_user"><i class="fa fa-user"></i> {{ c.first_name + ' ' + c.last_name }}</p>
-                        <p class="comment_date"><i class="fa fa-clock-o"></i> {{ c.date_created }}</p>
-                        <p>{{ c.comment }}</p>
-                    </div>
-                </section>
-                <section v-else>
-                    <div class="well">No comments found.</div>
-                </section>
-            </div>
-
-            <!-- History -->
-            <div role="tabpanel" class="tab-pane" id="history">
-               
-            </div>
-
-          </div>
+            <?php if (isset($property)): ?>
+            <button v-on:click="deleteProperty" class="btn btn-xs" style="margin-bottom: 35px;"><i class="fa fa-trash"></i> Delete Property</button>
+            <?php endif; ?>
         </div>
     </div>
     <?php endif; ?>
@@ -368,9 +402,10 @@
                             <div class="form-group" v-if="similar_address.length == 1">
                                 <label for="m_zip_code">* What action would you like to take?</label>
                                 <select class="form-control required" v-model="similar_address_action">
-                                    <option value="1">Save property for replacement approval.</option>
-                                    <option v-show="similar_address[0].permission" value="2">Replace the address of the old property. (Delete/Unsave this property)</option>
-                                    <option v-show="similar_address[0].permission" value="3">Remove the old property and keep this new property.</option>
+                                    <option value="save">Save property for replacement approval.</option>
+                                    <option v-show="similar_address[0].permission" value="2">Replace (Deceased Address only)</option>
+                                    <option v-show="similar_address[0].permission" value="3">Replace (All except list info)</option>
+                                    <option v-show="similar_address[0].permission" value="4">Replace (All)</option>
                                 </select>
                             </div>
                         </div>
@@ -379,7 +414,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-xs pull-left" data-dismiss="modal">Close</button>
                     <div v-if="similar_address.length == 1">
-                        <button v-on:click="similarAddressConfirmAction" type="button" class="btn btn-main btn-xs">Confirm</button>
+                        <button v-on:click="replaceConfirmAction" type="button" class="btn btn-main btn-xs">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -393,7 +428,7 @@
 
     var data = {
         similar_address: [],
-        similar_address_action: 1,
+        similar_address_action: 'save',
         list_category : <?php echo json_encode($list_category); ?>,
         list : <?php echo json_encode($list); ?>,
         property: {},
@@ -408,6 +443,15 @@
     var vm = new Vue({
         el: "#app",
         data: data,
+        filters: {
+            capitalize: function (value) {
+                if (!value) { 
+                    return '';
+                }
+                value = value.toString()
+                return value.charAt(0).toUpperCase() + value.slice(1)
+            }
+        },
         methods: {
             saveProperty: function() {
                 var infoForm = $('#info');
@@ -421,6 +465,7 @@
                             if (res.exist) {
                                 loading('warning', 'A similar existing property is detected.');
                                 data.similar_address = res.properties;
+
                                 var propertyExistModal = $('#property-exist-modal');
                                 propertyExistModal.modal({
                                     show: true,
@@ -434,9 +479,9 @@
                     }, 'json');
                 }
             },
-            similarAddressConfirmAction: function() {
+            replaceConfirmAction: function() {
                 loading("info", "Taking action, please wait...");
-                $.post(actionUrl, { action: 'similar_address_action', target_property_id: data.similar_address[0].id, property: data.property, similar_address_action: data.similar_address_action }, function(res) {
+                $.post(actionUrl, { action: 'replace_action', target_property_id: data.similar_address[0].id, property: data.property, replace_action: data.similar_address_action }, function(res) {
                     if (res.success && (undefined == data.property.id)) {
                         window.location = actionUrl + '/' + data.list.id + '/info/' + res.id;
                     } else if (!res.success) {
@@ -445,8 +490,11 @@
                         loading('success', 'Action complete.');
                         var propertyExistModal = $('#property-exist-modal');
                         propertyExistModal.modal('hide');
-                        if (data.similar_address_action == 1) {
+                        if (data.similar_address_action == 'save') {
                             data.property.status = 'replacement';
+                            data.property.target_property_id = data.similar_address[0].id;
+                        } else {
+                             window.location = actionUrl + '/' + res.target_list_id + '/info/' + res.target_id;
                         }
                     }
                 }, 'json');

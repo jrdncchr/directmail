@@ -196,14 +196,16 @@
             columns: [
                 { data: "id" },
                 { data: "status", render: function(data, type, row) {
-                        if (data == "active") {
-                            return "<span class='label label-success'>Active</span>";
-                        } else if (data == "pending") {
-                            return "<span class='label label-warning'>Pending</span>";
-                        } else if (data =="replacement") {
-                            return "<span class='label label-warning'>Replacement</span>";
-                        } else {
-                            return "<span class='label label-default'>Inactive</span>";
+                        if (data == "active" || data == "lead") {
+                            return "<span class='label label-success'>" + capitalize(data) + "</span>";
+                        } else if (data == "pending" || data == "replacement") {
+                            return "<span class='label label-warning'>" + capitalize(data) + "</span>";
+                        } else if (data =="change") {
+                            return "<span class='label label-info'>" + capitalize(data) + "</span>";
+                        } else if (data =="inactive") {
+                            return "<span class='label label-default'>" + capitalize(data) + "</span>";
+                        } else if (data =="stop") {
+                            return "<span class='label label-danger'>" + capitalize(data) + "</span>";
                         }
                     } 
                 },

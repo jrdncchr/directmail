@@ -58,6 +58,12 @@ class Property_model extends CI_Model {
         return array('success' => true, 'id' =>  $property['id']);
     }
 
+    public function update($where = array(), $update = array()) 
+    {
+        $this->db->where($where);
+        return $this->db->update('property', $update);
+    }
+
     public function delete($id, $company_id, $status = 'pending')
     {
         if ($status == 'replacement') {
@@ -94,28 +100,41 @@ class Property_model extends CI_Model {
 
     public function get_pending_properties($company_id) 
     {
-        $this->db->select('p.*, l.name as list_name');
+        $this->db->select('p.*, l.name as list_name, l.id as list_id');
         $this->db->join('list l', 'l.id = p.list_id');
-        $this->db->where(array('l.company_id' => $company_id, 'p.status' => 'pending'));
+        $this->db->where(array('l.company_id' => $company_id, 'p.status' => 'pending', 'p.deleted' => 0));
         $result = $this->db->get('property p');
         return $result->result();
     }
 
-    public function save_replacement_approval($property_id, $target_property_id, $company_id)
+    public function get_replacement_properties($company_id) 
+    {
+        $this->db->select('p.*, 
+            l.name as list_name, 
+            l.id as list_id, 
+            p2.id as target_id, 
+            p2.deceased_address as target_deceased_address, 
+            l2.name as target_list_name,
+            l2.id as target_list_id');
+        $this->db->join('list l', 'l.id = p.list_id', 'left');
+        $this->db->join('property_replacement pr', 'pr.property_id = p.id', 'left');
+        $this->db->join('property p2', 'p2.id = pr.target_property_id', 'left');
+        $this->db->join('list l2', 'l2.id = p2.list_id', 'left');
+        $this->db->where(array('l.company_id' => $company_id, 'p.status' => 'replacement', 'p.deleted' => 0, 'p.active' => 1));
+        $result = $this->db->get('property p');
+        return $result->result();
+    }
+
+    public function save_replacement_approval($replacement)
     {
         $result = array('success' => false);
         $exist = $this->db->get_where('property_replacement', array(
-            'property_id' => $property_id,
-            'company_id' => $company_id
+            'property_id' => $replacement['property_id'],
+            'company_id' => $replacement['company_id']
         ));
-        $replacement = array(
-            'property_id' => $property_id,
-            'target_property_id' => $target_property_id,
-            'status' => 'pending',
-            'company_id' => $company_id
-        );
+        
         if ($exist->num_rows() > 0) {
-            $this->db->where(array('target_property_id' => $target_property_id, 'company_id' => $company_id));
+            $this->db->where(array('target_property_id' => $replacement['target_property_id'], 'company_id' => $replacement['company_id']));
             $save = $this->db->update('property_replacement', $replacement);
         } else {
             $save = $this->db->insert('property_replacement', $replacement);
@@ -126,18 +145,25 @@ class Property_model extends CI_Model {
         return $result;
     }
 
+    public function update_property_replacement($where = array(), $update = array()) 
+    {
+        $this->db->where($where);
+        return $this->db->update('property_replacement', $update);
+    }
+
     public function check_property_exists($property, $company_id)
     {
         $result = array('exist' => false);
         $similar_address = $this->generate_similar_address($property['deceased_address'], $company_id);
         $similar_address[] = strtolower($property['deceased_address']);
-        $this->db->select('id, deceased_address, list_id');
+        $this->db->select('id, deceased_address, list_id, status');
         $this->db->where_in('LOWER(deceased_address)', $similar_address);
         $this->db->where('LOWER(deceased_city)', strtolower($property['deceased_city']));
         $this->db->where('LOWER(deceased_state)', strtolower($property['deceased_state']));
         $this->db->where('deceased_zipcode', $property['deceased_zipcode']);
         $this->db->where('company_id', $company_id);
         $this->db->where('deleted', 0);
+        $this->db->where('active', 1);
         if (isset($property['id'])) {
             $this->db->where('id !=', $property['id']);
         }

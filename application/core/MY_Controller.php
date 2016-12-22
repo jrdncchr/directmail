@@ -77,7 +77,7 @@ class MY_Controller extends CI_Controller
             $user_module_permissions = $this->_objectToArrayById($user_module_permissions);
             $this->session->set_userdata('user_module_permissions', $user_module_permissions);
         }
-        $module_permissions = $this->_arrayMergeById($role_module_permissions, $user_module_permissions);
+        $module_permissions = $role_module_permissions ? $this->_arrayMergeById($role_module_permissions, $user_module_permissions) : $user_module_permissions;
         $this->module_permissions = $module_permissions;
         $this->data['module_permissions'] = $module_permissions;
 
@@ -114,7 +114,7 @@ class MY_Controller extends CI_Controller
                 }
             }
         }
-        $list_category_permissions = $this->_arrayMergeById($role_list_category_permissions, $user_list_category_permissions);
+        $list_category_permissions = $role_list_category_permissions ? $this->_arrayMergeById($role_list_category_permissions, $user_list_category_permissions) : $user_list_category_permissions;
         $this->list_category_permissions = $list_category_permissions;
         $this->data['list_category_permissions'] = $list_category_permissions;
 
@@ -215,6 +215,11 @@ class MY_Controller extends CI_Controller
     }
 
     function _arrayMergeById($array1, $array2) {
+        if (!$array1) {
+            return $array2;
+        } else if (!$array2) {
+            return $array1;
+        }
         $final_array = $array1;
         foreach ($array2 as $k2 => $v2) {
             $add = true;

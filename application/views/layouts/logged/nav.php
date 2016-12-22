@@ -5,6 +5,7 @@
     <?php foreach ($modules as $m): ?>
     <?php if ($mc->_checkModulePermission($m->id, 'retrieve')): ?>
     <div class="panel panel-sidebar" id="panel-sidebar">
+
         <?php if (sizeof($m->children) > 0 || $m->code == "list" || $m->code == "templates"): ?>
         <a role="button" data-toggle="collapse" data-parent="#panel-sidebar" href="#sidebar-<?php echo $m->code; ?>" aria-expanded="true" aria-controls="sidebar-<?php echo $m->code; ?>">
         <?php else: ?>
@@ -19,14 +20,16 @@
                 </h4>
             </div>
         </a>
+
         <?php if (sizeof($m->children) > 0 || $m->code == "list" || $m->code == "templates"): ?>
         <div id="sidebar-<?php echo $m->code; ?>" class="panel-collapse collapse" role="tabpanel">
             <div class="panel-body">
                 <?php if ($m->code == "list" || $m->code == "templates"): ?>
-
             		<?php if ($m->code == "templates"): ?>
             			<?php foreach ($m->children as $child): ?>
+                            <?php if ($mc->_checkModulesChildPermission($m->id, $child->id, 'retrieve')): ?>
 	                        <a id="sidebar-<?php echo $child->code; ?>-link" href="<?php echo base_url() . $child->link; ?>"><?php echo $child->name; ?></a>
+                            <?php endif; ?>
 	                    <?php endforeach; ?>
 	                    <span class="dropdown-header" style="color: #F2CB57">List Templates</span>
         			<?php endif; ?>
@@ -42,7 +45,9 @@
                     <?php endforeach; ?>
                 <?php else: ?>
                     <?php foreach ($m->children as $child): ?>
+                        <?php if ($mc->_checkModulesChildPermission($m->id, $child->id, 'retrieve')): ?>
                         <a id="sidebar-<?php echo $child->code; ?>-link" href="<?php echo base_url() . $child->link; ?>"><?php echo $child->name; ?></a>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>

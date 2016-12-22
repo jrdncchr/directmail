@@ -67,7 +67,9 @@ class Lists extends MY_Controller {
                 case 'property_list' :
                     $this->load->model('property_model');
                     $lists = $this->property_model->get_list(array(
-                        'list_id' => $this->input->post('list_id')));
+                        'list_id' => $this->input->post('list_id'),
+                        'deleted' => 0, 
+                        'active' => 1));
                     echo json_encode(array('data' => $lists));
                     break;
                 case 'check_list_permission' :
@@ -104,6 +106,18 @@ class Lists extends MY_Controller {
                     $list_id = $this->input->post('list_id');
                     $testimonials = $this->input->post('testimonials');
                     $result = $this->list_model->save_testimonials($list_id, $testimonials);
+                    break;
+                case 'replace_action':
+                    $replace_action = $this->input->post('replace_action');
+                    $property = $this->input->post('property');
+                    $target_property_id = $this->input->post('target_property_id');
+                    $this->load->library('property_library');
+                    $result = $this->property_library->replace_action(
+                        $replace_action,
+                        $property,
+                        $target_property_id,
+                        $this->logged_user
+                    );
                     break;
             }
             if ($action != 'property_list') {
@@ -219,7 +233,8 @@ class Lists extends MY_Controller {
                                 $cp->permission = $this->_checkListPermission($cp->list_id, 'retrieve');
                                 $cp->url = base_url() . "lists/property/". $cp->list_id . "/info/" . $cp->id;
                             }
-                            $result = $check_property;
+                            $result['exist'] = true;
+                            $result['properties'] = $check_property['properties'];
                             $result['success'] = false;
                         } else {
                             $result = $this->property_model->save($property);
@@ -227,37 +242,17 @@ class Lists extends MY_Controller {
                     }
                     echo json_encode($result);
                     break;
-                case 'similar_address_action' :
-                    $target_property_id = $this->input->post('target_property_id');
+                case 'replace_action' :
+                    $replace_action = $this->input->post('replace_action');
                     $property = $this->input->post('property');
-                    $property['created_by'] = $this->logged_user->id;
-                    $property['company_id'] = $this->logged_user->company_id;
-
-                    $sa_action = $this->input->post('similar_address_action');
-                    if ($sa_action == 1) {
-                        $property['status'] = 'replacement';
-                        $save = $this->property_model->save($property);
-                        if ($save['success']) {
-                            $result = $this->property_model->save_replacement_approval($save['id'],
-                                $target_property_id, $this->logged_user->company_id);
-                        } else {
-                            $result = array('success' => false);
-                        }
-                    } else if ($sa_action == 2) {
-                        $old_property = array(
-                            'id' => $target_property_id,
-                            'deceased_address' => $property['deceased_address'],
-                            'company_id' => $property['company_id']
-                        );
-                        $result = $this->property_model->save($old_property);
-                    } else if ($sa_action == 3) {
-                        $delete = $this->property_model->delete($target_property_id, $this->logged_user->company_id);
-                        if ($delete['success']) {
-                            $result = $this->property_model->save($property);
-                        } else {
-                            $result = array('success' => false);
-                        }
-                    }
+                    $target_property_id = $this->input->post('target_property_id');
+                    $this->load->library('property_library');
+                    $result = $this->property_library->replace_action(
+                        $replace_action,
+                        $property,
+                        $target_property_id,
+                        $this->logged_user
+                    );
                     echo json_encode($result);
                     break;
                 case 'delete_property':
@@ -389,6 +384,7 @@ class Lists extends MY_Controller {
                     case 25 : $property['mail_city'] = $val; break;
                     case 26 : $property['mail_state'] = $val; break;
                     case 27 : $property['mail_zipcode'] = $val; break;
+                    case 28 : $property['status'] = $val; break;
                 }
             }
             if ($property['list_id'] == $list_id) {

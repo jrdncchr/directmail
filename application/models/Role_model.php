@@ -142,7 +142,7 @@ class Role_model extends CI_Model {
     {
         $this->db->select('lc.id as _id, lc.name, lc.description, lc.active, rlcp.*');
         $this->db->join('roles_list_category_permission rlcp', 'rlcp.list_category_id = lc.id AND rlcp.role_id = ' . $role_id, 'left');
-        $this->db->where(array('lc.active' => 1, 'lc.deleted' => 0));
+        $this->db->where(array('lc.active' => 1, 'lc.deleted' => 0, 'lc.company_id' => $company_id));
         $permission = $this->db->get('list_category lc')->result();
         if ($permission) {
             return $permission;

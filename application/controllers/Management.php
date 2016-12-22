@@ -85,6 +85,9 @@ class Management extends MY_Controller {
                     break;
                 case 'save' :
                     $list_category = $this->input->post('form');
+                    if (isset($list_category['active']) && $list_category['active'] === 'true') {
+                        $list_category['active'] = 1;
+                    }
                     $list_category['company_id'] = $this->logged_user->company_id;
                     $result = $this->list_category_model->save($list_category);
                     echo json_encode($result);

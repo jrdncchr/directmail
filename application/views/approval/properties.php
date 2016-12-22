@@ -7,7 +7,7 @@
 
     <div class="row">
         <div class="col-sm-12 panel-white">
-            <div class="table-responsive" style="width: 100%; margin-top: 20px;">
+            <div class="table-responsive" style="width: 100%;">
                 <table class="table table-bordered table-hover" width="100%">
                     <thead>
                     <tr>
@@ -57,7 +57,11 @@
                 }
             },
             columns: [
-                { data: "id" },
+                { data: "id", render: 
+                    function(data, type, row) {
+                        return row.url ? "<a target='_blank' href='" + row.url + "'>" + data + "</a>" : "";
+                    }
+                },
                 { data: "list_name" },
                 { data: "deceased_last_name", render:
                     function(data, type, row) {
@@ -77,7 +81,7 @@
                 $('table tbody tr').on('click', function () {
                     var pos = table.fnGetPosition(this);
                     var d = table.fnGetData(pos);
-                    window.location = baseUrl + 'lists/property/' + data.list.id + '/info/' + d.id; 
+                    console.log(d);
                 });
             },
             "language": {

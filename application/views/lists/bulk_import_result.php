@@ -13,7 +13,7 @@
         <li><a href="<?php echo base_url() . 'lists/category/' . $list_category->_id; ?>"><?php echo $list_category->name; ?></a></li>
         <li><a href="<?php echo base_url() . 'lists/info/' . $list->id; ?>"><?php echo  $list->name; ?></a></li>
         <li><a href="<?php echo base_url() . 'lists/info/' . $list->id . '/bulk_import'; ?>">Bulk Import</a></li>
-        <li><a class="active">Bulk Import Result</a></li>
+        <li><a class="active">Result</a></li>
     </ol>
 
     <div class="row">
@@ -25,11 +25,13 @@
                     <thead>
                         <tr>
                             <th>Action</th>
+                            <th>Status</th>
                             <th>Spreadsheet Row</th>
-                            <th>Property Address</th>
+                            <th>Deceased Address</th>
                             <th></th>
-                            <th>Similar Property ID</th>
-                            <th>Similar Property Address</th>
+                            <th>Target Status</th>
+                            <th>Taraget Property ID</th>
+                            <th>Target Deceased Address</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,14 +42,30 @@
                                         Action <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#">Replace similar property.</a></li>
-                                        <li><a href="#">Save property for replacement approval.</a></li>
+                                        <li><a href="#" v-on:click="replaceAction('save', similar)">Save property for replacement approval.</a></li>
+                                        <li><a href="#" v-on:click="replaceAction(2, similar)">Replace (Deceased Address only)</a></li>
+                                        <li><a href="#" v-on:click="replaceAction(3, similar)">Replace (All except list info)</a></li>
+                                        <li><a href="#" v-on:click="replaceAction(4, similar)">Replace (All)</a></li>
                                     </ul>
                                 </div>
+                            </td>
+                            <td>
+                                <span class="label label-success" v-show="similar.status == 'active' || similar.status == 'lead'">{{ similar.status }}</span>
+                                <span class="label label-warning" v-show="similar.status == 'pending'">{{ similar.status }}</span>
+                                <span class="label label-info" v-show="similar.status == 'change'">{{ similar.status }}</span>
+                                <span class="label label-danger" v-show="similar.status == 'stop'">{{ similar.status }}</span>
+                                <span class="label label-default" v-show="similar.status == 'inactive'">{{ similar.status }}</span>
                             </td>
                             <td>{{ similar.row }}</td>
                             <td>{{ similar.deceased_address }}</td>
                             <td><i class="fa fa-arrows-h fa-2x"></i></td>
+                            <td>
+                                <span class="label label-success" v-show="similar.check.properties[0].status == 'active' || similar.check.properties[0].status == 'lead'">{{ similar.check.properties[0].status }}</span>
+                                <span class="label label-warning" v-show="similar.check.properties[0].status == 'pending'">{{ similar.check.properties[0].status }}</span>
+                                <span class="label label-info" v-show="similar.check.properties[0].status == 'change'">{{ similar.check.properties[0].status }}</span>
+                                <span class="label label-danger" v-show="similar.check.properties[0].status == 'stop'">{{ similar.check.properties[0].status }}</span>
+                                <span class="label label-default" v-show="similar.check.properties[0].status == 'inactive'">{{ similar.check.properties[0].status }}</span>
+                            </td>
                             <td v-if="similar.check.properties[0].permission">
                                 <a style="font-size: 14px;" target="_blank" :href="similar.check.properties[0].url">{{ similar.check.properties[0].id }}</a>
                             </td>
@@ -89,7 +107,7 @@
 </div>
 
 <script>
-    var actionUrl = "<?php echo base_url() . 'list/info'; ?>";
+    var actionUrl = "<?php echo base_url() . 'lists/info'; ?>";
 
     var data = {
         result : <?php echo json_encode($result); ?>
@@ -99,7 +117,25 @@
         el: "#app",
         data: data,
         methods: {
-
+            replaceAction: function(action, property) {
+                loading('info', 'Taking action, please wait...');
+                $.post(actionUrl, {
+                    action: 'replace_action',
+                    replace_action: action,
+                    property: property,
+                    target_property_id: property.check.properties[0].id
+                }, function(res) {
+                    if (res.success) {
+                        for (var i = 0; i < data.result.similars.length; i++) {
+                            if (data.result.similars[i].row == property.row) {
+                                data.result.similars.splice(i, 1);
+                                break;
+                            }
+                        }
+                        loading('success', 'Replacement action complete.');
+                    }
+                }, 'json');
+            }
         }
     });
 
