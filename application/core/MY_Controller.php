@@ -29,6 +29,7 @@ class MY_Controller extends CI_Controller
     {
         parent::__construct();
         $this->logged_user = $this->session->userdata('user');
+
         if ($logged) {
             $this->_checkAuth();
             $this->_initializeSecrets();
@@ -56,13 +57,13 @@ class MY_Controller extends CI_Controller
 
     public function _initializePermissions()
     {
+        $this->load->model('role_model');
         /*
          * Module Permissions
          */
         $role_module_permissions = $this->session->userdata('role_module_permissions');
         if (!$role_module_permissions) {
             if ($this->logged_user->role_id > 0) {
-                $this->load->model('role_model');
                 $role_module_permissions = $this->role_model->get_module_permissions($this->logged_user->role_id);
                 $role_module_permissions = $this->_objectToArrayById($role_module_permissions);
                 $this->session->set_userdata('role_module_permissions', $role_module_permissions);
@@ -80,7 +81,6 @@ class MY_Controller extends CI_Controller
         $module_permissions = $role_module_permissions ? $this->_arrayMergeById($role_module_permissions, $user_module_permissions) : $user_module_permissions;
         $this->module_permissions = $module_permissions;
         $this->data['module_permissions'] = $module_permissions;
-
         /*
          * List Category Permissions
          */
@@ -91,7 +91,8 @@ class MY_Controller extends CI_Controller
                     if ($m->code == "list") {
                         if ($m->retrieve_action == 1) {
                             $role_list_category_permissions = $this->role_model->get_list_category_permissions($this->logged_user->role_id, $this->logged_user->company_id);
-                            $role_list_category_permissions = $this->_objectToArrayById($role_list_category_permissions);
+                            $role_list_category_permissions = $role_list_category_permissions ? 
+                                $this->_objectToArrayById($role_list_category_permissions) : null;
                             $this->session->set_userdata('role_list_category_permissions', $role_list_category_permissions);
                         }
                         break;
@@ -124,7 +125,6 @@ class MY_Controller extends CI_Controller
         $role_list_permissions = $this->session->userdata('role_list_permissions');
         if (!$role_list_permissions) {
             if ($this->logged_user->role_id > 0) {
-                $this->load->model('role_model');
                 $role_list_permissions = $this->role_model->get_list_permissions($this->logged_user->role_id, $this->logged_user->company_id);
                 $role_list_permissions = $this->_objectToArrayById($role_list_permissions);
                 $this->session->set_userdata('role_list_permissions', $role_list_permissions);

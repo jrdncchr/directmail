@@ -12,13 +12,12 @@
                 <input name="name" type="text" class="form-control" required
                        title="Address" v-model="address" v-on:blur="getSimilarAddress" />
             </div>
-            <div class="form-group" v-if="similar_address.length">
+            <div class="form-group" v-show="similar_address.length" style="display: none;">
                 <label for="name">{{ similar_address.length }} similar address generated:</label>
                 <ul class="list-group">
                     <li class="list-group-item" v-for="addr in similar_address">
-                        <a href="#" class="list-group-item">{{ addr }}</a>
+                        {{ addr }}
                     </li>
-                    <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
                 </ul>
             </div>
             

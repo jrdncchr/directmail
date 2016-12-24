@@ -30,12 +30,14 @@ class Management extends MY_Controller {
                     $role_id = $this->input->post('role_id');
                     $module_permissions = $this->input->post('module_permissions');
                     $result = $this->role_model->save_module_permissions($role_id, $module_permissions);
+                    $this->session->unset_userdata('role_module_permissions');
                     echo json_encode($result);
                     break;
                 case 'save_list_category_permissions' :
                     $role_id = $this->input->post('role_id');
                     $list_category_permissions = $this->input->post('list_category_permissions');
                     $result = $this->role_model->save_list_category_permissions($role_id, $list_category_permissions);
+                    $this->session->unset_userdata('role_list_category_permissions');
                     echo json_encode($result);
                     break;
                 case 'delete' :
@@ -163,12 +165,14 @@ class Management extends MY_Controller {
                     $user_id = $this->input->post('user_id');
                     $module_permissions = $this->input->post('module_permissions');
                     $result = $this->user_model->save_module_permissions($user_id, $module_permissions);
+                    $this->session->unset_userdata('user_module_permissions');
                     echo json_encode($result);
                     break;
                 case 'save_list_category_permissions' :
                     $user_id = $this->input->post('user_id');
                     $list_category_permissions = $this->input->post('list_category_permissions');
                     $result = $this->user_model->save_list_category_permissions($user_id, $list_category_permissions);
+                    $this->session->unset_userdata('user_list_category_permissions');
                     echo json_encode($result);
                     break;
                 default :
@@ -208,6 +212,15 @@ class Management extends MY_Controller {
         }
     }
 
+    public function companies()
+    {
+        if ($this->logged_user->role_id == 3 || $this->logged_user->role_id == 8) {
+            echo "test";
+        } else {
+            $this->show_404();
+        }
+    }
+
     public function similar_address_generator()
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
@@ -216,8 +229,8 @@ class Management extends MY_Controller {
             switch ($action) {
                 case 'get_similar_addresses' :
                     $addr = $this->input->post('addr');
-                    $this->load->model('list_model');
-                    $similar_address = $this->list_model->get_similar_address($addr, $this->logged_user->company_id);
+                    $this->load->model('property_model');
+                    $similar_address = $this->property_model->generate_similar_address($addr, $this->logged_user->company_id);
                     echo json_encode($similar_address);
                     break;
                 default :

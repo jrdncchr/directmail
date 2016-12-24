@@ -9,6 +9,11 @@ class Lists extends MY_Controller {
         $this->data['page_title'] = "Lists";
     }
 
+    public function no_list_category()
+    {
+        $this->_renderL('lists/empty');
+    }
+
     public function category($id = 0, $sub = "index")
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
@@ -40,12 +45,6 @@ class Lists extends MY_Controller {
                         if ($this->_checkListCategoryPermission($id, 'retrieve')) {
                             $this->data['list_category'] = $this->list_category_permissions[$id];
                             $this->_renderL('lists/category');
-                            return;
-                        }
-                        break;
-                    case 'add' :
-                        if ($this->_checkListCategoryPermission($id, 'create')) {
-                            echo "OK";
                             return;
                         }
                         break;
@@ -224,7 +223,7 @@ class Lists extends MY_Controller {
                     $property = $this->input->post('form');
                     $property['created_by'] = $this->logged_user->id;
                     $property['company_id'] = $this->logged_user->company_id;
-                    if ($property['status'] == 'replacement') {
+                    if (isset($property['status']) && $property['status'] == 'replacement') {
                         $result = $this->property_model->save($property);
                     } else {
                         $check_property = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
@@ -239,6 +238,9 @@ class Lists extends MY_Controller {
                         } else {
                             $result = $this->property_model->save($property);
                         }
+                    }
+                    if ($result['success']) {
+                        $this->session->set_flashdata('message', 'Saving property successful.');
                     }
                     echo json_encode($result);
                     break;

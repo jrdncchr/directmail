@@ -147,17 +147,21 @@ class Role_model extends CI_Model {
         if ($permission) {
             return $permission;
         } else {
-            $this->_create_new_list_category_permissions_for_new_role($role_id, $company_id);
-            return $this->get_list_category_permissions($role_id, $company_id);
+            return $this->_create_new_list_category_permissions_for_new_role($role_id, $company_id) ?
+                $this->get_list_category_permissions($role_id, $company_id) : null;
         }
     }
 
     public function _create_new_list_category_permissions_for_new_role($role_id, $company_id)
     {
-        $list_categories = $this->db->get_where('list_category', array('active' => 1, 'company_id' => $company_id))->result();
-        foreach ($list_categories as $lc) {
-            $this->db->insert('roles_list_category_permission', array('list_category_id' => $lc->id, 'role_id' => $role_id));
+        $list_categories = $this->db->get_where('list_category', array('active' => 1, 'company_id' => $company_id, 'deleted' => 0))->result();
+        if ($list_categories) {
+            foreach ($list_categories as $lc) {
+                $this->db->insert('roles_list_category_permission', array('list_category_id' => $lc->id, 'role_id' => $role_id));
+            }
+            return true;
         }
+        return false;
     }
 
     public function save_list_category_permissions($role_id, $list_category_permissions)

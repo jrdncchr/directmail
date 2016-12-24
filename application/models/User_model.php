@@ -286,22 +286,26 @@ class User_model extends CI_Model {
     {
         $this->db->select('lc.id as _id, lc.name, lc.description, lc.active, ulcp.*');
         $this->db->join('user_list_category_permission ulcp', 'ulcp.list_category_id = lc.id AND ulcp.user_id = ' . $user_id, 'left');
-        $this->db->where(array('lc.active' => 1, 'lc.deleted' => 0));
+        $this->db->where(array('lc.active' => 1, 'lc.deleted' => 0, 'lc.company_id' => $company_id));
         $permission = $this->db->get('list_category lc')->result();
         if ($permission) {
             return $permission;
         } else {
-            $this->_create_new_list_category_permissions_for_new_user($user_id, $company_id);
-            return $this->get_list_category_permissions($user_id, $company_id);
+            return $this->_create_new_list_category_permissions_for_new_user($user_id, $company_id) ?
+                $this->get_list_category_permissions($user_id, $company_id) : null;
         }
     }
 
     public function _create_new_list_category_permissions_for_new_user($user_id, $company_id)
     {
-        $list_categories = $this->db->get_where('list_category', array('active' => 1, 'company_id' => $company_id))->result();
-        foreach ($list_categories as $lc) {
-            $this->db->insert('user_list_category_permission', array('list_category_id' => $lc->id, 'user_id' => $user_id));
+        $list_categories = $this->db->get_where('list_category', array('active' => 1, 'company_id' => $company_id, 'deleted' => 0))->result();
+        if ($list_categories) {
+            foreach ($list_categories as $lc) {
+                $this->db->insert('user_list_category_permission', array('list_category_id' => $lc->id, 'user_id' => $user_id));
+            }
+            return true;
         }
+        return false;
     }
 
     public function save_list_category_permissions($user_id, $list_category_permissions)

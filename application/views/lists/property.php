@@ -431,7 +431,8 @@
         similar_address_action: 'save',
         list_category : <?php echo json_encode($list_category); ?>,
         list : <?php echo json_encode($list); ?>,
-        property: {},
+        property: {
+        },
         comment: ''
     };
 
