@@ -12,7 +12,7 @@
             <div class="alert alert-warning">
                 <p style="font-weight: bold;"><i class="fa fa-question-circle"></i> FORMAT</p>
                 <p>Excel .xls, Excel 2007 (OfficeOpenXML) .xlsx, CSV, Libre/OpenOffice Calc .ods</p>
-                <p><a href="<?php echo base_url() . 'resources/files/directmail_spreadsheet_format.xlsx'; ?>">Download Spreadsheet Format</a></p>
+                <p><a href="<?php echo base_url() . 'resources/files/directmail_spreadsheet_format.ods'; ?>">Download Spreadsheet Format</a></p>
             </div>
             <div v-show="error != ''" class="alert alert-danger" style="display:none;">
                 <i class="fa fa-exclamation-circle"></i> {{ error }}

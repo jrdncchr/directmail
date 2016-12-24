@@ -69,7 +69,7 @@
     var data = {
         selectedProperty: {
             id: 0,
-            deceased_address: '',
+            deceased_address: ''
         },
         comment: '',
         replacementAction: '1'
@@ -100,7 +100,7 @@
 
     $(function() {
         $('#sidebar-approval-link').addClass('active');
-        $('#sidebar-approval-properties-link').addClass('active');
+        $('#sidebar-approval-replacements-link').addClass('active');
         $('#sidebar-approval').addClass('in');
 
         dt = $('table').dataTable({
