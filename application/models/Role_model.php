@@ -239,15 +239,17 @@ class Role_model extends CI_Model {
     public function get_category_with_list_permission($role_id, $company_id)
     {
         $list_category_permissions = $this->get_list_category_permissions($role_id, $company_id);
-        $list_permissions = $this->get_list_permissions($role_id, $company_id);
-        foreach ($list_category_permissions as $lcp) {
-            $children = [];
-            foreach ($list_permissions as $lp) {
-                if ($lp->list_category_id == $lcp->_id) {
-                    $children[] = $lp;
+        if ($list_category_permissions) {
+            $list_permissions = $this->get_list_permissions($role_id, $company_id);
+            foreach ($list_category_permissions as $lcp) {
+                $children = [];
+                foreach ($list_permissions as $lp) {
+                    if ($lp->list_category_id == $lcp->_id) {
+                        $children[] = $lp;
+                    }
                 }
+                $lcp->children = $children;
             }
-            $lcp->children = $children;
         }
         return $list_category_permissions;
     }
