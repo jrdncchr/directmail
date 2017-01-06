@@ -17,6 +17,7 @@
             <div v-show="error != ''" class="alert alert-danger" style="display:none;">
                 <i class="fa fa-exclamation-circle"></i> {{ error }}
             </div>
+            <p>List ID: <b><?php echo $list->id; ?></b></p>
             <form action="<?php echo base_url() . 'lists/info/' . $list->id . '/bulk_import_result'; ?>" method="post" enctype="multipart/form-data" onsubmit="return validate()">
                 <div class="form-group">
                     <label for="file">Select File</label>

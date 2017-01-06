@@ -19,7 +19,11 @@ class User_model extends CI_Model {
 
         if (isset($auth['email']) && isset($auth['password']) && isset($auth['company'])) {
             // Check Company
-            $company_result = $this->db->get_where('company', array('company_key' => $auth['company'], 'deleted' => 0));
+            $company_result = $this->db->get_where('company', array(
+                'company_key' => $auth['company'], 
+                'deleted' => 0, 
+                'status' => 'active')
+            );
             if (!$company_result->num_rows()) {
                 $result['message'] = "Company does not exist.";
                 return $result;
@@ -30,12 +34,14 @@ class User_model extends CI_Model {
             // Check User
             $where = array(
                 'email' => $auth['email'],
-                'company_id' => $company->id,
-                'deleted' => 0
+                'user.company_id' => $company->id,
+                'user.deleted' => 0
             );
             if ($admin) {
                 $where['is_admin'] = 1;
             }
+            $this->db->select('user.*, roles.super_admin');
+            $this->db->join('roles', 'user.role_id = roles.id', 'left');
             $user_result = $this->db->get_where('user', $where);
             if (!$user_result->num_rows()) {
                 return $result;
@@ -125,9 +131,11 @@ class User_model extends CI_Model {
         $result = array('success' => false);
         $user_result = $this->db->get_where('user_secret', array('confirmation_key' => $confirmation_key));
         if ($user_result->num_rows() > 0) {
-            $user = $user_result->row();
-            $this->db->where('id', $user->user_id);
+            $user_secret = $user_result->row();
+            $this->db->where('id', $user_secret->user_id);
             $this->db->update('user', array('confirmed' => 1));
+            $user = $this->db->get_where('user', array('id' => $user_secret->user_id))->row();
+            $result['company_id'] = $user->company_id;
             $result['success'] = true;
             $result['message'] = "Account confirmed! You may now login.";
         }

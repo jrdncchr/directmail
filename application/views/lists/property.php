@@ -31,6 +31,7 @@
                 <i class="fa fa-info-circle"></i>
                 This property is saved for replacement approval for property <a target="_blank" :href="property.pr_url">{{ property.target_property_id }}</a>.
             </div>
+
             <?php if ($this->session->flashdata('message')): ?>
                 <div class="alert alert-success">
                     <i class="fa fa-check-circle"></i>
@@ -38,7 +39,11 @@
                 </div>
             <?php endif; ?>
 
-            <div style="margin-bottom: 15px;">
+            <button v-on:click="saveProperty" class="btn btn-xs btn-main" style="margin-bottom: 20px;">
+                <i class="fa fa-save"></i> Save Property
+            </button>
+
+            <div style="margin-bottom: 15px;" class="pull-right">
                 <span v-show="property.status == 'pending'" class="label label-warning" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'active' || property.status == 'lead'" class="label label-success" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'change'" class="label label-info" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
@@ -49,6 +54,7 @@
             <!-- Nav tabs -->
               <ul class="nav nav-tabs nav-justified" role="tablist">
                 <li role="presentation" class="active"><a href="#info" aria-controls="info" role="tab" data-toggle="tab">Information</a></li>
+                <li role="presentation"><a href="#mailing" aria-controls="mailing" role="tab" data-toggle="tab">Mailing</a></li>
                 <li v-show="data.property.id" role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments</a></li>
                 <li v-show="data.property.id" role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
               </ul>
@@ -57,26 +63,31 @@
                 <!-- Information -->
                 <div role="tabpanel" class="tab-pane active" id="info">
                     <div class="notice"></div>
-                    <button v-on:click="saveProperty" class="btn btn-xs btn-main" style="margin-bottom: 20px;">
-                        <i class="fa fa-save"></i> Save Property
-                    </button>
 
-                    <?php if (isset($property) && ($property->status !== 'pending' || $mc->_checkModulePermission(MODULE_APPROVAL_ID, 'update'))): ?>
-                    <div class="form-inline pull-right" style="margin-bottom: 10px;">
-                        <div class="form-group">
-                            <label for="status">Status</label>
-                            <select class="form-control" v-model="property.status">
-                                <option value="pending">Pending</option>
-                                <option value="active">Active</option>
-                                <option value="lead">Lead</option>
-                                <option value="change">Change</option>
-                                <option value="stop">Stop</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="funeral_home">* Funeral Home</label>
+                                <input name="funeral_home" type="text" class="form-control required" required
+                                       title="Funeral Home" v-model="property.funeral_home" />
+                            </div>
                         </div>
+                        <?php if (isset($property) && (($property->status !== 'pending' && $property->status !== 'replacement') || $mc->_checkModulePermission(MODULE_APPROVAL_ID, 'update'))): ?>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="status">Status</label>
+                                <select class="form-control" v-model="property.status">
+                                    <option value="pending">Pending</option>
+                                    <option value="active">Active</option>
+                                    <option value="lead">Lead</option>
+                                    <option value="change">Change</option>
+                                    <option value="stop">Stop</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
-                    <?php endif; ?>
-
 
                     <div class="panel panel-default" v-if="list.show_deceased == 1">
                         <div class="panel-heading">Deceased</div>
@@ -316,6 +327,58 @@
 
                 </div>
 
+                <!-- Mailing -->
+                <div role="tabpanel" class="tab-pane" id="mailing">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="mailing_date" class="col-sm-3 control-label">* Mailing Type</label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control required" v-model="property.mailing_type">
+                                            <option value="Bi-monthly">Bi-monthly</option>
+                                            <option value="Monthly">Monthly</option>
+                                            <option value="Quarterly">Quarterly</option>
+                                            <option value="Yearly">Yearly</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="mailing_date" class="col-sm-3 control-label">* Mailing Date</label>
+                                    <div class="col-sm-6">
+                                        <input id="mailing-date" name="mailing_date" type="text" class="form-control required" required
+                                           title="Zip Code" v-model="property.mailing_date" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="m_zip_code" class="col-sm-3 control-label">Next Mailing Date</label>
+                                    <div class="col-sm-6">
+                                        <p class="form-control-static text-info" style="font-size: 14px;">{{ property.next_mailing_date }}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="m_zip_code" class="col-sm-3 control-label">Letter Mailings</label>
+                                    <div class="col-sm-6">
+                                        <label class="control control--checkbox" style="top: 4px">
+                                            <input type="checkbox" v-model="property.elligible_letter_mailings" />
+                                            <div class="control__indicator"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="m_zip_code" class="col-sm-3 control-label">Postcard Mailings</label>
+                                    <div class="col-sm-6">
+                                        <label class="control control--checkbox" style="top: 4px">
+                                            <input type="checkbox" v-model="property.elligible_postcard_mailings" />
+                                            <div class="control__indicator"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Comments -->
                 <div role="tabpanel" class="tab-pane" id="comments">
                     <button class="btn btn-xs btn-default" style="margin-bottom: 20px;" data-toggle="modal" data-target="#comment-modal">
@@ -543,5 +606,17 @@
             validator.displayAlertError($(this), false);
             validator.displayInputError($(this).find('textarea'), false);
         })
+
+        $('#mailing-date').datepicker({
+            language: 'en',
+            minDate: new Date(),
+            dateFormat: 'yyyy-mm-dd',
+            onSelect: function(formattedDate, date, inst) {
+                data.property.mailing_date = formattedDate;
+                $.post(actionUrl, {action: 'get_next_mailing_date', type: data.property.mailing_type, date: formattedDate}, function(res) {
+                    data.property.next_mailing_date = res.nmd;
+                }, 'json');
+            }
+        });
     });
 </script>

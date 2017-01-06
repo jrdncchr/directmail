@@ -47,11 +47,22 @@ class Property_model extends CI_Model {
         unset($property['pr_list_id']);
         unset($property['pr_url']);
 
+        if (isset($property['elligible_letter_mailings']) && $property['elligible_letter_mailings'] != 1) {
+            $property['elligible_letter_mailings'] = $property['elligible_letter_mailings'] === 'true' ? 1 : 0;
+        }
+        if (isset($property['elligible_postcard_mailings']) && $property['elligible_postcard_mailings'] != 1) {
+            $property['elligible_postcard_mailings'] = $property['elligible_postcard_mailings'] === 'true' ? 1 : 0;
+        }
+
+        $this->load->library('property_library');
+        $property['next_mailing_date'] = $this->property_library->get_next_mailing_date($property['mailing_type'], $property['mailing_date']);
+
         $property['last_update'] = date('Y-m-d H:i:s');
         if (isset($property['id']) && $property['id'] > 0) {
             $this->db->where('id', $property['id']);
             $this->db->update('property', $property);
         } else {
+            $property['mailing_date'] = date('Y-m-d');
             $this->db->insert('property', $property);
             $property['id'] = $this->db->insert_id();
         }
@@ -121,6 +132,38 @@ class Property_model extends CI_Model {
         $this->db->join('property p2', 'p2.id = pr.target_property_id', 'left');
         $this->db->join('list l2', 'l2.id = p2.list_id', 'left');
         $this->db->where(array('l.company_id' => $company_id, 'p.status' => 'replacement', 'p.deleted' => 0, 'p.active' => 1));
+        $result = $this->db->get('property p');
+        return $result->result();
+    }
+
+    public function get_properties($company_id, $where = array(), $filter = array(), $order_by = 'p.id')
+    {
+        $where['p.company_id'] = $company_id;
+        $this->db->select('p.*, l.name as list_name, l.id as list_id');
+        $this->db->join('list l', 'l.id = p.list_id');
+        $this->db->where($where);
+        if (isset($filter['status'])) {
+            $this->db->where('status', $filter['status']);
+        }
+        if (isset($filter['id'])) {
+            $this->db->where('p.id', $filter['id']);
+        }
+        if (isset($filter['list'])) {
+            $this->db->where('p.list_id', $filter['list']);
+        }
+        if (isset($filter['deceased_name'])) {
+            $this->db->like("CONCAT(p.deceased_first_name, ' ', p.deceased_last_name)", $filter['deceased_name']);
+        }
+        if (isset($filter['deceased_address'])) {
+            $this->db->like("p.deceased_address", $filter['deceased_address']);
+        }
+        if (isset($filter['today']) && $filter['today'] === 'true') {
+            $this->db->where('p.next_mailing_date', date('Y-m-d'));
+        }
+        if (isset($filter['date_range'])) {
+            $this->db->where($filter['date_range']);
+        }
+        $this->db->order_by($order_by, 'asc');
         $result = $this->db->get('property p');
         return $result->result();
     }

@@ -90,16 +90,74 @@
 
             <!-- Properties -->
             <div role="tabpanel" class="tab-pane active" id="properties">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="filterHeading">
+                        <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" href="#filterBox" aria-expanded="true" aria-controls="filterBox" >
+                            <a role="button" style="font-size: 16px !important; font-weight: bold;">
+                                FILTER
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="filterBox" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="filterHeading">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="deceased-name" class="control-label col-sm-4">Deceased Name</label>
+                                            <div class="col-sm-8">
+                                                <input id="deceased-name" type="text" class="form-control" v-model="filter.deceased_name" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="deceased-address" class="control-label col-sm-4">Deceased Address</label>
+                                            <div class="col-sm-8">
+                                                <input id="deceased-address" type="text" class="form-control" v-model="filter.deceased_address" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="date-to" class="control-label col-sm-4">Status</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" v-model="filter.status">
+                                                    <option value="all">All</option>
+                                                    <option value="active">Active</option>
+                                                    <option value="lead">Lead</option>
+                                                    <option value="change">Change</option>
+                                                    <option value="pending">Pending</option>
+                                                    <option value="replacement">Replacement</option>
+                                                    <option value="stop">Stop</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">ID</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control" v-model="filter.id" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                                        <a target="_blank" href="<?php echo base_url() . 'download/properties/list_properties'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
+                                        <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-responsive" style="width: 100%; margin-top: 20px;">
                     <table class="table table-bordered table-hover" width="100%">
                         <thead>
                         <tr>
-                            <th width="6%">ID</th>
-                            <th width="8%">Status</th>
-                            <th width="17%">Deceased Name</th>
-                            <th width="27%">Deceased Address</th>
-                            <th width="15%">Mail Name</th>
-                            <th width="27%">Mail Address</th>
+                            <th width="10%">ID</th>
+                            <th width="10%">Status</th>
+                            <th width="20%">Deceased Name</th>
+                            <th width="35%">Deceased Address</th>
+                            <th width="20%">Date Created</th>
                         </tr>
                         </thead>
                         <tbody></tbody>
@@ -119,7 +177,13 @@
 
     var data = {
         list_category : <?php echo json_encode($list_category); ?>,
-        list : <?php echo json_encode($list); ?>
+        list : <?php echo json_encode($list); ?>,
+        filter :  {
+            deceased_name : '',
+            deceased_address : '',
+            status: 'all',
+            id: ''
+        }
     };
 
     var vm = new Vue({
@@ -173,6 +237,25 @@
                     }
                 });
             },
+            filterList: function() {
+                loading('info', 'Filtering, please wait...');
+                $.post(actionUrl, { action: 'property_list', list_id: data.list.id, filter: data.filter }, function(res) {
+                    dt.fnClearTable();
+                    if (res.data.length) {
+                        dt.fnAddData(res.data)   
+                    }
+                    dt.fnDraw();
+                    loading('success', 'Filter Complete');
+                }, 'json');
+            },
+            clearFilter: function() {
+                data.filter = {
+                    deceased_name : '',
+                    deceased_address : '',
+                    status: 'all',
+                    id: ''
+                }
+            }
         }
     });
 
@@ -215,12 +298,7 @@
                     }
                 },
                 { data: "deceased_address" },
-                { data: "mail_last_name", render:
-                    function(data, type, row) {
-                        return row.mail_last_name + " " + row.mail_first_name;
-                    }
-                },
-                { data: "mail_address" },
+                { data: "date_created" }
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();

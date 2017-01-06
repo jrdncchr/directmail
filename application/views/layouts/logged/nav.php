@@ -1,5 +1,5 @@
 <div class="panel-group sidebar-nav" role="tablist" aria-multiselectable="true">
-    <a class="sidebar-brand" href="<?php echo base_url() . 'dashboard'; ?>">
+    <a class="sidebar-brand" href="<?php echo base_url() . 'dashboard'; ?>" style="font-size: 24px !important;">
         Direct Mail
     </a>
     <?php foreach ($modules as $m): ?>
@@ -51,7 +51,7 @@
                         <a id="sidebar-<?php echo $child->code; ?>-link" href="<?php echo base_url() . $child->link; ?>"><?php echo $child->name; ?></a>
                         <?php endif; ?>
                     <?php endforeach; ?>
-                    <?php if ($m->code === 'management' && ($logged_user->role_id == 3 || $logged_user->role_id == 8)): ?>
+                    <?php if ($m->code === 'management' && $logged_user->super_admin): ?>
                         <a id="sidebar-companies-link" href="<?php echo base_url() . 'management/companies'; ?>">Companies</a>
                     <?php endif; ?>
                 <?php endif; ?>

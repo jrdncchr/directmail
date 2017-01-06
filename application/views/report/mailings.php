@@ -1,14 +1,13 @@
 <div id="app">
-    <h2>Pending Properties</h2>
+    <h2>Mailings</h2>
     <ol class="breadcrumb">
-        <li><a>Approval</a></li>
-        <li><a class="active">Properties</a></li>
+        <li><a>Reports</a></li>
+        <li><a class="active">Mailings</a></li>
     </ol>
 
     <div class="row">
         <div class="col-sm-12 panel-white">
             <div class="panel panel-default">
-
                 <div class="panel-heading" role="tab" id="filterHeading">
                     <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" href="#filterBox" aria-expanded="true" aria-controls="filterBox" >
                         <a role="button" style="font-size: 16px !important; font-weight: bold;">
@@ -33,14 +32,6 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-sm-4">ID</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" class="form-control" v-model="filter.id" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
                                         <label for="deceased-name" class="control-label col-sm-4">Deceased Name</label>
                                         <div class="col-sm-8">
                                             <input id="deceased-name" type="text" class="form-control" v-model="filter.deceased_name" />
@@ -53,9 +44,26 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="today" class="control-label col-sm-4">Today Only</label>
+                                        <div class="col-sm-8">
+                                            <label class="control control--checkbox" style="top: 4px">
+                                                <input type="checkbox" v-model="filter.today" />
+                                                <div class="control__indicator"></div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="date-range" class="control-label col-sm-4">Date Range</label>
+                                        <div class="col-sm-8">
+                                            <input id="date-range" type="text" readonly="true" class="form-control" v-model="filter.date_range" />
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-sm-12">
                                     <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                                    <a target="_blank" href="<?php echo base_url() . 'download/properties/approval_properties'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
+                                    <a target="_blank" href="<?php echo base_url() . 'download/properties/report_mailings'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
                                     <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
                                 </div>
                             </div>
@@ -68,11 +76,11 @@
                 <table class="table table-bordered table-hover" width="100%">
                     <thead>
                     <tr>
-                        <th width="10%">ID</th>
+                        <th width="6%">ID</th>
                         <th width="20%">List</th>
                         <th width="20%">Deceased Name</th>
-                        <th width="30%">Deceased Address</th>
-                        <th width="20%">Date Created</th>
+                        <th width="39%">Deceased Address</th>
+                        <th width="15%">Next Mail Date</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -84,15 +92,15 @@
 
 <script>
     var dt;
-    var actionUrl = "<?php echo base_url() . 'approval/properties'; ?>";
+    var actionUrl = "<?php echo base_url() . 'report/mailings'; ?>";
 
     var data = {
         filter : {
             list : 'all',
             deceased_name : '',
             deceased_address : '',
-            status: 'all',
-            id: ''
+            today : false,
+            date_range : ''
         }
     };
 
@@ -116,26 +124,47 @@
                     list : 'all',
                     deceased_name : '',
                     deceased_address : '',
-                    id: ''
+                    today : false,
+                    date_range : ''
                 }
             }
         }
     });
 
+    function setupFilterFields() {
+        $('#date-range').datepicker({
+            language: 'en',
+            minDate: new Date(),
+            range: true,
+            multipleDatesSeparator: ' - ',
+            dateFormat: 'yyyy-mm-dd',
+            onSelect: function(formattedDate, date, inst) {
+                if (formattedDate.length > 11) {
+                    data.filter.date_range = formattedDate;    
+                } else {
+                    data.filter.date_range = '';
+                    $('#date-range').val('');
+                }
+            }
+        });
+    }
+
     $(function() {
-        $('#sidebar-approval-link').addClass('active');
-        $('#sidebar-approval-properties-link').addClass('active');
-        $('#sidebar-approval').addClass('in');
+        $('#sidebar-reports-link').addClass('active');
+        $('#sidebar-reports-mailings-link').addClass('active');
+        $('#sidebar-reports').addClass('in');
+
+        setupFilterFields();
 
         dt = $('table').dataTable({
-            "order": [[ 0, "desc" ]],
+            "order": [[ 4, "asc" ]],
             "bDestroy": true,
             "filter": true,
             "ajax": {
                 "type": "POST",
                 "url": actionUrl,
                 "data":  {
-                    action: "property_list"
+                    action: "list"
                 }
             },
             columns: [
@@ -155,18 +184,17 @@
                     }
                 },
                 { data: "deceased_address" },
-                { data: "date_created" }
+                { data: "next_mailing_date" }
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();
                 $('table tbody tr').on('click', function () {
                     var pos = table.fnGetPosition(this);
                     var d = table.fnGetData(pos);
-                    console.log(d);
                 });
             },
             "language": {
-                "emptyTable": "No property found for this list."
+                "emptyTable": "No property found."
             }
         });
     });

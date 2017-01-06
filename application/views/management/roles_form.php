@@ -308,7 +308,7 @@
                     $.post(actionUrl, { action: 'save_role_details', form: data.role_details }, function(res) {
                         loading('success', 'Save successful!');
                         if (res.success && data.role_details.id == '') {
-                            window.location = actionUrl + "management/roles/form/" + res.id;
+                            window.location = actionUrl + "/form/" + res.id;
                         }
                     }, 'json');
                 }

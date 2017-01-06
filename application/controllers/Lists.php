@@ -63,13 +63,24 @@ class Lists extends MY_Controller {
             $action = $this->input->post('action');
             $this->load->model('list_model');
             switch ($action) {
-                case 'property_list' :
+                case 'property_list':
+                    $filter = $this->input->post('filter');
+                    $filter['list'] = $this->input->post('list_id');
+                    $this->load->library('property_library');
+                    $filter = $this->property_library->setup_search_filter($filter);
                     $this->load->model('property_model');
-                    $lists = $this->property_model->get_list(array(
-                        'list_id' => $this->input->post('list_id'),
-                        'deleted' => 0, 
-                        'active' => 1));
-                    echo json_encode(array('data' => $lists));
+                    $where = array(
+                        'p.deleted' => 0,
+                        'p.active' => 1
+                    );
+                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
+                    foreach ($properties as $p) {
+                        $p->url = "";
+                        if ($this->_checkListPermission($p->list_id, 'retrieve')) {
+                            $p->url = base_url() . 'lists/property/' . $p->list_id . '/info/' . $p->id;
+                        }
+                    }
+                    echo json_encode(array('data' => $properties));
                     break;
                 case 'check_list_permission' :
                     $list_id = $this->input->post('list_id');
@@ -239,7 +250,7 @@ class Lists extends MY_Controller {
                             $result = $this->property_model->save($property);
                         }
                     }
-                    if ($result['success']) {
+                    if ($result['success'] && (isset($property['id']) && $property['id']) == 0) {
                         $this->session->set_flashdata('message', 'Saving property successful.');
                     }
                     echo json_encode($result);
@@ -282,6 +293,13 @@ class Lists extends MY_Controller {
                     $property = $this->input->post('property');
                     $result = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
                     echo json_encode($result);
+                    break;
+                case 'get_next_mailing_date' :
+                    $this->load->library('property_library');
+                    $type = $this->input->post('type');
+                    $date = $this->input->post('date');
+                    $nmd = $this->property_library->get_next_mailing_date($type, $date);
+                    echo json_encode(array('nmd' => $nmd));
                     break;
                 default:
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));
@@ -338,7 +356,6 @@ class Lists extends MY_Controller {
             'similars' => array(),
             'saved' => array()
         );
-        date_default_timezone_set('America/Los_Angeles');
         $path = $_FILES["file"]["tmp_name"];
 
         $objPHPExcel = PHPExcel_IOFactory::load($path);

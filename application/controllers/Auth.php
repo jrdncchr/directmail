@@ -78,6 +78,20 @@ class Auth extends MY_Controller {
         }
     }
 
+    public function confirm_company($confirmation_key)
+    {
+        $this->load->model('user_model');
+        $result = $this->user_model->confirm($confirmation_key);
+        if ($result['success']) {
+            $this->load->model('company_model');
+            $this->company_model->save(array('id' => $result['company_id'], 'status' => 'active'));
+            $this->session->set_flashdata('message', create_alert_message($result));
+            $this->login();
+        } else {
+            show_404();
+        }
+    }
+
     public function not_found()
     {
         $this->output->set_status_header('404');

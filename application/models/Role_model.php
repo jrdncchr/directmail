@@ -85,11 +85,23 @@ class Role_model extends CI_Model {
         }
     }
 
-    public function _create_new_module_permissions_for_new_role($role_id)
+    public function _create_new_module_permissions_for_new_role($role_id, $default_role = false)
     {
         $modules = $this->db->get_where('modules', array('active' => 1))->result();
         foreach ($modules as $m) {
-            $this->db->insert('roles_module_permission', array('module_id' => $m->id, 'role_id' => $role_id));
+            if (!$default_role) {
+                $this->db->insert('roles_module_permission', array('module_id' => $m->id, 'role_id' => $role_id));    
+            } else {
+                $this->db->insert('roles_module_permission', array(
+                    'module_id' => $m->id, 
+                    'role_id' => $role_id,
+                    'create_action' => 1,
+                    'retrieve_action' => 1,
+                    'update_action' => 1,
+                    'delete_action' => 1)
+                );
+            }
+            
         }
     }
 

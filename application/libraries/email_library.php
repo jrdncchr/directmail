@@ -44,4 +44,16 @@ class Email_Library {
         $this->send_email($email);
     }
 
+    public function send_new_company_email_confirmation($data)
+    {
+        $email['subject'] = "Direct Mail - New Company Email Confirmation";
+        $email['content'] = "<p>Hi " . $data['name'] . ", </p>";
+        $email['content'] .= "<p>Welcome to Direct Mail, you are now registered as an administrator with your company <b>" . $data['company'] . "</b>. </p>";
+        $email['content'] .= "<p>Your password is: " . $data['password'] . "</p>";
+        $email['content'] .= "<p>Please confirm your account and company by clicking the link below: </p>";
+        $email['content'] .= "<a href='" . base_url() . "auth/confirm_company/" . $data['confirmation_key'] . "'>Confirm Account & Company</a>";
+        $email['to'] = $data['to'];
+        $this->send_email($email);
+    }
+
 }

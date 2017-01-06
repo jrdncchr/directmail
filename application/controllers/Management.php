@@ -212,10 +212,73 @@ class Management extends MY_Controller {
         }
     }
 
-    public function companies()
+    public function companies($sub = "index", $id = 0)
     {
-        if ($this->logged_user->role_id == 3 || $this->logged_user->role_id == 8) {
-            echo "test";
+        if ($this->logged_user->super_admin) {
+            if ($this->input->server('REQUEST_METHOD') == 'POST') {
+                $action = $this->input->post('action');
+                switch ($action) {
+                    case 'list' :
+                        $this->load->model('company_model');
+                        $companies = $this->company_model->get(array('company.deleted' => 0));
+                        echo json_encode(array('data' => $companies));
+                        break;
+                    case 'save' :
+                        $form = $this->input->post('form');
+                        $this->load->model('company_model');
+                        if (isset($form['company']['id'])) {
+                            $result = $this->company_model->save($form['company']);
+                        } else {
+                            $result = $this->company_model->create($form['company'], $form['user']);
+                            if ($result['success']) {
+                                $result['message'] = 'Saving company successful! <br />Company ID: ' 
+                                    . $result['company_id'] . '<br /> User ID: ' 
+                                    . $result['user_id'];
+                                $this->session->set_flashdata('message', create_alert_message($result));
+                            }
+                        }
+                        echo json_encode($result);
+                        break;
+                    case 'delete' :
+                        $this->load->model('company_model');
+                        $company_id = $this->input->post('company_id');
+                        if ($company_id) {
+                            $company = ['id' => $company_id, 'deleted' => 1];
+                            $result = $this->company_model->save($company);
+                        } else {
+                            $result = array('success' => false);
+                        }
+                        echo json_encode($result);
+                        break;
+                }
+            } else {
+                switch ($sub) {
+                    case 'index' :
+                        $this->_renderL('management/companies');
+                        break;
+                    case 'form' :
+                        if ($id > 0) {
+                            $this->load->model('company_model');
+                            $company = $this->company_model->get(array('company.id' => $id), false);
+                            $company_form = [
+                                'company' =>[
+                                    'id' => $company->id,
+                                    'name' => $company->name,
+                                    'company_key' => $company->company_key
+                                ],
+                                'user' => [
+                                    'first_name' => $company->first_name,
+                                    'last_name' => $company->last_name,
+                                    'email' => $company->email
+                                ]
+                            ];
+                            $this->data['company'] = $company_form;
+                        }
+                        $this->_renderL('management/companies_form');
+                        break; 
+                }
+            }
+            
         } else {
             $this->show_404();
         }
