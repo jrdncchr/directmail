@@ -331,6 +331,7 @@
                 <div role="tabpanel" class="tab-pane" id="mailing">
                     <div class="row">
                         <div class="col-sm-12">
+                            <div class="notice"></div>
                             <div class="form-horizontal">
                                 <div class="form-group">
                                     <label for="mailing_date" class="col-sm-3 control-label">* Mailing Type</label>
@@ -495,6 +496,8 @@
         list_category : <?php echo json_encode($list_category); ?>,
         list : <?php echo json_encode($list); ?>,
         property: {
+            next_mailing_date: '',
+            mailing_type: 'Bi-monthly'
         },
         comment: ''
     };
@@ -519,28 +522,33 @@
         methods: {
             saveProperty: function() {
                 var infoForm = $('#info');
+                var mailingForm = $('#mailing');
                 if (validator.validateForm(infoForm)) {
-                    data.property.list_id = data.list.id;
-                    loading("info", "Saving property...");
-                    $.post(actionUrl, { action: 'save_property', form: data.property }, function(res) {
-                        if (res.success && (undefined == data.property.id)) {
-                            window.location = actionUrl + '/' + data.list.id + '/info/' + res.id;
-                        }  else if (!res.success) {
-                            if (res.exist) {
-                                loading('warning', 'A similar existing property is detected.');
-                                data.similar_address = res.properties;
+                    if (validator.validateForm(mailingForm)) {
+                        data.property.list_id = data.list.id;
+                        loading("info", "Saving property...");
+                        $.post(actionUrl, { action: 'save_property', form: data.property }, function(res) {
+                            if (res.success && (undefined == data.property.id)) {
+                                window.location = actionUrl + '/' + data.list.id + '/info/' + res.id;
+                            }  else if (!res.success) {
+                                if (res.exist) {
+                                    loading('warning', 'A similar existing property is detected.');
+                                    data.similar_address = res.properties;
 
-                                var propertyExistModal = $('#property-exist-modal');
-                                propertyExistModal.modal({
-                                    show: true,
-                                    backdrop: 'static',
-                                    keyboard: false
-                                });
+                                    var propertyExistModal = $('#property-exist-modal');
+                                    propertyExistModal.modal({
+                                        show: true,
+                                        backdrop: 'static',
+                                        keyboard: false
+                                    });
+                                }
+                            } else {
+                                loading('success', 'Save successful!');
                             }
-                        } else {
-                            loading('success', 'Save successful!');
-                        }
-                    }, 'json');
+                        }, 'json');
+                    } else {
+                        $('.nav-tabs a[href="#mailing"]').tab('show');
+                    }
                 }
             },
             replaceConfirmAction: function() {

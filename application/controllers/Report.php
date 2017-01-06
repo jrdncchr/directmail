@@ -18,7 +18,6 @@ class Report extends MY_Controller {
                     $filter = $this->input->post('filter');
                     $this->load->library('property_library');
                     $filter = $this->property_library->setup_search_filter($filter);
-                    $test = $this->session->userdata('list_filter');
                     $this->load->model('property_model');
                     $where = array(
                         'p.status' => 'active', 
