@@ -19,6 +19,31 @@
                     <div class="panel-body">
                         <div class="form-horizontal">
                             <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="date-to" class="control-label col-sm-2">Status</label>
+                                        <div class="col-sm-10">
+                                            <div class="input-group">
+                                                <span class="input-group-btn">
+                                                    <div class="button-group">
+                                                        <button type="button" class="btn btn-dd btn-sm dropdown-toggle" data-toggle="dropdown"></span> <span class="fa fa-caret-down"></span></button>
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
+                                                                <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
+                                                                <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
+                                                                <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
+                                                                <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Replacement</a>
+                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </span>
+                                                <input type="text" class="form-control" v-model="statusText" disabled />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="date-to" class="control-label col-sm-4">List</label>
@@ -32,6 +57,14 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="control-label col-sm-4">ID</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" v-model="filter.id" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
                                         <label for="deceased-name" class="control-label col-sm-4">Deceased Name</label>
                                         <div class="col-sm-8">
                                             <input id="deceased-name" type="text" class="form-control" v-model="filter.deceased_name" />
@@ -41,28 +74,6 @@
                                         <label for="deceased-address" class="control-label col-sm-4">Deceased Address</label>
                                         <div class="col-sm-8">
                                             <input id="deceased-address" type="text" class="form-control" v-model="filter.deceased_address" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="date-to" class="control-label col-sm-4">Status</label>
-                                        <div class="col-sm-8">
-                                            <select class="form-control" v-model="filter.status">
-                                                <option value="all">All</option>
-                                                <option value="active">Active</option>
-                                                <option value="lead">Lead</option>
-                                                <option value="change">Change</option>
-                                                <option value="pending">Pending</option>
-                                                <option value="replacement">Replacement</option>
-                                                <option value="stop">Stop</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-4">ID</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" class="form-control" v-model="filter.id" />
                                         </div>
                                     </div>
                                 </div>
@@ -104,9 +115,11 @@
             list : 'all',
             deceased_name : '',
             deceased_address : '',
-            status: 'all',
-            id: ''
-        }
+            id: '',
+            status_off: [],
+            status_on: ['Active', 'Lead', 'Pending', 'Change', 'Replacement', 'Stop'],
+        },
+        statusText: 'All'
     };
 
     var vm = new Vue({
@@ -140,6 +153,32 @@
         $('#sidebar-reports-link').addClass('active');
         $('#sidebar-reports-properties-link').addClass('active');
         $('#sidebar-reports').addClass('in');
+
+        $('.dropdown-menu a').on( 'click', function( event ) {
+            var $target = $(event.currentTarget),
+                val = $target.attr('data-value'),
+                $inp = $target.find('input'),
+                idx;
+
+            if ((idx = data.filter.status_on.indexOf(val)) > -1) {
+                data.filter.status_off.push(val);
+                data.filter.status_on.splice(idx, 1);
+                setTimeout(function() {$inp.prop('checked', false)}, 0);
+            } else {
+                idx = data.filter.status_off.indexOf(val);
+                data.filter.status_on.push(val);
+                data.filter.status_off.splice(idx, 1);
+                setTimeout(function() {$inp.prop('checked', true)}, 0);
+            }
+
+            $(event.target).blur();
+            if (data.filter.status_off.length) {
+                data.statusText = data.filter.status_on.join(', ');
+            } else {
+                data.statusText = "All";
+            }
+            return false;
+        });
 
         dt = $('table').dataTable({
             "order": [[ 0, "asc" ]],

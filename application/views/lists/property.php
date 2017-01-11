@@ -336,7 +336,7 @@
                                 <div class="form-group">
                                     <label for="mailing_date" class="col-sm-3 control-label">* Mailing Type</label>
                                     <div class="col-sm-6">
-                                        <select class="form-control required" v-model="property.mailing_type">
+                                        <select id="mailing-type" class="form-control required" v-model="property.mailing_type">
                                             <option value="Bi-monthly">Bi-monthly</option>
                                             <option value="Monthly">Monthly</option>
                                             <option value="Quarterly">Quarterly</option>
@@ -621,10 +621,18 @@
             dateFormat: 'yyyy-mm-dd',
             onSelect: function(formattedDate, date, inst) {
                 data.property.mailing_date = formattedDate;
-                $.post(actionUrl, {action: 'get_next_mailing_date', type: data.property.mailing_type, date: formattedDate}, function(res) {
-                    data.property.next_mailing_date = res.nmd;
-                }, 'json');
+                getNextMailingDate();
             }
         });
+
+        $('#mailing-type').on('change', function() {
+            getNextMailingDate();
+        });
     });
+
+    function getNextMailingDate() {
+        $.post(actionUrl, {action: 'get_next_mailing_date', type: data.property.mailing_type, date: data.property.mailing_date}, function(res) {
+            data.property.next_mailing_date = res.nmd;
+        }, 'json');
+    }
 </script>

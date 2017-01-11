@@ -239,9 +239,6 @@ class Property_Library {
 	function setup_search_filter($filter) 
 	{
 	    if (sizeof($filter) > 0) {
-	        if (isset($filter['status']) && $filter['status'] === 'all') {
-	            unset($filter['status']);
-	        }
 	        if (isset($filter['list']) && $filter['list'] === 'all') {
 	            unset($filter['list']);
 	        }
@@ -263,6 +260,9 @@ class Property_Library {
 	            } else {
 	                unset($filter['date_range']);
 	            }
+	        }
+	        if (isset($filter['status_on'])) {
+	        	unset($filter['status_on']);
 	        }
 	    }
 	    $filter = $filter ? $filter : [];

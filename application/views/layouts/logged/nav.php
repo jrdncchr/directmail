@@ -52,7 +52,7 @@
                         <?php endif; ?>
                     <?php endforeach; ?>
                     <?php if ($m->code === 'management' && $logged_user->super_admin): ?>
-                        <a id="sidebar-companies-link" href="<?php echo base_url() . 'management/companies'; ?>">Companies</a>
+                        <a id="sidebar-management-companies-link" href="<?php echo base_url() . 'management/companies'; ?>">Companies</a>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>

@@ -80,7 +80,9 @@ class Property_model extends CI_Model {
         if ($status == 'replacement') {
             $this->db->delete('property_replacement', array('property_id' => $id, 'company_id' => $company_id));
         }
-        return $this->save(array('id' => $id, 'deleted' => 1));
+        $this->db->where('id', $id);
+        $this->db->update('property', array('deleted' => 1));
+        return array('success' => true);
     }
 
     public function truncate()
@@ -162,6 +164,15 @@ class Property_model extends CI_Model {
         }
         if (isset($filter['date_range'])) {
             $this->db->where($filter['date_range']);
+        }
+        if (isset($filter['date_range'])) {
+            $this->db->where($filter['date_range']);
+        }
+        if (isset($filter['status_off'])) {
+            foreach ($filter['status_off'] as $status) {
+                $this->db->where('p.status !=', $status);
+            }
+            unset($filter['status_off']);
         }
         $this->db->order_by($order_by, 'asc');
         $result = $this->db->get('property p');
