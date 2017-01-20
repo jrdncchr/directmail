@@ -198,7 +198,6 @@ class Property_model extends CI_Model {
         }
         $this->db->order_by($order_by, 'asc');
         $result = $this->db->get('property p');
-        // echo $this->db->last_query();
         return $result->result();
     }
 

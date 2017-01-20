@@ -17,11 +17,9 @@ class Download extends MY_Controller {
             switch ($type) {
                 case 'report_mailings' :
                     $where = array(
-                            'p.status' => 'active', 
-                            'p.deleted' => 0,
-                            'p.next_mailing_date >=' => date('Y-m-d')
+                            'p.deleted' => 0
                         );
-                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter, 'p.next_mailing_date');
+                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter, 'pm.mailing_date');
                     break;
                 case 'report_properties' :
                     $where = array( 

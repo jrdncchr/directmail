@@ -178,7 +178,7 @@
             </div>
 
             <!-- Mailing -->
-            <div role="tabpanel" class="tab-pane active" id="mailing">
+            <div role="tabpanel" class="tab-pane" id="mailing">
                 <div class="notice"></div>
                 <div class="row">
                     <div class="col-sm-12 col-lg-6">
