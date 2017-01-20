@@ -54,7 +54,7 @@
             <!-- Nav tabs -->
               <ul class="nav nav-tabs nav-justified" role="tablist">
                 <li role="presentation" class="active"><a href="#info" aria-controls="info" role="tab" data-toggle="tab">Information</a></li>
-                <li role="presentation"><a href="#mailing" aria-controls="mailing" role="tab" data-toggle="tab">Mailing</a></li>
+                <li role="presentation"><a href="#mailings" aria-controls="mailings" role="tab" data-toggle="tab">Mailings</a></li>
                 <li v-show="data.property.id" role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments</a></li>
                 <li v-show="data.property.id" role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
               </ul>
@@ -89,29 +89,29 @@
                         <?php endif; ?>
                     </div>
 
-                    <div class="panel panel-default" v-if="list.show_deceased == 1">
-                        <div class="panel-heading">Deceased</div>
+                    <div class="panel panel-default" v-if="list.show_property == 1">
+                        <div class="panel-heading">Property</div>
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label for="d_first_name">* First Name</label>
                                         <input name="d_first_name" type="text" class="form-control required" required
-                                               title="First Name" v-model="property.deceased_first_name" />
+                                               title="First Name" v-model="property.property_first_name" />
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label for="d_middle_name">Middle Name</label>
                                         <input name="d_middle_name" type="text" class="form-control"
-                                               title="Middle Name" v-model="property.deceased_middle_name" />
+                                               title="Middle Name" v-model="property.property_middle_name" />
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label for="d_last_name">* Last Name</label>
                                         <input name="d_last_name" type="text" class="form-control required" required
-                                               title="Last Name" v-model="property.deceased_last_name" />
+                                               title="Last Name" v-model="property.property_last_name" />
                                     </div>
                                 </div>
                             </div>
@@ -120,7 +120,7 @@
                                     <div class="form-group">
                                         <label for="d_address">* Address</label>
                                         <input name="d_address" type="text" class="form-control required" required
-                                               title="Address" v-model="property.deceased_address"
+                                               title="Address" v-model="property.property_address"
                                                :disabled="property.status == 'replacement' ? true : false" />
                                     </div>
                                 </div>
@@ -130,7 +130,7 @@
                                     <div class="form-group">
                                         <label for="d_city">* City</label>
                                         <input name="d_city" type="text" class="form-control required" required
-                                               title="City" v-model="property.deceased_city" 
+                                               title="City" v-model="property.property_city" 
                                                :disabled="property.status == 'replacement' ? true : false" />
                                     </div>
                                 </div>
@@ -138,7 +138,7 @@
                                     <div class="form-group">
                                         <label for="d_state">* State</label>
                                         <input name="d_state" type="text" class="form-control required" required
-                                               title="State" v-model="property.deceased_state" 
+                                               title="State" v-model="property.property_state" 
                                                :disabled="property.status == 'replacement' ? true : false" />
                                     </div>
                                 </div>
@@ -146,7 +146,7 @@
                                     <div class="form-group">
                                         <label for="d_zip_code">* Zip Code</label>
                                         <input name="d_zip_code" type="text" class="form-control required" required
-                                               title="Zip Code" v-model="property.deceased_zipcode" 
+                                               title="Zip Code" v-model="property.property_zipcode" 
                                                :disabled="property.status == 'replacement' ? true : false" />
                                     </div>
                                 </div>
@@ -327,54 +327,16 @@
 
                 </div>
 
-                <!-- Mailing -->
-                <div role="tabpanel" class="tab-pane" id="mailing">
+                <!-- Mailings -->
+                <div role="tabpanel" class="tab-pane" id="mailings">
+                    <div class="notice"></div>
                     <div class="row">
-                        <div class="col-sm-12">
-                            <div class="notice"></div>
-                            <div class="form-horizontal">
-                                <div class="form-group">
-                                    <label for="mailing_date" class="col-sm-3 control-label">* Mailing Type</label>
-                                    <div class="col-sm-6">
-                                        <select id="mailing-type" class="form-control required" v-model="property.mailing_type">
-                                            <option value="Bi-monthly">Bi-monthly</option>
-                                            <option value="Monthly">Monthly</option>
-                                            <option value="Quarterly">Quarterly</option>
-                                            <option value="Yearly">Yearly</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="mailing_date" class="col-sm-3 control-label">* Mailing Date</label>
-                                    <div class="col-sm-6">
-                                        <input id="mailing-date" name="mailing_date" type="text" class="form-control required" required
-                                           title="Zip Code" v-model="property.mailing_date" />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="m_zip_code" class="col-sm-3 control-label">Next Mailing Date</label>
-                                    <div class="col-sm-6">
-                                        <p class="form-control-static text-info" style="font-size: 14px;">{{ property.next_mailing_date }}</p>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="m_zip_code" class="col-sm-3 control-label">Letter Mailings</label>
-                                    <div class="col-sm-6">
-                                        <label class="control control--checkbox" style="top: 4px">
-                                            <input type="checkbox" v-model="property.elligible_letter_mailings" />
-                                            <div class="control__indicator"></div>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="m_zip_code" class="col-sm-3 control-label">Postcard Mailings</label>
-                                    <div class="col-sm-6">
-                                        <label class="control control--checkbox" style="top: 4px">
-                                            <input type="checkbox" v-model="property.elligible_postcard_mailings" />
-                                            <div class="control__indicator"></div>
-                                        </label>
-                                    </div>
-                                </div>
+                        <div class="col-sm-12 col-lg-6" v-for="mailing in mailings">
+                            <div class="form-group">
+                                <label>Letter {{ mailing.letter_no }}</label>
+                                <input type="text" class="form-control required mailing_date" required 
+                                    v-model="mailing.mailing_date" readonly />
+                                <input type="hidden" v-model="mailing.letter_no" />
                             </div>
                         </div>
                     </div>
@@ -450,7 +412,7 @@
                         <div class="col-sm-12">
                             <div class="alert alert-warning" v-if="similar_address.length == 1">
                                 <i class="fa fa-exclamation-circle"></i>
-                                An existing similar deceased address was detected.
+                                An existing similar property address was detected.
                             </div>
                             <div class="alert alert-warning" v-else>
                                 <i class="fa fa-exclamation-circle"></i>
@@ -458,7 +420,7 @@
                             </div>
                             <div class="form-group">
                                 <div class="list-group" v-for="addr in similar_address">
-                                    <a target="_blank" v-bind:href="addr.url" class="list-group-item"> {{ addr.deceased_address }} 
+                                    <a target="_blank" v-bind:href="addr.url" class="list-group-item"> {{ addr.property_address }} 
                                     <code class="pull-right">{{ addr.id }}</code>
                                     </a>
                                 </div>
@@ -467,7 +429,7 @@
                                 <label for="m_zip_code">* What action would you like to take?</label>
                                 <select class="form-control required" v-model="similar_address_action">
                                     <option value="save">Save property for replacement approval.</option>
-                                    <option v-show="similar_address[0].permission" value="2">Replace (Deceased Address only)</option>
+                                    <option v-show="similar_address[0].permission" value="2">Replace (Property Address only)</option>
                                     <option v-show="similar_address[0].permission" value="3">Replace (All except list info)</option>
                                     <option v-show="similar_address[0].permission" value="4">Replace (All)</option>
                                 </select>
@@ -495,11 +457,9 @@
         similar_address_action: 'save',
         list_category : <?php echo json_encode($list_category); ?>,
         list : <?php echo json_encode($list); ?>,
-        property: {
-            next_mailing_date: '',
-            mailing_type: 'Bi-monthly'
-        },
-        comment: ''
+        property: {},
+        comment: '',
+        mailings: <?php echo json_encode($mailings); ?>
     };
 
     <?php if (isset($property)): ?>
@@ -522,33 +482,28 @@
         methods: {
             saveProperty: function() {
                 var infoForm = $('#info');
-                var mailingForm = $('#mailing');
                 if (validator.validateForm(infoForm)) {
-                    if (validator.validateForm(mailingForm)) {
-                        data.property.list_id = data.list.id;
-                        loading("info", "Saving property...");
-                        $.post(actionUrl, { action: 'save_property', form: data.property }, function(res) {
-                            if (res.success && (undefined == data.property.id)) {
-                                window.location = actionUrl + '/' + data.list.id + '/info/' + res.id;
-                            }  else if (!res.success) {
-                                if (res.exist) {
-                                    loading('warning', 'A similar existing property is detected.');
-                                    data.similar_address = res.properties;
+                    data.property.list_id = data.list.id;
+                    loading("info", "Saving property...");
+                    $.post(actionUrl, { action: 'save_property', form: data.property, mailings: data.mailings }, function(res) {
+                        if (res.success && (undefined == data.property.id)) {
+                            window.location = actionUrl + '/' + data.list.id + '/info/' + res.id;
+                        }  else if (!res.success) {
+                            if (res.exist) {
+                                loading('warning', 'A similar existing property is detected.');
+                                data.similar_address = res.properties;
 
-                                    var propertyExistModal = $('#property-exist-modal');
-                                    propertyExistModal.modal({
-                                        show: true,
-                                        backdrop: 'static',
-                                        keyboard: false
-                                    });
-                                }
-                            } else {
-                                loading('success', 'Save successful!');
+                                var propertyExistModal = $('#property-exist-modal');
+                                propertyExistModal.modal({
+                                    show: true,
+                                    backdrop: 'static',
+                                    keyboard: false
+                                });
                             }
-                        }, 'json');
-                    } else {
-                        $('.nav-tabs a[href="#mailing"]').tab('show');
-                    }
+                        } else {
+                            loading('success', 'Save successful!');
+                        }
+                    }, 'json');
                 }
             },
             replaceConfirmAction: function() {
@@ -604,7 +559,7 @@
         }
     });
 
-    $(function() {
+    $(() => {
         $('#sidebar-list-link').addClass('active');
         $('#' + sidebarListCategoryId).addClass('active');
         $('#sidebar-list').addClass('in');
@@ -615,24 +570,18 @@
             validator.displayInputError($(this).find('textarea'), false);
         })
 
-        $('#mailing-date').datepicker({
+        $('.mailing_date').datepicker({
             language: 'en',
-            minDate: new Date(),
             dateFormat: 'yyyy-mm-dd',
             onSelect: function(formattedDate, date, inst) {
-                data.property.mailing_date = formattedDate;
-                getNextMailingDate();
+                var letterNo = inst.$el.parent().find('input[type="hidden"]').val();
+                for (var i = 0; i < data.mailings.length; i++) {
+                    if (data.mailings[i].letter_no == letterNo) {
+                        data.mailings[i].mailing_date = formattedDate;
+                        break;
+                    }
+                }
             }
         });
-
-        $('#mailing-type').on('change', function() {
-            getNextMailingDate();
-        });
     });
-
-    function getNextMailingDate() {
-        $.post(actionUrl, {action: 'get_next_mailing_date', type: data.property.mailing_type, date: data.property.mailing_date}, function(res) {
-            data.property.next_mailing_date = res.nmd;
-        }, 'json');
-    }
 </script>

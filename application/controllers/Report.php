@@ -20,11 +20,12 @@ class Report extends MY_Controller {
                     $filter = $this->property_library->setup_search_filter($filter);
                     $this->load->model('property_model');
                     $where = array(
-                        'p.status' => 'active', 
-                        'p.deleted' => 0,
-                        'p.next_mailing_date >=' => date('Y-m-d')
+                        'p.deleted' => 0
                     );
-                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter, 'p.next_mailing_date');
+                    if (!isset($filter['date_range'])) {
+                        $filter['date_range'] = "pm.mailing_date = '" . date('Y-m-d') . "'";
+                    }
+                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
                     foreach ($properties as $p) {
                         $p->url = "";
                         $p->list_url = "";
@@ -32,7 +33,6 @@ class Report extends MY_Controller {
                             $p->url = base_url() . 'lists/property/' . $p->list_id . '/info/' . $p->id;
                             $p->list_url = base_url() . 'lists/info/' . $p->list_id;
                         }
-                        $p->next_mailing_date = date('F d, Y', strtotime($p->next_mailing_date));
                     }
                     echo json_encode(array('data' => $properties));
                     break;

@@ -248,10 +248,11 @@ class Lists extends MY_Controller {
                             $result['success'] = false;
                         } else {
                             $result = $this->property_model->save($property);
+                            if ($result['success']) {
+                                 $mailings = $this->input->post('mailings');
+                                $this->property_model->save_mailings($result['id'], $mailings);
+                            }
                         }
-                    }
-                    if ($result['success'] && (isset($property['id']) && $property['id']) == 0) {
-                        $this->session->set_flashdata('message', 'Saving property successful.');
                     }
                     echo json_encode($result);
                     break;
@@ -294,13 +295,6 @@ class Lists extends MY_Controller {
                     $result = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
                     echo json_encode($result);
                     break;
-                case 'get_next_mailing_date' :
-                    $this->load->library('property_library');
-                    $type = $this->input->post('type');
-                    $date = $this->input->post('date');
-                    $nmd = $this->property_library->get_next_mailing_date($type, $date);
-                    echo json_encode(array('nmd' => $nmd));
-                    break;
                 default:
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));
             }
@@ -326,6 +320,14 @@ class Lists extends MY_Controller {
                             $property->pr_url = base_url() . 'lists/property/' . $property->pr_list_id . '/info/' . $property->target_property_id;
                             $this->data['property'] = $property;
                             $this->data['comments'] = $this->property_model->get_comment(array('property_id' => $property_id));
+                            $this->data['mailings'] = $this->property_model->get_mailings(array('property_id' => $property_id));
+                            if (!$this->data['mailings']) {
+                                $this->data['mailings'] = $this->_generateTempMailings($this->data['list']->mailing_type, $this->data['list']->no_of_letters);
+                                $this->property_model->save_mailings($property_id, $this->data['mailings']);
+                                $this->data['mailings'] = $this->property_model->get_mailings(array('property_id' => $property_id));
+                            }
+                        } else {
+                            $this->data['mailings'] = $this->_generateTempMailings($this->data['list']->mailing_type, $this->data['list']->no_of_letters);
                         }
                         $this->_renderL('lists/property');
                         return;
@@ -337,17 +339,22 @@ class Lists extends MY_Controller {
         }
     }
 
-    public function check_exists() {
-        $addr = "123 Main St Apt 5";
-        $property = array(
-            'deceased_address' => '#6019 Bookly Summit Apartment 658 Lisadoside',
-            'deceased_city' => 'New Loyalfurt',
-            'deceased_state' => 'land',
-            'deceased_zipcode' => '75562'
-        );
-        $this->load->model('property_model');
-        $check = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
-        var_dump($check);exit;
+    public function _generateTempMailings($type, $letter_count)
+    {
+        $mailings = [];
+        $date = date('Y-m-d');
+        $this->load->library('property_library');
+        for ($i = 1; $i <= $letter_count; $i++) {
+            $next_date = $this->property_library->get_next_mailing_date($type, $date);
+            $date = $next_date;
+
+            $mailings[] = [
+                'letter_no' => $i,
+                'mailing_date' => $date,
+                'company_id' => $this->logged_user->company_id
+            ];
+        }
+        return $mailings;
     }
 
     public function bulk_import($list_id)
@@ -377,13 +384,13 @@ class Lists extends MY_Controller {
                 switch ($col) {
                     case 0 : $property['list_id'] = $val; break;
                     case 1 : $property['funeral_home'] = $val; break;
-                    case 2 : $property['deceased_first_name'] = $val; break;
-                    case 3 : $property['deceased_middle_name'] = $val; break;
-                    case 4 : $property['deceased_last_name'] = $val; break;
-                    case 5 : $property['deceased_address'] = $val; break;
-                    case 6 : $property['deceased_city'] = $val; break;
-                    case 7 : $property['deceased_state'] = $val; break;
-                    case 8 : $property['deceased_zipcode'] = $val; break;
+                    case 2 : $property['property_first_name'] = $val; break;
+                    case 3 : $property['property_middle_name'] = $val; break;
+                    case 4 : $property['property_last_name'] = $val; break;
+                    case 5 : $property['property_address'] = $val; break;
+                    case 6 : $property['property_city'] = $val; break;
+                    case 7 : $property['property_state'] = $val; break;
+                    case 8 : $property['property_zipcode'] = $val; break;
                     case 9 : $property['pr_first_name'] = $val; break;
                     case 10 : $property['pr_middle_name'] = $val; break;
                     case 11 : $property['pr_last_name'] = $val; break;

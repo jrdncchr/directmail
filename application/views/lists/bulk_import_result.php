@@ -27,11 +27,11 @@
                             <th>Action</th>
                             <th>Status</th>
                             <th>Spreadsheet Row</th>
-                            <th>Deceased Address</th>
+                            <th>Property Address</th>
                             <th></th>
                             <th>Target Status</th>
                             <th>Taraget Property ID</th>
-                            <th>Target Deceased Address</th>
+                            <th>Target Property Address</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,7 +43,7 @@
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li><a href="#" v-on:click="replaceAction('save', similar)">Save property for replacement approval.</a></li>
-                                        <li><a href="#" v-on:click="replaceAction(2, similar)">Replace (Deceased Address only)</a></li>
+                                        <li><a href="#" v-on:click="replaceAction(2, similar)">Replace (Property Address only)</a></li>
                                         <li><a href="#" v-on:click="replaceAction(3, similar)">Replace (All except list info)</a></li>
                                         <li><a href="#" v-on:click="replaceAction(4, similar)">Replace (All)</a></li>
                                     </ul>
@@ -57,7 +57,7 @@
                                 <span class="label label-default" v-show="similar.status == 'inactive'">{{ similar.status }}</span>
                             </td>
                             <td>{{ similar.row }}</td>
-                            <td>{{ similar.deceased_address }}</td>
+                            <td>{{ similar.property_address }}</td>
                             <td><i class="fa fa-arrows-h fa-2x"></i></td>
                             <td>
                                 <span class="label label-success" v-show="similar.check.properties[0].status == 'active' || similar.check.properties[0].status == 'lead'">{{ similar.check.properties[0].status }}</span>
@@ -70,7 +70,7 @@
                                 <a style="font-size: 14px;" target="_blank" :href="similar.check.properties[0].url">{{ similar.check.properties[0].id }}</a>
                             </td>
                             <td v-else>{{ similar.check.properties[0].id }}</td>
-                            <td>{{ similar.check.properties[0].deceased_address }}</td>
+                            <td>{{ similar.check.properties[0].property_address }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -88,7 +88,7 @@
                     <tbody>
                         <tr class="success" v-for="saved in result.saved">
                             <td>{{ saved.row }}</td>
-                            <td>{{ saved.deceased_address }}</td>
+                            <td>{{ saved.property_address }}</td>
                             <td>{{ saved.id }}</td>
                         </tr>
                     </tbody>

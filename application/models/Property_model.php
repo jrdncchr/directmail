@@ -20,10 +20,10 @@ class Property_model extends CI_Model {
             p.id, 
             p.list_id, 
             p.status,
-            p.deceased_first_name, 
-            p.deceased_last_name, 
-            p.deceased_middle_name, 
-            p.deceased_address,
+            p.property_first_name, 
+            p.property_last_name, 
+            p.property_middle_name, 
+            p.property_address,
             p.mail_first_name, 
             p.mail_last_name, 
             p.mail_address');
@@ -54,15 +54,11 @@ class Property_model extends CI_Model {
             $property['elligible_postcard_mailings'] = $property['elligible_postcard_mailings'] === 'true' ? 1 : 0;
         }
 
-        $this->load->library('property_library');
-        $property['next_mailing_date'] = $this->property_library->get_next_mailing_date($property['mailing_type'], $property['mailing_date']);
-
         $property['last_update'] = date('Y-m-d H:i:s');
         if (isset($property['id']) && $property['id'] > 0) {
             $this->db->where('id', $property['id']);
             $this->db->update('property', $property);
         } else {
-            $property['mailing_date'] = date('Y-m-d');
             $this->db->insert('property', $property);
             $property['id'] = $this->db->insert_id();
         }
@@ -111,6 +107,25 @@ class Property_model extends CI_Model {
         $this->db->truncate('property_comment');
     }
 
+    public function get_mailings($where = array(), $list = true) 
+    {
+        $result = $this->db->get_where('property_mailing', $where);
+        return $list ? $result->result() : $result->row();
+    }
+
+    public function save_mailings($property_id, $mailings) {
+        foreach ($mailings as $mailing) {
+            $mailing['property_id'] = $property_id;
+            if (isset($mailing['id'])) {
+                $this->db->where('id', $mailing['id']);
+                $this->db->update('property_mailing', $mailing);
+            } else {
+                $this->db->insert('property_mailing', $mailing);
+            }
+        }
+        return array('success' => true);
+    }
+
     public function get_pending_properties($company_id) 
     {
         $this->db->select('p.*, l.name as list_name, l.id as list_id');
@@ -126,7 +141,7 @@ class Property_model extends CI_Model {
             l.name as list_name, 
             l.id as list_id, 
             p2.id as target_id, 
-            p2.deceased_address as target_deceased_address, 
+            p2.property_address as target_property_address, 
             l2.name as target_list_name,
             l2.id as target_list_id');
         $this->db->join('list l', 'l.id = p.list_id', 'left');
@@ -141,7 +156,11 @@ class Property_model extends CI_Model {
     public function get_properties($company_id, $where = array(), $filter = array(), $order_by = 'p.id')
     {
         $where['p.company_id'] = $company_id;
-        $this->db->select('p.*, l.name as list_name, l.id as list_id');
+        $select = 'p.*, l.name as list_name, l.id as list_id';
+        if (isset($filter['date_range'])) {
+            $select = 'p.*, l.name as list_name, l.id as list_id, pm.mailing_date, pm.letter_no';
+        }
+        $this->db->select($select);
         $this->db->join('list l', 'l.id = p.list_id');
         $this->db->where($where);
         if (isset($filter['status'])) {
@@ -153,17 +172,11 @@ class Property_model extends CI_Model {
         if (isset($filter['list'])) {
             $this->db->where('p.list_id', $filter['list']);
         }
-        if (isset($filter['deceased_name'])) {
-            $this->db->like("CONCAT(p.deceased_first_name, ' ', p.deceased_last_name)", $filter['deceased_name']);
+        if (isset($filter['property_name'])) {
+            $this->db->like("CONCAT(p.property_first_name, ' ', p.property_last_name)", $filter['property_name']);
         }
-        if (isset($filter['deceased_address'])) {
-            $this->db->like("p.deceased_address", $filter['deceased_address']);
-        }
-        if (isset($filter['today']) && $filter['today'] === 'true') {
-            $this->db->where('p.next_mailing_date', date('Y-m-d'));
-        }
-        if (isset($filter['date_range'])) {
-            $this->db->where($filter['date_range']);
+        if (isset($filter['property_address'])) {
+            $this->db->like("p.property_address", $filter['property_address']);
         }
         if (isset($filter['date_range'])) {
             $this->db->where($filter['date_range']);
@@ -174,8 +187,18 @@ class Property_model extends CI_Model {
             }
             unset($filter['status_off']);
         }
+        if (isset($filter['date_range'])) {
+            $this->db->where($filter['date_range']);
+        }
+        if (isset($filter['letter_no']) && (int)$filter['letter_no'] > 0) {
+            $this->db->where('pm.letter_no', $filter['letter_no']);
+        }
+        if (isset($filter['date_range']) || isset($filter['letter_no'])) {
+            $this->db->join('property_mailing pm', 'pm.property_id = p.id', 'left');
+        }
         $this->db->order_by($order_by, 'asc');
         $result = $this->db->get('property p');
+        // echo $this->db->last_query();
         return $result->result();
     }
 
@@ -208,13 +231,13 @@ class Property_model extends CI_Model {
     public function check_property_exists($property, $company_id)
     {
         $result = array('exist' => false);
-        $similar_address = $this->generate_similar_address($property['deceased_address'], $company_id);
-        $similar_address[] = strtolower($property['deceased_address']);
-        $this->db->select('id, deceased_address, list_id, status');
-        $this->db->where_in('LOWER(deceased_address)', $similar_address);
-        $this->db->where('LOWER(deceased_city)', strtolower($property['deceased_city']));
-        $this->db->where('LOWER(deceased_state)', strtolower($property['deceased_state']));
-        $this->db->where('deceased_zipcode', $property['deceased_zipcode']);
+        $similar_address = $this->generate_similar_address($property['property_address'], $company_id);
+        $similar_address[] = strtolower($property['property_address']);
+        $this->db->select('id, property_address, list_id, status');
+        $this->db->where_in('LOWER(property_address)', $similar_address);
+        $this->db->where('LOWER(property_city)', strtolower($property['property_city']));
+        $this->db->where('LOWER(property_state)', strtolower($property['property_state']));
+        $this->db->where('property_zipcode', $property['property_zipcode']);
         $this->db->where('company_id', $company_id);
         $this->db->where('deleted', 0);
         $this->db->where('active', 1);

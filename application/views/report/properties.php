@@ -65,15 +65,15 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label for="deceased-name" class="control-label col-sm-4">Deceased Name</label>
+                                        <label for="property-name" class="control-label col-sm-4">Property Name</label>
                                         <div class="col-sm-8">
-                                            <input id="deceased-name" type="text" class="form-control" v-model="filter.deceased_name" />
+                                            <input id="property-name" type="text" class="form-control" v-model="filter.property_name" />
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="deceased-address" class="control-label col-sm-4">Deceased Address</label>
+                                        <label for="property-address" class="control-label col-sm-4">Property Address</label>
                                         <div class="col-sm-8">
-                                            <input id="deceased-address" type="text" class="form-control" v-model="filter.deceased_address" />
+                                            <input id="property-address" type="text" class="form-control" v-model="filter.property_address" />
                                         </div>
                                     </div>
                                 </div>
@@ -94,8 +94,8 @@
                     <tr>
                         <th width="6%">ID</th>
                         <th width="20%">List</th>
-                        <th width="20%">Deceased Name</th>
-                        <th width="39%">Deceased Address</th>
+                        <th width="20%">Property Name</th>
+                        <th width="39%">Property Address</th>
                         <th width="15%">Status</th>
                     </tr>
                     </thead>
@@ -113,8 +113,8 @@
     var data = {
         filter : {
             list : 'all',
-            deceased_name : '',
-            deceased_address : '',
+            property_name : '',
+            property_address : '',
             id: '',
             status_off: [],
             status_on: ['Active', 'Lead', 'Pending', 'Change', 'Replacement', 'Stop'],
@@ -140,8 +140,8 @@
             clearFilter: function() {
                 data.filter = {
                     list : 'all',
-                    deceased_name : '',
-                    deceased_address : '',
+                    property_name : '',
+                    property_address : '',
                     status: 'all',
                     id: ''
                 }
@@ -202,12 +202,12 @@
                         return row.list_url ? "<a target='_blank' href='" + row.list_url + "'>" + data + "</a>" : data;
                     }
                 },
-                { data: "deceased_last_name", render:
+                { data: "property_last_name", render:
                     function(data, type, row) {
-                        return row.deceased_last_name + " " + row.deceased_first_name + ", " + row.deceased_middle_name;
+                        return row.property_last_name + " " + row.property_first_name + ", " + row.property_middle_name;
                     }
                 },
-                { data: "deceased_address" },
+                { data: "property_address" },
                 { data: "status", render: function(data, type, row) {
                         if (data == "active" || data == "lead") {
                             return "<span class='label label-success'>" + capitalize(data) + "</span>";

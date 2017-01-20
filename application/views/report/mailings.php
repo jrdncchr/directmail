@@ -57,32 +57,29 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="deceased-name" class="control-label col-sm-4">Deceased Name</label>
+                                        <label for="property-name" class="control-label col-sm-4">Property Name</label>
                                         <div class="col-sm-8">
-                                            <input id="deceased-name" type="text" class="form-control" v-model="filter.deceased_name" />
+                                            <input id="property-name" type="text" class="form-control" v-model="filter.property_name" />
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="deceased-address" class="control-label col-sm-4">Deceased Address</label>
+                                        <label for="property-address" class="control-label col-sm-4">Property Address</label>
                                         <div class="col-sm-8">
-                                            <input id="deceased-address" type="text" class="form-control" v-model="filter.deceased_address" />
+                                            <input id="property-address" type="text" class="form-control" v-model="filter.property_address" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label for="today" class="control-label col-sm-4">Today Only</label>
-                                        <div class="col-sm-8">
-                                            <label class="control control--checkbox" style="top: 4px">
-                                                <input type="checkbox" v-model="filter.today" />
-                                                <div class="control__indicator"></div>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
                                         <label for="date-range" class="control-label col-sm-4">Date Range</label>
                                         <div class="col-sm-8">
                                             <input id="date-range" type="text" readonly="true" class="form-control" v-model="filter.date_range" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="letter-no" class="control-label col-sm-4">Letter No.</label>
+                                        <div class="col-sm-8">
+                                            <input id="letter-no" type="number" class="form-control" v-model="filter.letter_no" />
                                         </div>
                                     </div>
                                 </div>
@@ -103,9 +100,10 @@
                     <tr>
                         <th width="6%">ID</th>
                         <th width="20%">List</th>
-                        <th width="20%">Deceased Name</th>
-                        <th width="39%">Deceased Address</th>
-                        <th width="15%">Next Mail Date</th>
+                        <th width="23%">Property Name</th>
+                        <th width="31%">Property Address</th>
+                        <th width="10%">Letter No</th>
+                        <th width="10%">Mailing Date</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -122,13 +120,13 @@
     var data = {
         filter : {
             list : 'all',
-            deceased_name : '',
-            deceased_address : '',
+            property_name : '',
+            property_address : '',
             id: '',
             status_off: ['Lead', 'Pending', 'Change', 'Replacement', 'Stop'],
             status_on: ['Active'],
-            today : false,
-            date_range : ''
+            date_range : '',
+            letter_no: ''
         },
         statusText: 'Active'
     };
@@ -151,8 +149,8 @@
             clearFilter: function() {
                 data.filter = {
                     list : 'all',
-                    deceased_name : '',
-                    deceased_address : '',
+                    property_name : '',
+                    property_address : '',
                     today : false,
                     date_range : ''
                 }
@@ -163,7 +161,6 @@
     function setupFilterFields() {
         $('#date-range').datepicker({
             language: 'en',
-            minDate: new Date(),
             range: true,
             multipleDatesSeparator: ' - ',
             dateFormat: 'yyyy-mm-dd',
@@ -212,14 +209,15 @@
         });
 
         dt = $('table').dataTable({
-            "order": [[ 4, "asc" ]],
+            "order": [[ 5, "asc" ]],
             "bDestroy": true,
             "filter": true,
             "ajax": {
                 "type": "POST",
                 "url": actionUrl,
                 "data":  {
-                    action: "list"
+                    action: "list",
+                    filter: data.filter
                 }
             },
             columns: [
@@ -233,13 +231,14 @@
                         return row.list_url ? "<a target='_blank' href='" + row.list_url + "'>" + data + "</a>" : data;
                     }
                 },
-                { data: "deceased_last_name", render:
+                { data: "property_last_name", render:
                     function(data, type, row) {
-                        return row.deceased_last_name + " " + row.deceased_first_name + ", " + row.deceased_middle_name;
+                        return row.property_last_name + " " + row.property_first_name + ", " + row.property_middle_name;
                     }
                 },
-                { data: "deceased_address" },
-                { data: "next_mailing_date" }
+                { data: "property_address" },
+                { data: "letter_no" },
+                { data: "mailing_date" }
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();

@@ -22,10 +22,10 @@
                    	<ul class="list-group" style="margin-top: 20px;">
 					  <li class="list-group-item">
 					    <label class="control control--checkbox pull-right" style="top: -2px">
-                            <input type="checkbox" v-model="list.show_deceased" />
+                            <input type="checkbox" v-model="list.show_property" />
                             <div class="control__indicator"></div>
                         </label>
-					    Deceased
+					    Property
 					  </li>
 					  <li class="list-group-item">
 					    <label class="control control--checkbox pull-right" style="top: -2px">
@@ -83,6 +83,7 @@
         <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a href="#properties" aria-controls="properties" role="tab" data-toggle="tab"><i class="fa fa-home"></i> Properties</a></li>
+            <li role="presentation"><a href="#mailing" aria-controls="mailing" role="tab" data-toggle="tab"><i class="fa fa-envelope"></i> Mailing</a></li>
           </ul>
 
           <!-- Tab panes -->
@@ -129,15 +130,15 @@
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label for="deceased-name" class="control-label col-sm-4">Deceased Name</label>
+                                            <label for="property-name" class="control-label col-sm-4">Property Name</label>
                                             <div class="col-sm-8">
-                                                <input id="deceased-name" type="text" class="form-control" v-model="filter.deceased_name" />
+                                                <input id="property-name" type="text" class="form-control" v-model="filter.property_name" />
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="deceased-address" class="control-label col-sm-4">Deceased Address</label>
+                                            <label for="property-address" class="control-label col-sm-4">Property Address</label>
                                             <div class="col-sm-8">
-                                                <input id="deceased-address" type="text" class="form-control" v-model="filter.deceased_address" />
+                                                <input id="property-address" type="text" class="form-control" v-model="filter.property_address" />
                                             </div>
                                         </div>
                                     </div>
@@ -166,13 +167,36 @@
                         <tr>
                             <th width="10%">ID</th>
                             <th width="10%">Status</th>
-                            <th width="20%">Deceased Name</th>
-                            <th width="35%">Deceased Address</th>
+                            <th width="20%">Property Name</th>
+                            <th width="35%">Property Address</th>
                             <th width="20%">Date Created</th>
                         </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Mailing -->
+            <div role="tabpanel" class="tab-pane active" id="mailing">
+                <div class="notice"></div>
+                <div class="row">
+                    <div class="col-sm-12 col-lg-6">
+                        <div class="form-group">
+                            <label>Mailing Type</label>
+                            <select class="form-control required" v-model="list.mailing_type">
+                                <option value="">Select Mailing Type</option>
+                                <option value="Bi-monthly">Bi-monthly</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="Weekly">Weekly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>No. of Letters</label>
+                            <input type="number" class="form-control required" v-model="list.no_of_letters" />
+                        </div>
+                    </div>
                 </div>
             </div>
           </div>
@@ -190,8 +214,8 @@
         list_category : <?php echo json_encode($list_category); ?>,
         list : <?php echo json_encode($list); ?>,
         filter : {
-            deceased_name : '',
-            deceased_address : '',
+            property_name : '',
+            property_address : '',
             id: '',
             status_off: [],
             status_on: ['Active', 'Lead', 'Pending', 'Change', 'Replacement', 'Stop'],
@@ -213,10 +237,12 @@
                     var list = {
                         name : data.list.name,
                         list_category_id: data.list_category._id,
-                        show_deceased: data.list.show_deceased ? 1 : 0,
+                        show_property: data.list.show_property ? 1 : 0,
                         show_pr: data.list.show_pr ? 1 : 0,
                         show_attorney: data.list.show_attorney ? 1 : 0,
                         show_mail: data.list.show_mail ? 1 : 0,
+                        mailing_type: data.list.mailing_type,
+                        no_of_letters: data.list.no_of_letters
                     };
                     if (data.list.id > 0) {
                         list.id = data.list.id;
@@ -263,8 +289,8 @@
             },
             clearFilter: function() {
                 data.filter = {
-                    deceased_name : '',
-                    deceased_address : '',
+                    property_name : '',
+                    property_address : '',
                     status: 'all',
                     id: ''
                 }
@@ -331,12 +357,12 @@
                         }
                     } 
                 },
-                { data: "deceased_last_name", render:
+                { data: "property_last_name", render:
                     function(data, type, row) {
-                        return row.deceased_last_name + " " + row.deceased_first_name + ", " + row.deceased_middle_name;
+                        return row.property_last_name + " " + row.property_first_name + ", " + row.property_middle_name;
                     }
                 },
-                { data: "deceased_address" },
+                { data: "property_address" },
                 { data: "date_created" }
             ],
             "fnDrawCallback": function (oSettings) {

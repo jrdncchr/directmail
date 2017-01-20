@@ -17,10 +17,10 @@
                     <tr>
                         <th width="10%">ID</th>
                         <th width="15%">List</th>
-                        <th width="25%">Deceased Address</th>
+                        <th width="25%">Property Address</th>
                         <th width="10%">Target ID</th>
                         <th width="15%">Target List</th>
-                        <th width="25%">Target Deceased Address</th>
+                        <th width="25%">Target Property Address</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -40,10 +40,10 @@
                 <div class="modal-body">
                     <p>What action would you like to take with this property?</p>
                     <div class="form-group">
-                        <label for="selected_property_action">{{ selectedProperty.deceased_address }}</label>
+                        <label for="selected_property_action">{{ selectedProperty.property_address }}</label>
                         <select class="form-control" v-model="replacementAction">
                             <option value="1">Reject</option>
-                            <option v-show="selectedProperty.url && selectedProperty.target_url" value="2">Replace (Deceased Address only)</option>
+                            <option v-show="selectedProperty.url && selectedProperty.target_url" value="2">Replace (Property Address only)</option>
                             <option v-show="selectedProperty.url && selectedProperty.target_url" value="3">Replace (All except list info)</option>
                             <option v-show="selectedProperty.url && selectedProperty.target_url" value="4">Replace (All)</option>
                         </select>
@@ -69,7 +69,7 @@
     var data = {
         selectedProperty: {
             id: 0,
-            deceased_address: ''
+            property_address: ''
         },
         comment: '',
         replacementAction: '1'
@@ -121,14 +121,14 @@
                     }
                 },
                 { data: "list_name" },
-                { data: "deceased_address" },
+                { data: "property_address" },
                 { data: "target_id", render: 
                     function(data, type, row) {
                         return row.target_url ? "<a target='_blank' href='" + row.target_url + "'>" + data + "</a>" : data;
                     }
                 },
                 { data: "target_list_name" },
-                { data: "target_deceased_address" }
+                { data: "target_property_address" }
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();

@@ -52,7 +52,7 @@ class Property_Library {
 			case 1: // reject
 				return $this->replace('rejected', $property_id, $target_property_id, $comment);
 				break;
-			case 2: // replace the target deceased address only
+			case 2: // replace the target property address only
 				return $this->replace('replaced_address_only', $property_id, $target_property_id, $comment);
 				break;
 			case 3: // replace the entire target property info except the list it belongs to
@@ -89,7 +89,7 @@ class Property_Library {
 		if ($status !== 'rejected') {
 			$target_property = $this->CI->property_model->get(['p.id' => $target_property_id], false);
 			if ($status === 'replaced_address_only') {
-				$update = ['deceased_address' => $property->deceased_address];
+				$update = ['property_address' => $property->property_address];
 			} else if ($status === 'replaced_all' || $status === 'replaced_all_except_list') {
 				unset($property->id);
 				unset($property->status);
@@ -150,13 +150,13 @@ class Property_Library {
         $objPHPExcel->setActiveSheetIndex(0)
                     ->setCellValue('A1', 'List ID')
                     ->setCellValue('B1', 'Funeral Home')
-                    ->setCellValue('C1', 'Deceased First Name')
-                    ->setCellValue('D1', 'Deceased Middle Name')
-                    ->setCellValue('E1', 'Deceased Last Name')
-                    ->setCellValue('F1', 'Deceased Address')
-                    ->setCellValue('G1', 'Deceased City')
-                    ->setCellValue('H1', 'Deceased State')
-                    ->setCellValue('I1', 'Deceased Zipcode')
+                    ->setCellValue('C1', 'Property First Name')
+                    ->setCellValue('D1', 'Property Middle Name')
+                    ->setCellValue('E1', 'Property Last Name')
+                    ->setCellValue('F1', 'Property Address')
+                    ->setCellValue('G1', 'Property City')
+                    ->setCellValue('H1', 'Property State')
+                    ->setCellValue('I1', 'Property Zipcode')
                     ->setCellValue('J1', 'PR First Name')
                     ->setCellValue('K1', 'PR Middle Name')
                     ->setCellValue('L1', 'PR Last Name')
@@ -184,13 +184,13 @@ class Property_Library {
         	$objPHPExcel->setActiveSheetIndex(0)
                     ->setCellValue('A' . $row, $property->list_id)
                     ->setCellValue('B' . $row, $property->funeral_home)
-                    ->setCellValue('C' . $row, $property->deceased_first_name)
-                    ->setCellValue('D' . $row, $property->deceased_middle_name)
-                    ->setCellValue('E' . $row, $property->deceased_last_name)
-                    ->setCellValue('F' . $row, $property->deceased_address)
-                    ->setCellValue('G' . $row, $property->deceased_city)
-                    ->setCellValue('H' . $row, $property->deceased_state)
-                    ->setCellValue('I' . $row, $property->deceased_zipcode)
+                    ->setCellValue('C' . $row, $property->property_first_name)
+                    ->setCellValue('D' . $row, $property->property_middle_name)
+                    ->setCellValue('E' . $row, $property->property_last_name)
+                    ->setCellValue('F' . $row, $property->property_address)
+                    ->setCellValue('G' . $row, $property->property_city)
+                    ->setCellValue('H' . $row, $property->property_state)
+                    ->setCellValue('I' . $row, $property->property_zipcode)
                     ->setCellValue('J' . $row, $property->pr_first_name)
                     ->setCellValue('K' . $row, $property->pr_middle_name)
                     ->setCellValue('L' . $row, $property->pr_last_name)
@@ -242,25 +242,21 @@ class Property_Library {
 	        if (isset($filter['list']) && $filter['list'] === 'all') {
 	            unset($filter['list']);
 	        }
-	        if (isset($filter['deceased_name']) && $filter['deceased_name'] === '') {
-	            unset($filter['deceased_name']);
+	        if (isset($filter['property_name']) && $filter['property_name'] === '') {
+	            unset($filter['property_name']);
 	        }
-	        if (isset($filter['deceased_address']) && $filter['deceased_address'] === '') {
-	            unset($filter['deceased_address']);
+	        if (isset($filter['property_address']) && $filter['property_address'] === '') {
+	            unset($filter['property_address']);
 	        }
 	        if (isset($filter['id']) && $filter['id'] === '') {
 	            unset($filter['id']);
 	        }
-	        if (isset($filter['today']) && $filter['today'] === 'true') {
-	            unset($filter['date_range']);
-	        } else {
-	            if (isset($filter['date_range']) && $filter['date_range'] !== '') {
-	                $date_split = explode(' - ', $filter['date_range']);
-	                $filter['date_range'] = "next_mailing_date BETWEEN '$date_split[0]' AND '$date_split[1]'"; 
-	            } else {
-	                unset($filter['date_range']);
-	            }
-	        }
+            if (isset($filter['date_range']) && $filter['date_range'] !== '') {
+                $date_split = explode(' - ', $filter['date_range']);
+                $filter['date_range'] = "pm.mailing_date BETWEEN '$date_split[0]' AND '$date_split[1]'"; 
+            } else {
+                unset($filter['date_range']);
+            }
 	        if (isset($filter['status_on'])) {
 	        	unset($filter['status_on']);
 	        }
