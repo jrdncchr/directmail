@@ -9,6 +9,9 @@
         color: gray;
         line-height: 10px;
     }
+    input:disabled {
+        background-color: lightgray !important;
+    }
 </style>
 <div id="app">
     <h2>Property Details</h2>
@@ -335,7 +338,7 @@
                             <div class="form-group">
                                 <label>Letter {{ mailing.letter_no }}</label>
                                 <input type="text" class="form-control required mailing_date" required 
-                                    v-model="mailing.mailing_date" readonly />
+                                    v-model="mailing.mailing_date" readonly :disabled="checkDate(mailing.mailing_date)" />
                                 <input type="hidden" v-model="mailing.letter_no" />
                             </div>
                         </div>
@@ -555,6 +558,9 @@
                         }, 'json');
                     }, 'json');
                 }
+            },
+            checkDate(date) {
+                return mydate = new Date(date) < new Date();
             }
         }
     });
@@ -570,7 +576,7 @@
             validator.displayInputError($(this).find('textarea'), false);
         })
 
-        $('.mailing_date').datepicker({
+        $('.mailing_date:enabled').datepicker({
             language: 'en',
             dateFormat: 'yyyy-mm-dd',
             onSelect: function(formattedDate, date, inst) {

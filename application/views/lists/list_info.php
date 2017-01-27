@@ -9,6 +9,7 @@
     <div class="row" id="list-form">
         <div class="col-sm-12">
             <div class="notice"></div>
+            <?php echo $this->session->flashdata('message'); ?>
         </div>
         <div class="col-sm-12 panel-white">
             <div class="col-sm-6" style="padding: 0 !important;">
@@ -222,6 +223,8 @@
         },
         statusText: 'All'
     };
+    var oldMailingType = data.list.mailing_type;
+    var oldNoLetters = data.list.no_of_letters;
 
     var vm = new Vue({
         el: "#app",
@@ -233,32 +236,52 @@
             saveList: function() {
                 var form = $('#list-form');
                 if (validator.validateForm(form)) {
-                    loading('info', 'Saving list...');
                     var list = {
                         name : data.list.name,
                         list_category_id: data.list_category._id,
-                        show_property: data.list.show_property ? 1 : 0,
-                        show_pr: data.list.show_pr ? 1 : 0,
-                        show_attorney: data.list.show_attorney ? 1 : 0,
-                        show_mail: data.list.show_mail ? 1 : 0,
+                        show_property: data.list.show_property == "1" && data.list.show_property ? 1 : 0,
+                        show_pr: data.list.show_pr == "1" &&  data.list.show_pr ? 1 : 0,
+                        show_attorney: data.list.show_attorney == "1" && data.list.show_pr ? 1 : 0,
+                        show_mail: data.list.show_mail == "1" && data.list.show_pr ? 1 : 0,
                         mailing_type: data.list.mailing_type,
                         no_of_letters: data.list.no_of_letters
                     };
                     if (data.list.id > 0) {
                         list.id = data.list.id;
                     }
-                    $.post(actionUrl, { 
-                        action: 'save_list', 
-                        list: list
-                    }, function(res) {
-                        if (res.success) {
-                            loading('success', 'Save successful!');
-                            window.location = baseUrl + 'lists/info/' + res.id;
-                        } else {
-                            validator.displayAlertError(form, true, res.message);
-                        }
-                    }, 'json');
+                    var adjust = false;
+                    if (oldMailingType !== list.mailing_type || oldNoLetters !== list.no_of_letters) {
+                         showConfirmModal({
+                            title: 'Auto Adjust',
+                            body: 'You have changed the mailing type or no. of letters, do you want to adjust all existing properties with this setup?',
+                            callback: function() {
+                                adjust = true;
+                                vm.saveNow(list, adjust);
+                                hideConfirmModal();
+                            },
+                            cancelCallback: function() {
+                                vm.saveNow(list, adjust);
+                            }
+                        });
+                    } else {
+                        vm.saveNow(list, adjust);
+                    }
                 }
+            },
+            saveNow: function(list, adjust) {
+                loading('info', 'Saving list...');
+                $.post(actionUrl, { 
+                    action: 'save_list', 
+                    list: list,
+                    adjust: adjust
+                }, function(res) {
+                    if (res.success) {
+                        loading('success', 'Save successful!');
+                        window.location = baseUrl + 'lists/info/' + res.id;
+                    } else {
+                        validator.displayAlertError(form, true, res.message);
+                    }
+                }, 'json');
             },
             deleteList: function() {
                 showConfirmModal({

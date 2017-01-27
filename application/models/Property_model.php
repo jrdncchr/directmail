@@ -303,4 +303,50 @@ class Property_model extends CI_Model {
         return $result;
     }
 
+    function adjust_mailing($list) {
+        $properties = $this->get(array('p.list_id' => $list['id']));
+        $this->load->library('property_library');
+        foreach ($properties as $property) {
+            $this->db->order_by('mailing_date', 'desc');
+            $mailings = $this->db->get_where('property_mailing', array('property_id' => $property->id))->result();
+            if ($mailings) {
+                // filter past and future
+                $past_mailings = [];
+                $future_mailings = [];
+                foreach ($mailings as $mailing) {
+                    if (strtotime($mailing->mailing_date) > strtotime("now")) {
+                        $future_mailings[] = $mailing;
+                    } else {
+                        $past_mailings[] = $mailing;
+                    }
+                }
+                // delete future mailings
+                for ($i = 0; $i < sizeof($future_mailings); $i++) {
+                    $this->db->where(array('id' => $future_mailings[$i]->id));
+                    $this->db->delete('property_mailing');
+                }
+                // add the new adjust mailings
+                $to_be_added = $list['no_of_letters'] - sizeof($past_mailings);
+                if ($to_be_added > 0) {
+                    $last_mail_date = sizeof($past_mailings) ? $past_mailings[0]->mailing_date : date('Y-m-d');
+                    $last_letter_no = sizeof($past_mailings) ? $past_mailings[0]->letter_no : 0;
+                    for ($i = 0; $i < $to_be_added; $i++) {
+                        $mailing_date = $this->property_library->get_next_mailing_date(
+                                $list['mailing_type'], $last_mail_date);
+                        $last_letter_no = $last_letter_no + 1;
+                        $new_mailing = [
+                            'property_id' => $property->id,
+                            'company_id' => $property->company_id,
+                            'letter_no' => $last_letter_no,
+                            'mailing_date' => $this->property_library->get_next_mailing_date(
+                                $list['mailing_type'], $last_mail_date)
+                        ]; 
+                        $last_mail_date = $mailing_date;
+                        $this->db->insert('property_mailing', $new_mailing);
+                    }
+                }
+            }
+        }
+    }
+
 } 

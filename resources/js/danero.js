@@ -52,6 +52,7 @@ function loading(type, message) {
  * @return {[void]}
  */
 function showConfirmModal(config) {
+
     var modal = $('#global-confirm-modal');
     modal.find('.modal-title').html(config.title);
     modal.find('.modal-body').html(config.body);
@@ -59,6 +60,9 @@ function showConfirmModal(config) {
         modal.find('.btn-main').on('click', config.callback);
     } else {
         modal.find('.btn-main').hide();
+    }
+    if (undefined !== config.cancelCallback) {
+        modal.on('hidden.bs.modal', config.cancelCallback);
     }
     modal.modal({
         show: true,

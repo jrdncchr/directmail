@@ -96,6 +96,18 @@ class Lists extends MY_Controller {
                     }
                     $list['company_id'] = $this->logged_user->company_id;
                     $result = $this->list_model->save($list);
+                    if ($result['success']) {
+                        $adjust = $this->input->post('adjust');
+                        if (filter_var($adjust, FILTER_VALIDATE_BOOLEAN)) {
+                            $this->load->model('property_model');
+                            $adjust_result = $this->property_model->adjust_mailing($list);
+                            $result['message'] = "Save successful and the properties mailing dates are now adjusted!";
+                        } else {
+                            $result['message'] = "Save successful!";
+                        }
+                        
+                        $this->session->set_flashdata('message', create_alert_message($result));
+                    }
                     break;
                 case 'delete_list' :
                     $list_id = $this->input->post('list_id');
