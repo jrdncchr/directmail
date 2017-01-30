@@ -271,20 +271,7 @@ class Property_Library {
 	{
 	    $date = strtotime($date);
 
-	    switch ($type) {
-	    	case 'Bi-monthly' :
-			    $nmd = date('Y-m-d', strtotime("+15 days", $date));	
-			    break;
-		    case 'Monthly' :
-		    	$nmd = date('Y-m-d', strtotime("+1 month", $date));
-		    	break;
-	    	case 'Yearly' :
-			    $nmd = date('Y-m-d', strtotime("+1 year", $date));
-			    break;
-			case 'Quarterly' :
-				$nmd = date('Y-m-d', strtotime("+3 months", $date));
-				break;
-	    }
+	    $nmd = date('Y-m-d', strtotime("+" . $type, $date));
 	    return $nmd;
 	}
 

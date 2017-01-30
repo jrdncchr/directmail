@@ -187,10 +187,15 @@
                             <label>Mailing Type</label>
                             <select class="form-control required" v-model="list.mailing_type">
                                 <option value="">Select Mailing Type</option>
-                                <option value="Bi-monthly">Bi-monthly</option>
-                                <option value="Monthly">Monthly</option>
-                                <option value="Quarterly">Quarterly</option>
-                                <option value="Weekly">Weekly</option>
+                                <option value="1 week">1 week</option>
+                                <option value="2 weeks">2 weeks</option>
+                                <option value="3 weeks">3 weeks</option>
+                                <option value="1 month">1 month</option>
+                                <option value="2 months">2 months</option>
+                                <option value="3 months">3 months</option>
+                                <option value="4 months">4 months</option>
+                                <option value="5 months">5 months</option>
+                                <option value="6 months">6 months</option>
                             </select>
                         </div>
                         <div class="form-group">

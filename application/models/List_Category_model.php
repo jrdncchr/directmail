@@ -11,7 +11,7 @@ class List_Category_model extends CI_Model {
     }
 
     /*
-     * list_category
+     * list Property
      */
     public function get($where = array(), $list = true)
     {
@@ -35,7 +35,7 @@ class List_Category_model extends CI_Model {
     public function delete($id, $company_id)
     {
         $result = array('success' => false);
-        $list = $this->db->get_where('list', array('list_category_id' => $id, 'company_id' => $company_id));
+        $list = $this->db->get_where('list', array('list_category_id' => $id, 'company_id' => $company_id, 'deleted' => 0));
         if ($list->num_rows() > 0) {
             $result['message'] = "Cannot delete because there are list on the selected category.";
         } else {
