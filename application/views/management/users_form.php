@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         <?php if (isset($user)): ?>
-                        <div class="col-sm-3">
+                        <div class="col-sm-6">
                             <div class="form-group">
                                 <label>User Permission</label>
                                 <a href="<?php echo base_url() . 'management/users/form/' . $user->id . '/permissions'; ?>" class="btn btn-default btn-block btn-xs">
@@ -196,13 +196,13 @@
                 }
             },
             deleteUser: function() {
-                showConfirmModal({
+                showModal('confirm', {
                     title: 'Delete User',
                     body: 'Are you sure to delete this user?',
                     callback: function() {
                         loading("info", "Deleting user...");
                         $.post(actionUrl, { action: 'delete', user_id: data.form.user_details.id }, function(res) {
-                            hideConfirmModal();
+                            hideModal();
                             window.location = actionUrl;
                         }, 'json');
                     }

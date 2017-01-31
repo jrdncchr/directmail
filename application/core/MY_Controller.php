@@ -58,6 +58,7 @@ class MY_Controller extends CI_Controller
     public function _initializePermissions()
     {
         $this->load->model('role_model');
+        $this->load->model('user_model');
         /*
          * Module Permissions
          */
@@ -73,7 +74,6 @@ class MY_Controller extends CI_Controller
         }
         $user_module_permissions = $this->session->userdata('user_module_permissions');
         if (!$user_module_permissions) {
-            $this->load->model('user_model');
             $user_module_permissions = $this->user_model->get_module_permissions($this->logged_user->id);
             $user_module_permissions = $this->_objectToArrayById($user_module_permissions);
             $this->session->set_userdata('user_module_permissions', $user_module_permissions);
@@ -102,6 +102,7 @@ class MY_Controller extends CI_Controller
                 $role_list_category_permissions = array();
             }
         }
+        
         $user_list_category_permissions = $this->session->userdata('user_list_category_permissions');
         if (!$user_list_category_permissions) {
             foreach ($user_module_permissions as $m) {
@@ -118,7 +119,6 @@ class MY_Controller extends CI_Controller
         $list_category_permissions = $role_list_category_permissions ? $this->_arrayMergeById($role_list_category_permissions, $user_list_category_permissions) : $user_list_category_permissions;
         $this->list_category_permissions = $list_category_permissions;
         $this->data['list_category_permissions'] = $list_category_permissions;
-
         /*
          * List Permission
          */
@@ -220,20 +220,33 @@ class MY_Controller extends CI_Controller
         } else if (!$array2) {
             return $array1;
         }
-        $final_array = $array1;
+        
         foreach ($array2 as $k2 => $v2) {
             $add = true;
             foreach ($array1 as $k1 => $v1) {
                 if ($k2 == $k1) {
                     $add = false;
+                    if ((int)$v2->create_action == 1) {
+                        $array1[$k1]->create_action = 1;
+                    }
+                    if ((int)$v2->retrieve_action == 1) {
+                        $array1[$k1]->retrieve_action = 1;
+                    }
+                    if ((int)$v2->update_action == 1) {
+                        $array1[$k1]->update_action = 1;
+                    }
+                    if ((int)$v2->delete_action == 1) {
+                        $array1[$k1]->delete_action = 1;
+                    }
                     break;
                 }
             }
             if ($add) {
-                $final_array[$k2] = $v2;
+                $array1[$k2] = $v2;
             }
         }
-        return $final_array;
+
+        return $array1;
     }
 
     function _permissionArrayMergeById($array1, $array2) {

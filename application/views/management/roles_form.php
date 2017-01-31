@@ -340,14 +340,14 @@
                 }, 'json');
             },
             deleteRole: function() {
-                showConfirmModal({
+                showModal('confirm', {
                     title: 'Delete Role',
                     body: 'Are you sure to delete this role?',
                     callback: function() {
                         loading("info", "Deleting role...");
                         $.post(actionUrl, { action: 'delete', role_id: data.role_details.id }, function(res) {
                             if (res.success) {
-                                hideConfirmModal();
+                                hideModal();
                                 window.location = actionUrl;
                             } else {
                                 loading('danger', res.message);

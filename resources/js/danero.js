@@ -47,13 +47,12 @@ function loading(type, message) {
     }
 }
 
-/**
- * @param  {[array = title, body, callback]}
- * @return {[void]}
- */
-function showConfirmModal(config) {
-
+function showModal(type, config) {
     var modal = $('#global-confirm-modal');
+    if (type === 'yesno') {
+        modal = $('#global-yesno-modal');
+    }
+    
     modal.find('.modal-title').html(config.title);
     modal.find('.modal-body').html(config.body);
     if (undefined !== config.callback) {
@@ -71,8 +70,9 @@ function showConfirmModal(config) {
     });
 }
 
-function hideConfirmModal() {
+function hideModal() {
     $('#global-confirm-modal').hide();
+    $('#global-yesno-modal').hide();
 }
 
 function capitalize(str) {

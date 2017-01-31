@@ -393,6 +393,9 @@ class Lists extends MY_Controller {
             for ($col = 0; $col < $highestColumnIndex; ++ $col) {
                 $cell = $sheet->getCellByColumnAndRow($col, $row);
                 $val = $cell->getValue();
+                if (!$val) {
+                    $val = '';
+                }
                 switch ($col) {
                     case 0 : $property['list_id'] = $val; break;
                     case 1 : $property['funeral_home'] = $val; break;
@@ -422,7 +425,7 @@ class Lists extends MY_Controller {
                     case 25 : $property['mail_city'] = $val; break;
                     case 26 : $property['mail_state'] = $val; break;
                     case 27 : $property['mail_zipcode'] = $val; break;
-                    case 28 : $property['status'] = $val; break;
+                    case 28 : $property['status'] = $val ? $val : 'pending'; break;
                 }
             }
             if ($property['list_id'] == $list_id) {

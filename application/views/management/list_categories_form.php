@@ -80,14 +80,14 @@
                 }
             },
             deleteListCategory: function() {
-                showConfirmModal({
+                showModal('confirm', {
                     title: 'Delete List Category',
                     body: 'Are you sure to delete this list category?',
                     callback: function() {
                         loading("info", "Deleting list category...");
                         $.post(actionUrl, { action: 'delete', id: data.list_category.id }, function(res) {
                             if (res.success) {
-                                hideConfirmModal();
+                                hideModal();
                                 window.location = actionUrl;
                             } else {
                                 loading('danger', res.message);

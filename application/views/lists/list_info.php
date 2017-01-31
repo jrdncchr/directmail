@@ -77,21 +77,19 @@
         </div>
     </div>
 
-
-    <?php if ($list->id > 0): ?>
     <div class="row" style="margin-top: 20px;">
         <div class="col-sm-12" style="padding: 0;">
         <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#properties" aria-controls="properties" role="tab" data-toggle="tab"><i class="fa fa-home"></i> Properties</a></li>
-            <li role="presentation"><a href="#mailing" aria-controls="mailing" role="tab" data-toggle="tab"><i class="fa fa-envelope"></i> Mailing</a></li>
+            <li role="presentation" class="active" v-show="list.id > 0"><a href="#properties" aria-controls="properties" role="tab" data-toggle="tab"><i class="fa fa-home"></i> Properties</a></li>
+            <li role="presentation" v-bind:class="{ active: list.id == 0 }"><a href="#mailing" aria-controls="mailing" role="tab" data-toggle="tab"><i class="fa fa-envelope"></i> Mailing</a></li>
           </ul>
 
           <!-- Tab panes -->
           <div class="tab-content">
 
             <!-- Properties -->
-            <div role="tabpanel" class="tab-pane active" id="properties">
+            <div role="tabpanel" class="tab-pane active" id="properties" v-show="list.id > 0">
                 <div class="panel panel-default">
                     <div class="panel-heading" role="tab" id="filterHeading">
                         <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" href="#filterBox" aria-expanded="true" aria-controls="filterBox" >
@@ -179,14 +177,14 @@
             </div>
 
             <!-- Mailing -->
-            <div role="tabpanel" class="tab-pane" id="mailing">
+            <div role="tabpanel" class="tab-pane" id="mailing" v-bind:class="{ active: list.id == 0 }">
                 <div class="notice"></div>
                 <div class="row">
                     <div class="col-sm-12 col-lg-6">
                         <div class="form-group">
-                            <label>Mailing Type</label>
+                            <label>Mailing Interval</label>
                             <select class="form-control required" v-model="list.mailing_type">
-                                <option value="">Select Mailing Type</option>
+                                <option value="">Select Mailing Interval</option>
                                 <option value="1 week">1 week</option>
                                 <option value="2 weeks">2 weeks</option>
                                 <option value="3 weeks">3 weeks</option>
@@ -208,7 +206,6 @@
           </div>
         </div>
     </div>
-<?php endif; ?>
 </div>
 
 <script>
@@ -255,14 +252,15 @@
                         list.id = data.list.id;
                     }
                     var adjust = false;
-                    if (oldMailingType !== list.mailing_type || oldNoLetters !== list.no_of_letters) {
-                         showConfirmModal({
+                    if ((oldMailingType !== list.mailing_type || oldNoLetters !== list.no_of_letters) && data.list.id > 0) {
+                        alert('test');
+                         showModal('yesno', {
                             title: 'Auto Adjust',
-                            body: 'You have changed the mailing type or no. of letters, do you want to adjust all existing properties with this setup?',
+                            body: 'You have changed the mailing interval or no. of letters, do you want to adjust all existing properties with this setup?',
                             callback: function() {
                                 adjust = true;
                                 vm.saveNow(list, adjust);
-                                hideConfirmModal();
+                                hideModal();
                             },
                             cancelCallback: function() {
                                 vm.saveNow(list, adjust);
@@ -284,12 +282,12 @@
                         loading('success', 'Save successful!');
                         window.location = baseUrl + 'lists/info/' + res.id;
                     } else {
-                        validator.displayAlertError(form, true, res.message);
+                        validator.displayAlertError($('#list-form'), true, res.message);
                     }
                 }, 'json');
             },
             deleteList: function() {
-                showConfirmModal({
+                showModal('confirm', {
                     title: 'Delete List',
                     body: 'Are you sure to delete this list?',
                     callback: function() {
@@ -298,7 +296,7 @@
                             action: 'delete_list', 
                             list_id: data.list.id 
                         }, function(res) {
-                            hideConfirmModal();
+                            hideModal();
                             window.location = baseUrl + 'lists/category/' + data.list_category._id ;
                         }, 'json');
                     }

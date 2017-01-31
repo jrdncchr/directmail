@@ -111,13 +111,13 @@
                 }
             },
             deleteCompany: function() {
-                showConfirmModal({
+                showModal('confirm', {
                     title: 'Delete Company',
                     body: 'Are you sure to delete this company?',
                     callback: function() {
                         loading("info", "Deleting company...");
                         $.post(actionUrl, { action: 'delete', company_id: data.form.company.id }, function(res) {
-                            hideConfirmModal();
+                            hideModal();
                             window.location = actionUrl;
                         }, 'json');
                     }

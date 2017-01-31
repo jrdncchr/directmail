@@ -62,7 +62,7 @@
                         if (res.success) {
                             window.location = baseUrl + "templates/info/" + data.id;
                         } else {
-                            showConfirmModal({
+                            showModal('confirm', {
                                 title: "Permission Denied",
                                 body: "You don't have permission for this list."
                             });

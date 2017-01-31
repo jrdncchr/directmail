@@ -530,14 +530,14 @@
                 }, 'json');
             },
             deleteProperty: function() {
-                showConfirmModal({
+                showModal('confirm', {
                     title: 'Delete Property',
                     body: 'Are you sure to delete this property?',
                     callback: function() {
                         loading("info", "Deleting property...");
                         $.post(actionUrl, { action: 'delete_property', id: data.property.id, status: data.property.status }, function(res) {
                             if (res.success) {
-                                hideConfirmModal();
+                                hideModal();
                                 window.location = baseUrl + 'lists/info/' + data.list.id;
                             } else {
                                 loading('danger', res.message);
