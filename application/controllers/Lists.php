@@ -425,13 +425,17 @@ class Lists extends MY_Controller {
                     case 25 : $property['mail_city'] = $val; break;
                     case 26 : $property['mail_state'] = $val; break;
                     case 27 : $property['mail_zipcode'] = $val; break;
-                    case 28 : $property['status'] = $val ? $val : 'pending'; break;
+                    case 28 : $property['mailing_date'] = $val; break;
+                    case 29 : $property['status'] = $val ? $val : 'pending'; break;
                 }
             }
             if ($property['list_id'] == $list_id) {
                 $properties[] = $property;
             }
         }
+
+        $this->load->model('list_model');
+        $list = $this->list_model->get(array('l.id' => $list_id), false);
 
         $this->load->model('property_model');
         foreach ($properties as $property) {
@@ -446,8 +450,17 @@ class Lists extends MY_Controller {
             } else {
                 $row = $property['row'];
                 unset($property['row']);
+                $mailing_date = $property['mailing_date'];
+                unset($property['mailing_date']);
                 $save = $this->property_model->save($property);
                 if ($save['success']) {
+                    $property['id'] = $save['id'];
+                    $this->property_model->add_mailings(
+                        $list->mailing_type, 
+                        $list->no_of_letters, 
+                        $property,
+                        $mailing_date
+                    );
                     $property['row'] = $row;
                     $property['id'] = $save['id'];
                     $result['saved'][] = $property;

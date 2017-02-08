@@ -253,7 +253,6 @@
                     }
                     var adjust = false;
                     if ((oldMailingType !== list.mailing_type || oldNoLetters !== list.no_of_letters) && data.list.id > 0) {
-                        alert('test');
                          showModal('yesno', {
                             title: 'Auto Adjust',
                             body: 'You have changed the mailing interval or no. of letters, do you want to adjust all existing properties with this setup?',

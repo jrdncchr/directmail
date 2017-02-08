@@ -349,4 +349,25 @@ class Property_model extends CI_Model {
         }
     }
 
+    public function add_mailings($list_type, $no_of_letters, $property, $last_mail_date = null, $last_letter_no = 0) {
+        $this->load->library('property_library');
+        if (is_null($last_mail_date)) {
+            $last_mail_date = date('Y-m-d');
+        } else {
+            $last_mail_date = date('Y-m-d', strtotime($last_mail_date));
+        }
+        for ($i = 0; $i < $no_of_letters; $i++) {
+            $last_letter_no = $last_letter_no + 1;
+            $new_mailing = [
+                'property_id' => $property['id'],
+                'company_id' => $property['company_id'],
+                'letter_no' => $last_letter_no,
+                'mailing_date' => $last_mail_date
+            ]; 
+            $this->db->insert('property_mailing', $new_mailing);
+            $last_mail_date = $this->property_library->get_next_mailing_date(
+                    $list_type, $last_mail_date);
+        }
+    }
+
 } 
