@@ -104,6 +104,7 @@ class Company_model extends CI_Model {
             'to' => $user['email'],
             'name' => $user['first_name'] . " " . $user['last_name'],
             'company' => $company['name'],
+            'company_key' => $company['company_key'],
             'password' => $pw, 
             'confirmation_key' => $confirmation_key
         );

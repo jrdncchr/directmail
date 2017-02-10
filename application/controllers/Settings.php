@@ -16,7 +16,8 @@ class Settings extends MY_Controller {
             $this->load->model('setting_model');
             switch ($action) {
             	case 'list':
-                    $abbr = $this->setting_model->get_abbreviations($this->logged_user->company_id);
+                    $type = $this->input->post('type');
+                    $abbr = $this->setting_model->get_abbreviations($this->logged_user->company_id, $type);
                     echo json_encode(array('data' => $abbr));
                     break;
                 case 'save':

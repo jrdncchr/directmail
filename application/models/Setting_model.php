@@ -13,9 +13,13 @@ class Setting_model extends CI_Model {
     /*
      * Default CRUD
      */
-    public function get_abbreviations($company_id, $list = true)
+    public function get_abbreviations($company_id, $type, $list = true)
     {
-        $result = $this->db->get_where('abbreviations', array('company_id' => $company_id));
+        $where = ['type' => $type];
+        if ($type == 'Custom') {
+            $where['company_id'] = $company_id;
+        }
+        $result = $this->db->get_where('abbreviations', $where);
         return $list ? $result->result() : $result->row();
     }
 
