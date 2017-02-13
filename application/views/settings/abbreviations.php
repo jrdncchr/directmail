@@ -132,7 +132,8 @@
                     	if (res.success) {
                     		loading('success', 'Delete successful!');
                     		modal.modal('hide');
-                    		dt.fnReloadAjax();
+                            customDt.fnReloadAjax();
+                            globalDt.fnReloadAjax();
                     		data.id = 0;
                     	}
                     }, 'json');
@@ -192,8 +193,8 @@
                 { data: "id", visible: false }
             ],
             "fnDrawCallback": function (oSettings) {
-                var table = $("table").dataTable();
-                $('table tbody tr').on('click', function () {
+                var table = $("#custom-abbr-table").dataTable();
+                $('#custom-abbr-table tbody tr').on('click', function () {
                     var pos = table.fnGetPosition(this);
                     var rowData = table.fnGetData(pos);
                     data.id = rowData.id;
@@ -232,9 +233,9 @@
                 { data: "id", visible: false }
             ],
             "fnDrawCallback": function (oSettings) {
-                if (companyId == 1) {
-                    var table = $("table").dataTable();
-                    $('table tbody tr').on('click', function () {
+                if (companyId == 1 || companyId == '1') {
+                    var table = $("#global-abbr-table").dataTable();
+                    $('#global-abbr-table tbody tr').on('click', function () {
                         var pos = table.fnGetPosition(this);
                         var rowData = table.fnGetData(pos);
                         data.id = rowData.id;

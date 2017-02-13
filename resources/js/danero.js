@@ -48,20 +48,28 @@ function loading(type, message) {
 }
 
 function showModal(type, config) {
-    var modal = $('#global-confirm-modal');
+    var modal = $('#global-modal');
     if (type === 'yesno') {
-        modal = $('#global-yesno-modal');
+        $('#global-modal-yes').html('Yes');
+        $('#global-modal-no').html('No');
+    } else if (type === 'approve') {
+        $('#global-modal-yes').html('Approve');
+        $('#global-modal-no').html('Reject');
+    } else {
+        $('#global-modal-yes').html('Confirm');
+        $('#global-modal-no').html('Close');
     }
     
     modal.find('.modal-title').html(config.title);
     modal.find('.modal-body').html(config.body);
     if (undefined !== config.callback) {
-        modal.find('.btn-main').on('click', config.callback);
+        $('#global-modal-yes').show();
+        $('#global-modal-yes').off('click').on('click', config.callback);
     } else {
-        modal.find('.btn-main').hide();
+        $('#global-modal-yes').hide();
     }
     if (undefined !== config.cancelCallback) {
-        modal.on('hidden.bs.modal', config.cancelCallback);
+        $('#global-modal-no').off('click').on('click', config.cancelCallback);
     }
     modal.modal({
         show: true,
@@ -71,8 +79,7 @@ function showModal(type, config) {
 }
 
 function hideModal() {
-    $('#global-confirm-modal').hide();
-    $('#global-yesno-modal').hide();
+    $('#global-modal').modal('hide');
 }
 
 function capitalize(str) {

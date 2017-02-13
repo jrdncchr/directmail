@@ -163,11 +163,43 @@
                     var pos = table.fnGetPosition(this);
                     var d = table.fnGetData(pos);
                     console.log(d);
+                    showModal('approve', {
+                        title: 'Approve Property',
+                        body: 'Do you want to approve this property?',
+                        callback: function() {
+                            loading("info", "Approving Property");
+                            saveProperty({
+                                id: d.id,
+                                status: 'active'
+                            });
+                        },
+                        cancelCallback: function() {
+                            loading("info", "Rejecting Property");
+                            d.status = 'Active';
+                            d.active = 0;
+                            saveProperty({
+                                id: d.id,
+                                status: 'rejected',
+                                active: 0
+                            });
+                        }
+                    });
                 });
             },
             "language": {
-                "emptyTable": "No property found for this list."
+                "emptyTable": "No pending properties found."
             }
         });
     });
+
+    function saveProperty(property) {
+        $.post(actionUrl, { 
+            action: 'save_property', 
+            form: property
+        }, function(res) {
+            hideModal();
+            loading('success', 'Done');
+            dt.fnReloadAjax();
+        }, 'json');
+    }
 </script>
