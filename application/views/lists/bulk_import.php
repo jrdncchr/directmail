@@ -2,7 +2,6 @@
     <h2>Bulk Import</h2>
     <ol class="breadcrumb">
         <li><a>List</a></li>
-        <li><a href="<?php echo base_url() . 'lists/category/' . $list_category->_id; ?>"><?php echo $list_category->name; ?></a></li>
         <li><a href="<?php echo base_url() . 'lists/info/' . $list->id; ?>"><?php echo  $list->name; ?></a></li>
         <li><a class="active">Bulk Import</a></li>
     </ol>
@@ -50,11 +49,9 @@
 
         }
     });
-
-    var sidebarListCategoryId = "<?php echo 'sidebar-list-category-' . $list_category->_id . '-link'; ?>";
+    
     $(function() {
         $('#sidebar-list-link').addClass('active');
-        $('#' + sidebarListCategoryId).addClass('active');
         $('#sidebar-list').addClass('in');
 
         $('#browse').on('change', function() {

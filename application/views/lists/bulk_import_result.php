@@ -10,7 +10,6 @@
     <h2>Bulk Import Result</h2>
     <ol class="breadcrumb">
         <li><a>List</a></li>
-        <li><a href="<?php echo base_url() . 'lists/category/' . $list_category->_id; ?>"><?php echo $list_category->name; ?></a></li>
         <li><a href="<?php echo base_url() . 'lists/info/' . $list->id; ?>"><?php echo  $list->name; ?></a></li>
         <li><a href="<?php echo base_url() . 'lists/info/' . $list->id . '/bulk_import'; ?>">Bulk Import</a></li>
         <li><a class="active">Result</a></li>
@@ -139,10 +138,8 @@
         }
     });
 
-    var sidebarListCategoryId = "<?php echo 'sidebar-list-category-' . $list_category->_id . '-link'; ?>";
     $(function() {
         $('#sidebar-list-link').addClass('active');
-        $('#' + sidebarListCategoryId).addClass('active');
         $('#sidebar-list').addClass('in');
     });
 </script>

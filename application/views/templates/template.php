@@ -2,7 +2,6 @@
     <h2><?php echo $list->name;?></h2>
     <ol class="breadcrumb">
         <li><a>Templates</a></li>
-        <li><a href="<?php echo base_url() . 'templates/category/' . $list_category->_id; ?>"><?php echo $list_category->name; ?></a></li>
         <li><a class="active"><?php echo $list->name; ?></a></li>
     </ol>
 
@@ -267,7 +266,6 @@
 <script>
     var dt;
     var actionUrl = "<?php echo base_url() . 'templates/info'; ?>";
-    var sidebarTemplatesCategoryId = "<?php echo 'sidebar-templates-category-' . $list_category->_id . '-link'; ?>";
 
     $(function() {
         $('#sidebar-templates-link').addClass('active');
@@ -276,7 +274,6 @@
     });
 
     var data = {
-        list_category : <?php echo json_encode($list_category); ?>,
         list : <?php echo json_encode($list); ?>
     };
     data.paragraphs = <?php echo json_encode($paragraphs); ?>;
