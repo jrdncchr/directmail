@@ -6,6 +6,7 @@ class Download extends MY_Controller {
     function __construct()
     {
         parent::__construct(true);
+        $this->data['page_title'] = "Downloads";
     }
 
     public function properties($type)
@@ -46,6 +47,17 @@ class Download extends MY_Controller {
         }
         $this->load->library('property_library');
         $this->property_library->download_list($type, $properties, $this->logged_user);
+    }
+
+    public function mailings()
+    {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $action = $this->input->post('action');
+        } else {
+            $this->load->model('list_model');
+            $this->data['lists'] = $this->list_model->get(array('l.company_id' => $this->logged_user->company_id));
+            $this->_renderL('download/mailings');
+        }
     }
 
 }

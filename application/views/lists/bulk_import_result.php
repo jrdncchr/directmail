@@ -49,7 +49,7 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="label label-success" v-show="similar.status == 'active' || similar.status == 'lead'">{{ similar.status }}</span>
+                                <span class="label label-success" v-show="similar.status == 'active' || similar.status == 'lead' || similar.status == 'buy'">{{ similar.status }}</span>
                                 <span class="label label-warning" v-show="similar.status == 'pending'">{{ similar.status }}</span>
                                 <span class="label label-info" v-show="similar.status == 'change'">{{ similar.status }}</span>
                                 <span class="label label-danger" v-show="similar.status == 'stop'">{{ similar.status }}</span>
@@ -88,7 +88,7 @@
                         <tr class="success" v-for="saved in result.saved">
                             <td>{{ saved.row }}</td>
                             <td>{{ saved.property_address }}</td>
-                            <td>{{ saved.id }}</td>
+                            <td><a :href="saved.property_link" target="_blank">View Property</a></td>
                         </tr>
                     </tbody>
                 </table>
