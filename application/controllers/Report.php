@@ -58,6 +58,7 @@ class Report extends MY_Controller {
                     $this->load->model('property_model');
                     $where = array( 
                         'p.deleted' => 0,
+                        'p.active' => 1
                     );
                     $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
                     foreach ($properties as $p) {

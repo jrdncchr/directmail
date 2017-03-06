@@ -49,7 +49,7 @@ class Seeder extends CI_Controller {
                 $property = array(
                     'list_id' => rand(1, 3),
                     'status' => 'pending',
-                    'funeral_home' => $faker->address,
+                    'resource' => $faker->bank,
                     'property_first_name' => $faker->firstName,
                     'property_middle_name' => $faker->lastName,
                     'property_last_name' => $faker->lastName,

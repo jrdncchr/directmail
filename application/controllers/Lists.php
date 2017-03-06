@@ -9,12 +9,7 @@ class Lists extends MY_Controller {
         $this->data['page_title'] = "Lists";
     }
 
-    public function no_list_category()
-    {
-        $this->_renderL('lists/empty');
-    }
-
-    public function category($id = 0, $sub = "index")
+    public function index()
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
             $result = array('success' => false);
@@ -23,7 +18,6 @@ class Lists extends MY_Controller {
             switch ($action) {
                 case 'list' :
                     $lists = $this->list_model->get(array(
-                        'list_category_id' => $this->input->post('list_category_id'),
                         'l.company_id' => $this->logged_user->company_id));
                     echo json_encode(array('data' => $lists));
                     break;
@@ -38,22 +32,9 @@ class Lists extends MY_Controller {
                     echo json_encode($result);
             }
         } else {
-            if ($id > 0) {
-                $this->session->set_userdata('current_list_category_id', $id);
-                switch ($sub) {
-                    case 'index' :
-                        if ($this->_checkListCategoryPermission($id, 'retrieve')) {
-                            $this->data['list_category'] = $this->list_category_permissions[$id];
-                            $this->_renderL('lists/category');
-                            return;
-                        }
-                        break;
-                }
-                $this->show_404();
-            } else {
-                $this->show_404();
-            }
+            $this->_renderL('lists/index');
         }
+        
     }
 
     public function info($id = 0, $sub = "index")
@@ -150,19 +131,12 @@ class Lists extends MY_Controller {
                 case 'index' :
                     $this->load->model('list_model');
                     if ($id == 'new') {
-                        $list_category_id = $this->session->userdata('current_list_category_id');
-                        if ($list_category_id) {
-                            if ($this->_checkListCategoryPermission($list_category_id, 'create')) {
-                                    $list = new stdClass();
-                                    $list->id = 0;
-                                    $list->content = '';
-                                $this->data['list'] = $list;
-                                $this->data['list_category'] = $this
-                                    ->list_category_permissions[$list_category_id];
-                                $this->_renderL('lists/list_info');
-                                return;
-                            }
-                        }                        
+                        $list = new stdClass();
+                        $list->id = 0;
+                        $list->content = '';
+                        $this->data['list'] = $list;
+                        $this->_renderL('lists/list_info');
+                        return;            
                     } else {
                         $list = $this->list_model->get(
                             array(
@@ -173,9 +147,6 @@ class Lists extends MY_Controller {
                             if ($this->_checkListPermission($id, 'retrieve')) {
                                 // list
                                 $this->data['list'] = $list;
-                                // list category
-                                $this->data['list_category'] = $this
-                                    ->list_category_permissions[$this->data['list']->list_category_id];
                                 // paragraphs
                                 $all_paragraphs = $this->list_model->get_paragraphs(array('list_id' => $id));
                                 $paragraphs = array(
@@ -210,9 +181,6 @@ class Lists extends MY_Controller {
                                 'l.id' => $id, 
                                 'l.company_id' => $this->logged_user->company_id
                             ), false);
-                        // list category
-                        $this->data['list_category'] = $this
-                            ->list_category_permissions[$this->data['list']->list_category_id];
                         $this->_renderL('lists/bulk_import');
                         return;
                     }
@@ -224,9 +192,6 @@ class Lists extends MY_Controller {
                             'l.id' => $id, 
                             'l.company_id' => $this->logged_user->company_id
                         ), false);
-                    // list category
-                    $this->data['list_category'] = $this
-                        ->list_category_permissions[$this->data['list']->list_category_id];
                     $this->data['result'] = $this->bulk_import($id);
                     $this->_renderL('lists/bulk_import_result');
                     return;
@@ -261,6 +226,11 @@ class Lists extends MY_Controller {
                         } else {
                             $result = $this->property_model->save($property);
                             if ($result['success']) {
+                                $this->property_model->add_history([
+                                    'property_id' => $result['id'],
+                                    'company_id' => $property['company_id'],
+                                    'message' => 'Property was ' .  (isset($property['id']) ? 'updated' : 'added') . ' by ' . $this->logged_user->first_name . ' ' . $this->logged_user->last_name
+                                ]);
                                  $mailings = $this->input->post('mailings');
                                 $this->property_model->save_mailings($result['id'], $mailings);
                             }
@@ -279,12 +249,22 @@ class Lists extends MY_Controller {
                         $target_property_id,
                         $this->logged_user
                     );
+                    $this->property_model->add_history([
+                        'property_id' => $property['id'],
+                        'company_id' => $property['company_id'],
+                        'message' => 'Property was replaced by ' . $this->logged_user->first_name . ' ' . $this->logged_user->last_name
+                    ]);
                     echo json_encode($result);
                     break;
                 case 'delete_property':
                     $id = $this->input->post('id');
                     $status = $this->input->post('status');
                     $result = $this->property_model->delete($id, $this->logged_user->company_id, $status);
+                    $this->property_model->add_history([
+                        'property_id' => $property['id'],
+                        'company_id' => $property['company_id'],
+                        'message' => 'Property was deleted by ' . $this->logged_user->first_name . ' ' . $this->logged_user->last_name
+                    ]);
                     echo json_encode($result);
                     break;
                 case 'save_comment':
@@ -321,9 +301,6 @@ class Lists extends MY_Controller {
                                 'l.id' => $list_id, 
                                 'l.company_id' => $this->logged_user->company_id
                             ), false);
-                        // list category
-                        $this->data['list_category'] = $this
-                            ->list_category_permissions[$this->data['list']->list_category_id];
                         // Property
                         if ($property_id > 0) {
                             $this->load->model('property_model');
@@ -332,6 +309,7 @@ class Lists extends MY_Controller {
                             $property->pr_url = base_url() . 'lists/property/' . $property->pr_list_id . '/info/' . $property->target_property_id;
                             $this->data['property'] = $property;
                             $this->data['comments'] = $this->property_model->get_comment(array('property_id' => $property_id));
+                            $this->data['histories'] = $this->property_model->get_history(array('property_id' => $property_id));
                             $this->data['mailings'] = $this->property_model->get_mailings(array('property_id' => $property_id));
                             if (!$this->data['mailings']) {
                                 $this->data['mailings'] = $this->_generateTempMailings($this->data['list']->mailing_type, $this->data['list']->no_of_letters);
@@ -398,7 +376,7 @@ class Lists extends MY_Controller {
                 }
                 switch ($col) {
                     case 0 : $property['list_id'] = $val; break;
-                    case 1 : $property['funeral_home'] = $val; break;
+                    case 1 : $property['resource'] = $val; break;
                     case 2 : $property['property_first_name'] = $val; break;
                     case 3 : $property['property_middle_name'] = $val; break;
                     case 4 : $property['property_last_name'] = $val; break;
@@ -425,8 +403,10 @@ class Lists extends MY_Controller {
                     case 25 : $property['mail_city'] = $val; break;
                     case 26 : $property['mail_state'] = $val; break;
                     case 27 : $property['mail_zipcode'] = $val; break;
-                    case 28 : $property['mailing_date'] = $val; break;
+                    case 28 : $property['mailing_date'] = gmdate('Y-m-d', (($val - 25569) * 86400)); break;
                     case 29 : $property['status'] = $val ? $val : 'pending'; break;
+                    case 30 : $property['comment'] = $val; break;
+                    case 31 : $property['skip_traced'] = $val != 1 ? 0 : 1; break;
                 }
             }
             if ($property['list_id'] == $list_id) {
@@ -452,6 +432,12 @@ class Lists extends MY_Controller {
                 unset($property['row']);
                 $mailing_date = $property['mailing_date'];
                 unset($property['mailing_date']);
+                $comment = [
+                	'comment' => $property['comment'],
+                	'type' => 'comment',
+                	'user_id' => $this->logged_user->id
+                ];
+                unset($property['comment']);
                 $save = $this->property_model->save($property);
                 if ($save['success']) {
                     $property['id'] = $save['id'];
@@ -461,8 +447,10 @@ class Lists extends MY_Controller {
                         $property,
                         $mailing_date
                     );
+                    $comment['property_id'] = $property['id'];
+                    $this->property_model->save_comment($comment);
                     $property['row'] = $row;
-                    $property['id'] = $save['id'];
+                    $property['property_link'] = base_url() . 'lists/property/' . $list_id . '/info/' . $save['id'];
                     $result['saved'][] = $property;
                 }
             }

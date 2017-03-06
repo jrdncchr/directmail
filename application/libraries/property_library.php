@@ -183,7 +183,7 @@ class Property_Library {
         foreach ($properties as $property) {
         	$objPHPExcel->setActiveSheetIndex(0)
                     ->setCellValue('A' . $row, $property->list_id)
-                    ->setCellValue('B' . $row, $property->funeral_home)
+                    ->setCellValue('B' . $row, $property->resource)
                     ->setCellValue('C' . $row, $property->property_first_name)
                     ->setCellValue('D' . $row, $property->property_middle_name)
                     ->setCellValue('E' . $row, $property->property_last_name)

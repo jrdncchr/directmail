@@ -1,8 +1,7 @@
 <div id="app">
     <h2><?php echo $list->id > 0 ? $list->name : 'Create List'; ?></h2>
     <ol class="breadcrumb">
-        <li><a>List</a></li>
-        <li><a href="<?php echo base_url() . 'lists/category/' . $list_category->_id; ?>"><?php echo $list_category->name; ?></a></li>
+        <li><a href="<?php echo base_url() . 'lists'; ?>">Lists</a></li>
         <li><a class="active"><?php echo $list->id > 0 ? $list->name : 'Create List'; ?></a></li>
     </ol>
 
@@ -17,9 +16,9 @@
                     <label for="name">* List Name</label>
                      <input name="name" type="text" class="form-control required" required
                            title="List Name" v-model="list.name" />
-                    <?php if (($list->id > 0 && $mc->_checkListPermission($list->id, 'update')) ||
-                        ($list->id == 0 && $mc->_checkListCategoryPermission($list_category->_id, 'create'))): 
-                    ?>
+
+                    <?php if ($mc->_checkModulePermission(MODULE_LIST_ID, 'update') || 
+                    ($list->id > 0 && $mc->_checkListPermission($list->id, 'update'))): ?>
                    	<ul class="list-group" style="margin-top: 20px;">
 					  <li class="list-group-item">
 					    <label class="control control--checkbox pull-right" style="top: -2px">
@@ -114,6 +113,7 @@
                                                                 <li>
                                                                     <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
                                                                     <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
+                                                                    <a class="small" data-value="Buy" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Buy</a>
                                                                     <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
                                                                     <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
                                                                     <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Replacement</a>
@@ -211,10 +211,8 @@
 <script>
     var dt;
     var actionUrl = "<?php echo base_url() . 'lists/info'; ?>";
-    var sidebarListCategoryId = "<?php echo 'sidebar-list-category-' . $list_category->_id . '-link'; ?>";
 
     var data = {
-        list_category : <?php echo json_encode($list_category); ?>,
         list : <?php echo json_encode($list); ?>,
         filter : {
             property_name : '',
@@ -240,7 +238,6 @@
                 if (validator.validateForm(form)) {
                     var list = {
                         name : data.list.name,
-                        list_category_id: data.list_category._id,
                         show_property: data.list.show_property == "1" && data.list.show_property ? 1 : 0,
                         show_pr: data.list.show_pr == "1" &&  data.list.show_pr ? 1 : 0,
                         show_attorney: data.list.show_attorney == "1" && data.list.show_pr ? 1 : 0,
@@ -296,7 +293,7 @@
                             list_id: data.list.id 
                         }, function(res) {
                             hideModal();
-                            window.location = baseUrl + 'lists/category/' + data.list_category._id ;
+                            window.location = baseUrl + 'lists/';
                         }, 'json');
                     }
                 });
@@ -325,7 +322,6 @@
 
     $(function() {
         $('#sidebar-list-link').addClass('active');
-        $('#' + sidebarListCategoryId).addClass('active');
         $('#sidebar-list').addClass('in');
 
         $('.dropdown-menu a').on( 'click', function( event ) {
@@ -369,7 +365,7 @@
             columns: [
                 { data: "id" },
                 { data: "status", render: function(data, type, row) {
-                        if (data == "active" || data == "lead") {
+                        if (data == "active" || data == "lead" || data == "buy") {
                             return "<span class='label label-success'>" + capitalize(data) + "</span>";
                         } else if (data == "pending" || data == "replacement") {
                             return "<span class='label label-warning'>" + capitalize(data) + "</span>";

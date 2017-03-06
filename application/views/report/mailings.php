@@ -30,11 +30,12 @@
                                                         <ul class="dropdown-menu">
                                                             <li>
                                                                 <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
-                                                                <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" />&nbsp;Lead</a>
-                                                                <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" />&nbsp;Pending</a>
-                                                                <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" />&nbsp;Change</a>
-                                                                <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" />&nbsp;Replacement</a>
-                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" />&nbsp;Stop</a>
+                                                                <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
+                                                                <a class="small" data-value="Buy" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Buy</a>
+                                                                <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
+                                                                <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
+                                                                <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Replacement</a>
+                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
                                                             </li>
                                                         </ul>
                                                     </div>

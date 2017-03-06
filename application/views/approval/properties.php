@@ -10,7 +10,8 @@
             <div class="panel panel-default">
 
                 <div class="panel-heading" role="tab" id="filterHeading">
-                    <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" href="#filterBox" aria-expanded="true" aria-controls="filterBox" >
+                    <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" href="#filterBox" 
+                    aria-expanded="true" aria-controls="filterBox">
                         <a role="button" style="font-size: 16px !important; font-weight: bold;">
                             FILTER
                         </a>

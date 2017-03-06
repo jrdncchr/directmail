@@ -53,6 +53,7 @@ class Property_model extends CI_Model {
         if (isset($property['elligible_postcard_mailings']) && $property['elligible_postcard_mailings'] != 1) {
             $property['elligible_postcard_mailings'] = $property['elligible_postcard_mailings'] === 'true' ? 1 : 0;
         }
+        $property['skip_traced'] = filter_var($property['skip_traced'], FILTER_VALIDATE_BOOLEAN);
 
         $property['last_update'] = date('Y-m-d H:i:s');
         if (isset($property['id']) && $property['id'] > 0) {
@@ -368,6 +369,17 @@ class Property_model extends CI_Model {
             $last_mail_date = $this->property_library->get_next_mailing_date(
                     $list_type, $last_mail_date);
         }
+    }
+
+    public function get_history($where)
+    {
+        $this->db->order_by('date_created', 'desc');
+        return $this->db->get_where('property_history', $where)->result();
+    }
+
+    public function add_history($history)
+    {
+        return $this->db->insert('property_history', $history);
     }
 
 } 

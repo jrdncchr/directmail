@@ -12,12 +12,16 @@
     input:disabled {
         background-color: lightgray !important;
     }
+    p.history_date {
+        font-size: 16px;
+        color: gray;
+        line-height: 10px;
+    }
 </style>
 <div id="app">
     <h2>Property Details</h2>
     <ol class="breadcrumb">
         <li><a>List</a></li>
-        <li><a href="<?php echo base_url() . 'lists/category/' . $list_category->_id; ?>"><?php echo $list_category->name; ?></a></li>
         <li><a href="<?php echo base_url() . 'lists/info/' . $list->id; ?>"><?php echo  $list->name; ?></a></li>
         <li><a class="active"><?php echo isset($property->id) ? $property->id : 'New Property'; ?></a></li>
     </ol>
@@ -70,9 +74,16 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
-                                <label for="funeral_home">* Funeral Home</label>
-                                <input name="funeral_home" type="text" class="form-control required" required
-                                       title="Funeral Home" v-model="property.funeral_home" />
+                                <label for="resource">* Resource</label>
+                                <input name="resource" type="text" class="form-control required" required
+                                       title="Resource" v-model="property.resource" />
+                            </div>
+                            <div class="form-group">
+                                 <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" v-model="property.skip_traced"> Skip Traced
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <?php if (isset($property) && (($property->status !== 'pending' && $property->status !== 'replacement') || $mc->_checkModulePermission(MODULE_APPROVAL_ID, 'update'))): ?>
@@ -83,6 +94,7 @@
                                     <option value="pending">Pending</option>
                                     <option value="active">Active</option>
                                     <option value="lead">Lead</option>
+                                    <option value="lead">Buy</option>
                                     <option value="change">Change</option>
                                     <option value="stop">Stop</option>
                                     <option value="inactive">Inactive</option>
@@ -364,7 +376,15 @@
 
                 <!-- History -->
                 <div role="tabpanel" class="tab-pane" id="history">
-                   
+                    <section v-if="histories">
+                        <div class="well" v-for="history in histories">
+                            <p class="history_date"><i class="fa fa-clock-o"></i> {{ history.date_created }}</p>
+                            <p style="font-size: 16px;">{{ history.message }}</p>
+                        </div>
+                    </section>
+                    <section v-else>
+                        <div class="well">No comments found.</div>
+                    </section>
                 </div>
 
             </div>
@@ -453,21 +473,21 @@
 
 <script>
     var actionUrl = "<?php echo base_url() . 'lists/property'; ?>";
-    var sidebarListCategoryId = "<?php echo 'sidebar-list-category-' . $list_category->_id . '-link'; ?>";
 
     var data = {
         similar_address: [],
         similar_address_action: 'save',
-        list_category : <?php echo json_encode($list_category); ?>,
         list : <?php echo json_encode($list); ?>,
         property: {},
         comment: '',
+        histories: [],
         mailings: <?php echo json_encode($mailings); ?>
     };
 
     <?php if (isset($property)): ?>
     data.property = <?php echo json_encode($property); ?>;
     data.comments = <?php echo json_encode($comments); ?>;
+    data.histories = <?php echo json_encode($histories); ?>;
     <?php endif; ?>
 
     var vm = new Vue({
@@ -567,7 +587,6 @@
 
     $(() => {
         $('#sidebar-list-link').addClass('active');
-        $('#' + sidebarListCategoryId).addClass('active');
         $('#sidebar-list').addClass('in');
 
         $('.modal').on('hidden.bs.modal', function () {

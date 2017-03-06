@@ -33,11 +33,11 @@ class Management extends MY_Controller {
                     $this->session->unset_userdata('role_module_permissions');
                     echo json_encode($result);
                     break;
-                case 'save_list_category_permissions' :
+                case 'save_list_permissions' :
                     $role_id = $this->input->post('role_id');
-                    $list_category_permissions = $this->input->post('list_category_permissions');
-                    $result = $this->role_model->save_list_category_permissions($role_id, $list_category_permissions);
-                    $this->session->unset_userdata('role_list_category_permissions');
+                    $list_permissions = $this->input->post('list_permissions');
+                    $result = $this->role_model->save_list_permissions($role_id, $list_permissions);
+                    $this->session->unset_userdata('role_list_permissions');
                     echo json_encode($result);
                     break;
                 case 'delete' :
@@ -60,62 +60,11 @@ class Management extends MY_Controller {
                             array('id' => $id, 'company_id' => $this->logged_user->company_id), false);
                         $this->data['role'] = $role;
                         $this->data['module_permissions'] = $this->role_model->get_module_permissions($role->id);
-                        $this->data['list_category_permissions'] = $this->role_model
-                            ->get_category_with_list_permission($role->id, $this->logged_user->company_id);
+                        $this->data['list_permissions'] = $this->role_model
+                            ->get_list_permissions($role->id, $this->logged_user->company_id);
                         $this->_renderL('management/roles_form');
                     } else {
                         $this->_renderL('management/roles_form');
-                    }
-                    break;
-                default:
-                    $this->show_404();
-            }
-        }
-    }
-
-    public function list_categories($sub = 'index', $id = 0)
-    {
-        if ($this->input->server('REQUEST_METHOD') == 'POST') {
-            $result = array('success' => false);
-            $action = $this->input->post('action');
-            $this->load->model('list_category_model');
-            switch ($action) {
-                case 'list' :
-                    $list_category = $this->list_category_model->get(
-                        array('company_id' => $this->logged_user->company_id));
-                    echo json_encode(array('data' => $list_category));
-                    break;
-                case 'save' :
-                    $list_category = $this->input->post('form');
-                    if (isset($list_category['active']) && $list_category['active'] === 'true') {
-                        $list_category['active'] = 1;
-                    }
-                    $list_category['company_id'] = $this->logged_user->company_id;
-                    $result = $this->list_category_model->save($list_category);
-                    echo json_encode($result);
-                    break;
-                case 'delete' :
-                    $list_category_id = $this->input->post('id');
-                    $result = $this->list_category_model->delete($list_category_id, $this->logged_user->company_id);
-                    echo json_encode($result);
-                    break;
-                default :
-                    echo json_encode($result);
-            }
-        } else {
-            switch ($sub) {
-                case 'index' :
-                    $this->_renderL('management/list_categories');
-                    break;
-                case 'form' :
-                    if ($id > 0) {
-                        $this->load->model('list_category_model');
-                        $list_category = $this->list_category_model->get(
-                            array('id' => $id, 'company_id' => $this->logged_user->company_id), false);
-                        $this->data['list_category'] = $list_category;
-                        $this->_renderL('management/list_categories_form');
-                    } else {
-                        $this->_renderL('management/list_categories_form');
                     }
                     break;
                 default:
@@ -168,11 +117,11 @@ class Management extends MY_Controller {
                     $this->session->unset_userdata('user_module_permissions');
                     echo json_encode($result);
                     break;
-                case 'save_list_category_permissions' :
+                case 'save_list_permissions' :
                     $user_id = $this->input->post('user_id');
-                    $list_category_permissions = $this->input->post('list_category_permissions');
-                    $result = $this->user_model->save_list_category_permissions($user_id, $list_category_permissions);
-                    $this->session->unset_userdata('user_list_category_permissions');
+                    $list_permissions = $this->input->post('list_permissions');
+                    $result = $this->user_model->save_list_permissions($user_id, $list_permissions);
+                    $this->session->unset_userdata('user_list_permissions');
                     echo json_encode($result);
                     break;
                 default :
@@ -194,7 +143,7 @@ class Management extends MY_Controller {
                             $this->data['user'] = $user;
                             if ($user_page == "permissions") {
                                 $this->data['module_permissions'] = $this->user_model->get_module_permissions($user->id);
-                                $this->data['list_category_permissions'] = $this->user_model->get_category_with_list_permission($user->id, $this->logged_user->company_id);
+                                $this->data['list_permissions'] = $this->user_model->get_list_permissions($user->id, $this->logged_user->company_id);
                                 $this->_renderL('management/users_permissions');
                             } else {
                                 $this->_renderL('management/users_form');

@@ -7,7 +7,6 @@ class MY_Controller extends CI_Controller
 {
     protected $logged_user;
     protected $module_permissions;
-    protected $list_category_permissions;
     protected $list_permissions;
 
 
@@ -29,7 +28,6 @@ class MY_Controller extends CI_Controller
     {
         parent::__construct();
         $this->logged_user = $this->session->userdata('user');
-
         if ($logged) {
             $this->_checkAuth();
             $this->_initializeSecrets();
@@ -81,45 +79,8 @@ class MY_Controller extends CI_Controller
         $module_permissions = $role_module_permissions ? $this->_arrayMergeById($role_module_permissions, $user_module_permissions) : $user_module_permissions;
         $this->module_permissions = $module_permissions;
         $this->data['module_permissions'] = $module_permissions;
-        /*
-         * List Category Permissions
-         */
-        $role_list_category_permissions = $this->session->userdata('role_list_category_permissions');
-        if (!$role_list_category_permissions) {
-            if ($this->logged_user->role_id > 0) {
-                foreach ($role_module_permissions as $m) {
-                    if ($m->code == "list") {
-                        if ($m->retrieve_action == 1) {
-                            $role_list_category_permissions = $this->role_model->get_list_category_permissions($this->logged_user->role_id, $this->logged_user->company_id);
-                            $role_list_category_permissions = $role_list_category_permissions ? 
-                                $this->_objectToArrayById($role_list_category_permissions) : null;
-                            $this->session->set_userdata('role_list_category_permissions', $role_list_category_permissions);
-                        }
-                        break;
-                    }
-                }
-            }  else {
-                $role_list_category_permissions = array();
-            }
-        }
         
-        $user_list_category_permissions = $this->session->userdata('user_list_category_permissions');
-        if (!$user_list_category_permissions) {
-            foreach ($user_module_permissions as $m) {
-                if ($m->code == "list") {
-                    if ($m->retrieve_action == 1) {
-                        $user_list_category_permissions = $this->user_model->get_list_category_permissions($this->logged_user->id, $this->logged_user->company_id);
-                        $user_list_category_permissions = $this->_objectToArrayById($user_list_category_permissions);
-                        $this->session->set_userdata('user_list_category_permissions', $user_list_category_permissions);
-                    }
-                    break;
-                }
-            }
-        }
-        $list_category_permissions = $role_list_category_permissions ? $this->_arrayMergeById($role_list_category_permissions, $user_list_category_permissions) : $user_list_category_permissions;
-        $this->list_category_permissions = $list_category_permissions;
-        $this->data['list_category_permissions'] = $list_category_permissions;
-        /*
+         /*
          * List Permission
          */
         $role_list_permissions = $this->session->userdata('role_list_permissions');
@@ -159,28 +120,20 @@ class MY_Controller extends CI_Controller
     {
         $action .= "_action";
         if (isset($this->module_permissions[$parent_id])) {
-        	$child_module = null;
-        	foreach ($this->module_permissions[$parent_id]->children as $child) {
-        		if ($child->_id == $child_id) {
-        			$child_module = $child;
-        		}
-        	}
-        	if ($child_module) {
-        		if (filter_var($child_module->$action, FILTER_VALIDATE_BOOLEAN)) {
-	                return true;
-	            }	
-        	}
-        }
-        return false;
-    }
-
-    public function _checkListCategoryPermission($id, $action)
-    {
-        $action .= "_action";
-        if (isset($this->list_category_permissions[$id]->$action)) {
-            if (filter_var($this->list_category_permissions[$id]->$action, FILTER_VALIDATE_BOOLEAN)) {
-                return true;
+            if ($child_id !== null) {
+                $child_module = false;
+                foreach ($this->module_permissions[$parent_id]->children as $child) {
+                    if ($child->_id == $child_id) {
+                        $child_module = $child;
+                    }
+                }
+                if ($child_module) {
+                    return filter_var($child_module->$action, FILTER_VALIDATE_BOOLEAN);  
+                }
+            } else {
+                return filter_var($this->module_permissions[$parent_id]->$action, FILTER_VALIDATE_BOOLEAN);
             }
+        	
         }
         return false;
     }
@@ -226,6 +179,11 @@ class MY_Controller extends CI_Controller
             foreach ($array1 as $k1 => $v1) {
                 if ($k2 == $k1) {
                     $add = false;
+                    if ($array1[$k1]->module_id === null) {
+                        if ($v2->module_id !== null) {
+                            $array1[$k1] = $v2;
+                        }
+                    }
                     if ((int)$v2->create_action == 1) {
                         $array1[$k1]->create_action = 1;
                     }
@@ -238,6 +196,9 @@ class MY_Controller extends CI_Controller
                     if ((int)$v2->delete_action == 1) {
                         $array1[$k1]->delete_action = 1;
                     }
+                    if (is_array(@$v1->children)) {
+                        $array1[$k1]->children = $this->_arrayMergeById($v1->children, $v2->children);
+                    }
                     break;
                 }
             }
@@ -245,6 +206,7 @@ class MY_Controller extends CI_Controller
                 $array1[$k2] = $v2;
             }
         }
+
 
         return $array1;
     }

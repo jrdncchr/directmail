@@ -42,7 +42,7 @@ class Role_model extends CI_Model {
         } else {
             $result = $this->save(array('id' => $role_id, 'deleted' => 1));
             $this->db->delete('roles_module_permission', array('role_id' => $role_id));
-            $this->db->delete('roles_list_category_permission', array('role_id' => $role_id));
+            $this->db->delete('roles_list_permission', array('role_id' => $role_id));
         }
         return $result;
     }
@@ -148,69 +148,36 @@ class Role_model extends CI_Model {
     }
 
     /*
-     * roles_list_category_permission
+     * roles_list_permission
      */
-    public function get_list_category_permissions($role_id, $company_id)
+    public function save_list_permissions($role_id, $list_permissions)
     {
-        $this->db->select('lc.id as _id, lc.name, lc.description, lc.active, rlcp.*');
-        $this->db->join('roles_list_category_permission rlcp', 'rlcp.list_category_id = lc.id AND rlcp.role_id = ' . $role_id, 'left');
-        $this->db->where(array('lc.active' => 1, 'lc.deleted' => 0, 'lc.company_id' => $company_id));
-        $permission = $this->db->get('list_category lc')->result();
-        if ($permission) {
-            return $permission;
-        } else {
-            return $this->_create_new_list_category_permissions_for_new_role($role_id, $company_id) ?
-                $this->get_list_category_permissions($role_id, $company_id) : null;
-        }
-    }
-
-    public function _create_new_list_category_permissions_for_new_role($role_id, $company_id)
-    {
-        $list_categories = $this->db->get_where('list_category', array('active' => 1, 'company_id' => $company_id, 'deleted' => 0))->result();
-        if ($list_categories) {
-            foreach ($list_categories as $lc) {
-                $this->db->insert('roles_list_category_permission', array('list_category_id' => $lc->id, 'role_id' => $role_id));
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public function save_list_category_permissions($role_id, $list_category_permissions)
-    {
-        foreach ($list_category_permissions as $lcp) {
+        foreach ($list_permissions as $lp) {
             $permission = array(
-                'create_action'     => filter_var($lcp['create_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
-                'retrieve_action'   => filter_var($lcp['retrieve_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
-                'update_action'     => filter_var($lcp['update_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
-                'delete_action'     => filter_var($lcp['delete_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
+                'create_action'     => filter_var($lp['create_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
+                'retrieve_action'   => filter_var($lp['retrieve_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
+                'update_action'     => filter_var($lp['update_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
+                'delete_action'     => filter_var($lp['delete_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
                 'last_update'       => date("Y-m-d H:i:s")
             );
-            if ($lcp['id']) {
-                $this->db->where('id', $lcp['id']);
-                $this->db->update('roles_list_category_permission', $permission);
+            if ($lp['id']) {
+                $this->db->where('id', $lp['id']);
+                $this->db->update('roles_list_permission', $permission);
             } else {
-                $permission['list_category_id'] = $lcp['_id'];
+                $permission['list_id'] = $lp['_id'];
                 $permission['role_id'] = $role_id;
-                $this->db->insert('roles_list_category_permission', $permission);
-            }
-            if (isset($lcp['children'])) {
-                foreach ($lcp['children'] as $child) {
-                    $this->save_list_permissions($role_id, $child);
-                }
+                $this->db->insert('roles_list_permission', $permission);
             }
         }
         return array('success' => true);
     }
 
-    /*
-     * roles_list_permission
-     */
     public function get_list_permissions($role_id, $company_id)
     {
-        $this->db->select('l.id as _id, l.name, l.active, l.list_category_id, rlp.*');
-        $this->db->join('roles_list_permission rlp', 'rlp.list_id = l.id AND rlp.role_id = ' . $role_id, 'left');
-        $this->db->where(array('l.deleted' => 0, 'l.active' => 1));
+        $this->db->select('l.id as _id, l.name, l.active, rlp.*');
+        $this->db->join('roles_list_permission rlp ', 'rlp.list_id = l.id AND rlp.role_id = ' . $role_id, 'left');
+        $this->db->where(array('l.deleted' => 0, 'l.active' => 1, 'l.company_id' => $company_id));
+        $this->db->order_by('l.name', 'asc');
         $permission = $this->db->get('list l')->result();
         if ($permission) {
             return $permission;
@@ -226,44 +193,6 @@ class Role_model extends CI_Model {
         foreach ($list as $l) {
             $this->db->insert('roles_list_permission', array('list_id' => $l->id, 'role_id' => $role_id));
         }
-    }
-
-    public function save_list_permissions($role_id, $list)
-    {
-        $permission = array(
-            'create_action'     => filter_var($list['create_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
-            'retrieve_action'   => filter_var($list['retrieve_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
-            'update_action'     => filter_var($list['update_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
-            'delete_action'     => filter_var($list['delete_action'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
-            'last_update'       => date("Y-m-d H:i:s")
-        );
-        if ($list['id']) {
-            $this->db->where('id', $list['id']);
-            $this->db->update('roles_list_permission', $permission);
-        } else {
-            $permission['list_id'] = $list['_id'];
-            $permission['role_id'] = $role_id;
-            $this->db->insert('roles_list_permission', $permission);
-        }
-        return array('success' => true);
-    }
-
-    public function get_category_with_list_permission($role_id, $company_id)
-    {
-        $list_category_permissions = $this->get_list_category_permissions($role_id, $company_id);
-        if ($list_category_permissions) {
-            $list_permissions = $this->get_list_permissions($role_id, $company_id);
-            foreach ($list_category_permissions as $lcp) {
-                $children = [];
-                foreach ($list_permissions as $lp) {
-                    if ($lp->list_category_id == $lcp->_id) {
-                        $children[] = $lp;
-                    }
-                }
-                $lcp->children = $children;
-            }
-        }
-        return $list_category_permissions;
     }
 
 } 
