@@ -49,14 +49,33 @@ class Download extends MY_Controller {
         $this->property_library->download_list($type, $properties, $this->logged_user);
     }
 
-    public function mailings()
+    public function mailings($sub = "index")
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
-            $action = $this->input->post('action');
+            if ($sub == 'download') {
+                $filter = $this->input->post();
+                // validate filter
+                if ($filter['report_type'] == 'Date Range') {
+                    if (strtotime($filter['to']) < strtotime($filter['from'])) {
+                        $alert = create_alert_message(array('success' => false, 'message' => 'Date from cannot be greater than date to.'));
+                        $this->session->set_flashdata('message', $alert);
+                        $this->load->model('list_model');
+                        $this->data['lists'] = $this->list_model->get(array('l.company_id' => $this->logged_user->company_id));
+                        $this->_renderL('download/mailings');
+                        return;
+                    }
+                }
+                $this->load->library('download_library');
+                $this->download_library->download_mailings($filter);
+            } else {
+                $action = $this->input->post('action');
+            }
         } else {
-            $this->load->model('list_model');
-            $this->data['lists'] = $this->list_model->get(array('l.company_id' => $this->logged_user->company_id));
-            $this->_renderL('download/mailings');
+            if ($sub == 'index') {
+                $this->load->model('list_model');
+                $this->data['lists'] = $this->list_model->get(array('l.company_id' => $this->logged_user->company_id));
+                $this->_renderL('download/mailings');
+            }
         }
     }
 

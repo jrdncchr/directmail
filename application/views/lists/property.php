@@ -124,8 +124,8 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="d_last_name">* Last Name</label>
-                                        <input name="d_last_name" type="text" class="form-control required" required
+                                        <label for="d_last_name">Last Name</label>
+                                        <input name="d_last_name" type="text" class="form-control" required
                                                title="Last Name" v-model="property.property_last_name" />
                                     </div>
                                 </div>
