@@ -61,8 +61,7 @@
                                 </div>
                                 <div class="col-sm-12">
                                     <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                                    <a target="_blank" href="<?php echo base_url() . 'download/properties/report_mailings'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
-                                    <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
+                                    <button v-on:click="download" class="btn btn-default btn-sm pull-right" style="width: 200px;"><i class="fa fa-download"></i> Download</button>
                                 </div>
                             </div>
                         </div>
@@ -91,7 +90,7 @@
         el: "#app",
         data: data,
         methods: {
-            filterList: function() {
+            download: function() {
                 loading('info', 'Filtering, please wait...');
                 $.post(actionUrl, { action: 'list', filter: data.filter }, function(res) {
                     dt.fnClearTable();
@@ -105,10 +104,9 @@
             clearFilter: function() {
                 data.filter = {
                     list : 'all',
-                    property_name : '',
-                    property_address : '',
-                    today : false,
-                    date_range : ''
+                    date_range : '',
+                    type: 'letter',
+                    report_type: 'Date Range'
                 }
             }
         }

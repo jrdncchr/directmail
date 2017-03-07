@@ -365,16 +365,18 @@
             columns: [
                 { data: "id" },
                 { data: "status", render: function(data, type, row) {
-                        if (data == "active" || data == "lead" || data == "buy") {
+                        if (data.toLowerCase() == "active" || data.toLowerCase() == "lead" || data.toLowerCase() == "buy") {
                             return "<span class='label label-success'>" + capitalize(data) + "</span>";
-                        } else if (data == "pending" || data == "replacement") {
+                        } else if (data.toLowerCase() == "pending" || data.toLowerCase() == "replacement") {
                             return "<span class='label label-warning'>" + capitalize(data) + "</span>";
-                        } else if (data =="change") {
+                        } else if (data.toLowerCase() =="change") {
                             return "<span class='label label-info'>" + capitalize(data) + "</span>";
-                        } else if (data =="inactive") {
+                        } else if (data.toLowerCase() =="inactive") {
                             return "<span class='label label-default'>" + capitalize(data) + "</span>";
-                        } else if (data =="stop") {
+                        } else if (data.toLowerCase() =="stop") {
                             return "<span class='label label-danger'>" + capitalize(data) + "</span>";
+                        } else {
+                            return data.toLowerCase();
                         }
                     } 
                 },

@@ -94,7 +94,7 @@
                                     <option value="pending">Pending</option>
                                     <option value="active">Active</option>
                                     <option value="lead">Lead</option>
-                                    <option value="lead">Buy</option>
+                                    <option value="buy">Buy</option>
                                     <option value="change">Change</option>
                                     <option value="stop">Stop</option>
                                     <option value="inactive">Inactive</option>

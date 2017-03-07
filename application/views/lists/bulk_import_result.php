@@ -49,21 +49,21 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="label label-success" v-show="similar.status == 'active' || similar.status == 'lead' || similar.status == 'buy'">{{ similar.status }}</span>
-                                <span class="label label-warning" v-show="similar.status == 'pending'">{{ similar.status }}</span>
-                                <span class="label label-info" v-show="similar.status == 'change'">{{ similar.status }}</span>
-                                <span class="label label-danger" v-show="similar.status == 'stop'">{{ similar.status }}</span>
-                                <span class="label label-default" v-show="similar.status == 'inactive'">{{ similar.status }}</span>
+                                <span class="label label-success" v-show="similar.status.toLowerCase() == 'active' || similar.status.toLowerCase() == 'lead' || similar.status.toLowerCase() == 'buy'">{{ similar.status }}</span>
+                                <span class="label label-warning" v-show="similar.status.toLowerCase() == 'pending'">{{ similar.status }}</span>
+                                <span class="label label-info" v-show="similar.status.toLowerCase() == 'change'">{{ similar.status }}</span>
+                                <span class="label label-danger" v-show="similar.status.toLowerCase() == 'stop'">{{ similar.status }}</span>
+                                <span class="label label-default" v-show="similar.status.toLowerCase() == 'inactive'">{{ similar.status }}</span>
                             </td>
                             <td>{{ similar.row }}</td>
                             <td>{{ similar.property_address }}</td>
                             <td><i class="fa fa-arrows-h fa-2x"></i></td>
                             <td>
-                                <span class="label label-success" v-show="similar.check.properties[0].status == 'active' || similar.check.properties[0].status == 'lead'">{{ similar.check.properties[0].status }}</span>
-                                <span class="label label-warning" v-show="similar.check.properties[0].status == 'pending'">{{ similar.check.properties[0].status }}</span>
-                                <span class="label label-info" v-show="similar.check.properties[0].status == 'change'">{{ similar.check.properties[0].status }}</span>
-                                <span class="label label-danger" v-show="similar.check.properties[0].status == 'stop'">{{ similar.check.properties[0].status }}</span>
-                                <span class="label label-default" v-show="similar.check.properties[0].status == 'inactive'">{{ similar.check.properties[0].status }}</span>
+                                <span class="label label-success" v-show="similar.check.properties[0].status.toLowerCase() == 'active' || similar.check.properties[0].status.toLowerCase() == 'lead'">{{ similar.check.properties[0].status }}</span>
+                                <span class="label label-warning" v-show="similar.check.properties[0].status.toLowerCase() == 'pending'">{{ similar.check.properties[0].status }}</span>
+                                <span class="label label-info" v-show="similar.check.properties[0].status.toLowerCase() == 'change'">{{ similar.check.properties[0].status }}</span>
+                                <span class="label label-danger" v-show="similar.check.properties[0].status.toLowerCase() == 'stop'">{{ similar.check.properties[0].status }}</span>
+                                <span class="label label-default" v-show="similar.check.properties[0].status.toLowerCase() == 'inactive'">{{ similar.check.properties[0].status }}</span>
                             </td>
                             <td v-if="similar.check.properties[0].permission">
                                 <a style="font-size: 14px;" target="_blank" :href="similar.check.properties[0].url">{{ similar.check.properties[0].id }}</a>
