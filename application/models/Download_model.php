@@ -29,12 +29,21 @@ class Download_model extends CI_Model {
         
         // generate mailings by list
         foreach ($lists as $list) {
-            $letters = [];
+            $mail = ['list' => $list->name, 'letters' => []];
             for ($i = 1; $i <= (int)$list->no_of_letters; $i++) {
+                $letter = [
+                    'number' => $i,
+                    'mail_qty' => 0,
+                    'leads' => 0,
+                    'buys' => 0,
+                    'costs' => 0
+                ];
+
                 $sql = "SELECT * FROM property_mailing pm 
                     LEFT JOIN property p ON pm.property_id = p.id 
                     WHERE pm.letter_no = " . $this->db->escape($i) . "
-                    AND p.company_id = " . $filter['company_id'];
+                    AND p.company_id = " . $filter['company_id'] . " 
+                    AND p.status NOT IN ('stop', 'pending')";
 
                 if ($filter['list'] != 'all') {
                     $sql .= " AND p.list_id = " . $this->db->escape($list->id);
@@ -46,10 +55,22 @@ class Download_model extends CI_Model {
                     . $this->db->escape($filter['to']);
                 }
 
-                $result = $this->db->query($sql)->result();
-                var_dump($result);exit;
+                $property_mailings = $this->db->query($sql)->result();
+                foreach ($property_mailings as $pm) {
+                    $letter['mail_qty']++;
+                    $letter['costs']++;
+                    if ($pm->status == 'buy') {
+                        $letter['buys']++;
+                    }
+                    if ($pm->status == 'lead') {
+                        $letter['leads']++;
+                    }
+                }
+                $mail['letters'][] = $letter;
             }
+            $mailings[] = $mail;
         }
+        return $mailings;
     }
 
 } 

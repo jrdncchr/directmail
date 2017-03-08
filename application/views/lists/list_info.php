@@ -129,6 +129,12 @@
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
+                                            <label for="resource" class="control-label col-sm-4">Resource</label>
+                                            <div class="col-sm-8">
+                                                <input id="resource" type="text" class="form-control" v-model="filter.resource" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
                                             <label for="property-name" class="control-label col-sm-4">Property Name</label>
                                             <div class="col-sm-8">
                                                 <input id="property-name" type="text" class="form-control" v-model="filter.property_name" />
@@ -146,6 +152,12 @@
                                             <label class="control-label col-sm-4">ID</label>
                                             <div class="col-sm-8">
                                                 <input type="text" class="form-control" v-model="filter.id" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="skip-traced" class="control-label col-sm-4">Skip Traced</label>
+                                            <div class="col-sm-8" style="padding-top: 5px;">
+                                                <input id="skip-traced" type="checkbox" v-model="filter.skip_traced" />
                                             </div>
                                         </div>
                                     </div>
@@ -215,9 +227,11 @@
     var data = {
         list : <?php echo json_encode($list); ?>,
         filter : {
+            resource: '',
             property_name : '',
             property_address : '',
             id: '',
+            skip_traced: 0,
             status_off: [],
             status_on: ['Active', 'Lead', 'Pending', 'Change', 'Replacement', 'Stop'],
         },

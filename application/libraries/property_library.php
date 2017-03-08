@@ -242,6 +242,9 @@ class Property_Library {
 	        if (isset($filter['list']) && $filter['list'] === 'all') {
 	            unset($filter['list']);
 	        }
+	        if (isset($filter['resource']) && $filter['resource'] === '') {
+	            unset($filter['resource']);
+	        }
 	        if (isset($filter['property_name']) && $filter['property_name'] === '') {
 	            unset($filter['property_name']);
 	        }
@@ -259,6 +262,9 @@ class Property_Library {
             }
 	        if (isset($filter['status_on'])) {
 	        	unset($filter['status_on']);
+	        }
+	        if (isset($filter['skip_traced']) && !filter_var($filter['skip_traced'], FILTER_VALIDATE_BOOLEAN)) {
+	        	unset($filter['skip_traced']);
 	        }
 	    }
 	    $filter = $filter ? $filter : [];

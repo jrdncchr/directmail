@@ -29,13 +29,13 @@
                                                         <button type="button" class="btn btn-dd btn-sm dropdown-toggle" data-toggle="dropdown"></span> <span class="fa fa-caret-down"></span></button>
                                                         <ul class="dropdown-menu">
                                                             <li>
-                                                                    <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
-                                                                    <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
-                                                                    <a class="small" data-value="Buy" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Buy</a>
-                                                                    <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
-                                                                    <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
-                                                                    <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Replacement</a>
-                                                                    <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
+                                                                <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
+                                                                <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
+                                                                <a class="small" data-value="Buy" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Buy</a>
+                                                                <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
+                                                                <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
+                                                                <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Replacement</a>
+                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -63,8 +63,20 @@
                                             <input type="text" class="form-control" v-model="filter.id" />
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="skip-traced" class="control-label col-sm-4">Skip Traced</label>
+                                        <div class="col-sm-8" style="padding-top: 5px;">
+                                            <input id="skip-traced" type="checkbox" v-model="filter.skip_traced" />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-sm-6">
+                                    <div class="form-group">
+                                            <label for="resource" class="control-label col-sm-4">Resource</label>
+                                            <div class="col-sm-8">
+                                                <input id="resource" type="text" class="form-control" v-model="filter.resource" />
+                                            </div>
+                                        </div>
                                     <div class="form-group">
                                         <label for="property-name" class="control-label col-sm-4">Property Name</label>
                                         <div class="col-sm-8">
@@ -115,8 +127,10 @@
         filter : {
             list : 'all',
             property_name : '',
+            resource: '',
             property_address : '',
             id: '',
+            skip_traced: 0,
             status_off: [],
             status_on: ['Active', 'Lead', 'Pending', 'Change', 'Replacement', 'Stop'],
         },
@@ -210,7 +224,7 @@
                 },
                 { data: "property_address" },
                 { data: "status", render: function(data, type, row) {
-                        if (data == "active" || data == "lead") {
+                        if (data == "active" || data == "lead" || data == "buy") {
                             return "<span class='label label-success'>" + capitalize(data) + "</span>";
                         } else if (data == "pending" || data == "replacement") {
                             return "<span class='label label-warning'>" + capitalize(data) + "</span>";

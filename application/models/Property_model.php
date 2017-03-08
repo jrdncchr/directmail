@@ -53,7 +53,9 @@ class Property_model extends CI_Model {
         if (isset($property['elligible_postcard_mailings']) && $property['elligible_postcard_mailings'] != 1) {
             $property['elligible_postcard_mailings'] = $property['elligible_postcard_mailings'] === 'true' ? 1 : 0;
         }
-        $property['skip_traced'] = filter_var($property['skip_traced'], FILTER_VALIDATE_BOOLEAN);
+        if (isset($property['skip_traced'])) {
+            $property['skip_traced'] = filter_var($property['skip_traced'], FILTER_VALIDATE_BOOLEAN);
+        }
 
         $property['last_update'] = date('Y-m-d H:i:s');
         if (isset($property['id']) && $property['id'] > 0) {
@@ -164,6 +166,15 @@ class Property_model extends CI_Model {
         $this->db->select($select);
         $this->db->join('list l', 'l.id = p.list_id');
         $this->db->where($where);
+        if (isset($filter['status'])) {
+            $this->db->where('status', $filter['status']);
+        }
+        if (isset($filter['resource'])) {
+            $this->db->like('p.resource', $filter['resource']);
+        }
+        if (isset($filter['skip_traced'])) {
+            $this->db->where('p.skip_traced', 1);
+        }
         if (isset($filter['status'])) {
             $this->db->where('status', $filter['status']);
         }

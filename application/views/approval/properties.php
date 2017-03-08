@@ -92,7 +92,6 @@
             list : 'all',
             property_name : '',
             property_address : '',
-            status: 'all',
             id: ''
         }
     };

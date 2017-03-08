@@ -52,7 +52,7 @@
 
             <div style="margin-bottom: 15px;" class="pull-right">
                 <span v-show="property.status == 'pending'" class="label label-warning" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
-                <span v-show="property.status == 'active' || property.status == 'lead'" class="label label-success" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
+                <span v-show="property.status == 'active' || property.status == 'lead' || property.status == 'buy'" class="label label-success" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'change'" class="label label-info" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'stop'" class="label label-danger" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'inactive'" class="label label-default" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
