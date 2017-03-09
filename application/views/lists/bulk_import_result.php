@@ -43,8 +43,9 @@
                                     <ul class="dropdown-menu">
                                         <li><a href="#" v-on:click="replaceAction('save', similar)">Save property for replacement approval.</a></li>
                                         <li><a href="#" v-on:click="replaceAction(2, similar)">Replace (Property Address only)</a></li>
-                                        <li><a href="#" v-on:click="replaceAction(3, similar)">Replace (All except list info)</a></li>
-                                        <li><a href="#" v-on:click="replaceAction(4, similar)">Replace (All)</a></li>
+                                        <li><a href="#" v-on:click="replaceAction(3, similar)">Replace (Property info only)</a></li>
+                                        <li><a href="#" v-on:click="replaceAction(4, similar)">Replace (All including list, mailing, and comments)</a></li>
+                                        <li><a href="#" v-on:click="replaceAction(5, similar)">Keep Both</a></li>
                                     </ul>
                                 </div>
                             </td>

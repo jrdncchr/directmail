@@ -32,10 +32,10 @@
                                                                 <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
                                                                 <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
                                                                 <a class="small" data-value="Buy" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Buy</a>
-                                                                <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
-                                                                <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
-                                                                <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Replacement</a>
-                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
+                                                                <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" />&nbsp;Pending</a>
+                                                                <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" />&nbsp;Change</a>
+                                                                <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" />&nbsp;Replacement</a>
+                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" />&nbsp;Stop</a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -124,12 +124,12 @@
             property_name : '',
             property_address : '',
             id: '',
-            status_off: ['Lead', 'Pending', 'Change', 'Replacement', 'Stop'],
-            status_on: ['Active'],
+            status_off: ['Pending', 'Change', 'Replacement', 'Stop'],
+            status_on: ['Active', 'Lead', 'Buy'],
             date_range : '',
             letter_no: ''
         },
-        statusText: 'Active'
+        statusText: 'Active, Lead, Buy'
     };
 
     var vm = new Vue({
@@ -183,7 +183,7 @@
 
         setupFilterFields();
 
-        $('.dropdown-menu a').on( 'click', function( event ) {
+        $('.dropdown-menu a').on('click', function( event ) {
             var $target = $(event.currentTarget),
                 val = $target.attr('data-value'),
                 $inp = $target.find('input'),

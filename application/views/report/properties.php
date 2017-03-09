@@ -132,7 +132,7 @@
             id: '',
             skip_traced: 0,
             status_off: [],
-            status_on: ['Active', 'Lead', 'Pending', 'Change', 'Replacement', 'Stop'],
+            status_on: ['Active', 'Lead', 'Pending', 'Change', 'Replacement', 'Stop', 'Buy'],
         },
         statusText: 'All'
     };

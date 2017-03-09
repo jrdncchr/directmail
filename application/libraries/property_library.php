@@ -23,6 +23,12 @@ class Property_Library {
             if (isset($property['row'])) {
             	unset($property['row']);
             }
+            if (isset($property['comment'])) {
+            	unset($property['comment']);
+            }
+            if (isset($property['mailing_date'])) {
+            	unset($property['mailing_date']);
+            }
 			$save = $this->CI->property_model->save($property);
 			$replacement = array(
 				'property_id' => $save['id'],
@@ -55,11 +61,14 @@ class Property_Library {
 			case 2: // replace the target property address only
 				return $this->replace('replaced_address_only', $property_id, $target_property_id, $comment);
 				break;
-			case 3: // replace the entire target property info except the list it belongs to
-				return $this->replace('replaced_all_except_list', $property_id, $target_property_id, $comment);
+			case 3: // replace the entire target property info only
+				return $this->replace('replaced_property_info_only', $property_id, $target_property_id, $comment);
 				break;
-			case 4: // replace the entire target property info including the list it belongs to
+			case 4: // replace the entire target property info including the list, mailings, comments it belongs to
 				return $this->replace('replaced_all', $property_id, $target_property_id, $comment, true);
+				break;
+			case 5: // keep both
+				return $this->replace('keep_both', $property_id, $target_property_id, $comment);
 				break;
 		}
 	}
@@ -87,12 +96,16 @@ class Property_Library {
 			$property_id = $property->id;
 		}
 		if ($status !== 'rejected') {
-			$target_property = $this->CI->property_model->get(['p.id' => $target_property_id], false);
+			$target_property = $this->CI->property_model->get_by_id($target_property_id, $this->CI->logged_user->company_id);
 			if ($status === 'replaced_address_only') {
 				$update = ['property_address' => $property->property_address];
-			} else if ($status === 'replaced_all' || $status === 'replaced_all_except_list') {
+			} else if ($status === 'replaced_all' || $status === 'replaced_property_info_only') {
+				$property_comments = $property->comment;
+				$mailing_date = $property->mailing_date;
+
+				unset($property->comment);
+				unset($property->mailing_date);
 				unset($property->id);
-				unset($property->status);
 				unset($property->company_id);
 				unset($property->deleted);
 				unset($property->date_created);
@@ -113,7 +126,39 @@ class Property_Library {
 				$property->last_update = date('Y-m-d H:i:s');
 				$update = (array) $property;
 			}
-			$this->CI->property_model->update(['id' => $target_property_id], $update);
+			if ($this->CI->property_model->update(['id' => $target_property_id], $update)) {
+				if ($status === 'replaced_all') {
+					$list_id = isset($property->list_id) 
+						? $property->list_id 
+						: 
+
+					$this->CI->load->model('list_model');
+        			$list = $this->CI->list_model->get(array('l.id' => $list_id), false);
+
+        			$this->CI->property_model->delete_mailings(['property_id' => $target_property->id]);
+					$this->CI->property_model->add_mailings(
+                        $list->mailing_type, 
+                        $list->no_of_letters, 
+                        ['id' => $target_property->id, 'company_id' => $target_property->company_id],
+                        $mailing_date
+                    );
+                    $this->CI->property_model->delete_comments(['property_id' => $target_property->id]);
+                    $comment = [
+                    	'property_id' => $target_property->id,
+                    	'comment' => $property_comments,
+                    	'user_id' => $this->CI->logged_user->id
+                    ];
+                    $this->CI->property_model->save_comment($comment);
+				}
+			}
+
+			$this->CI->property_model->add_history([
+				'property_id' =>  $target_property->id,
+				'message' => 'Replaced using the [' . $status . '] option by ' 
+					. $this->CI->logged_user->first_name . ' ' . $this->CI->logged_user->last_name,
+				'company_id' => $this->CI->logged_user->company_id
+			]);
+
 			$message = "Replacement successful!";
 		}
 		if ($property_id) {

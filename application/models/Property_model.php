@@ -41,6 +41,10 @@ class Property_model extends CI_Model {
         return $list ? $result->result() : $result->row();
     }
 
+    public function get_by_id($id, $company_id) {
+        return $this->db->get_where('property', ['id' => $id, 'company_id' => $company_id])->row();
+    }
+
     public function save($property)
     {
         unset($property['target_property_id']);
@@ -103,6 +107,11 @@ class Property_model extends CI_Model {
         $this->db->order_by('date_created', 'desc');
         $result = $this->db->get_where('property_comment pc', $where);
         return $list ? $result->result() : $result->row();
+    }
+
+    public function delete_comments($where) {
+        $this->db->where($where);
+        return $this->db->delete('property_comment'); 
     }
 
     public function truncate_comment()
@@ -380,6 +389,11 @@ class Property_model extends CI_Model {
             $last_mail_date = $this->property_library->get_next_mailing_date(
                     $list_type, $last_mail_date);
         }
+    }
+
+    public function delete_mailings($where) {
+        $this->db->where($where);
+        return $this->db->delete('property_mailing'); 
     }
 
     public function get_history($where)

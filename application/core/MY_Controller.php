@@ -5,7 +5,7 @@ if (!defined('BASEPATH'))
 
 class MY_Controller extends CI_Controller
 {
-    protected $logged_user;
+    public $logged_user;
     protected $module_permissions;
     protected $list_permissions;
 
