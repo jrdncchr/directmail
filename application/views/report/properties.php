@@ -27,7 +27,7 @@
                                                 <span class="input-group-btn">
                                                     <div class="button-group">
                                                         <button type="button" class="btn btn-dd btn-sm dropdown-toggle" data-toggle="dropdown"></span> <span class="fa fa-caret-down"></span></button>
-                                                        <ul class="dropdown-menu">
+                                                        <ul id="status" class="dropdown-menu">
                                                             <li>
                                                                 <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
                                                                 <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
@@ -169,7 +169,7 @@
         $('#sidebar-reports-properties-link').addClass('active');
         $('#sidebar-reports').addClass('in');
 
-        $('.dropdown-menu a').on( 'click', function( event ) {
+        $('#status.dropdown-menu a').on( 'click', function( event ) {
             var $target = $(event.currentTarget),
                 val = $target.attr('data-value'),
                 $inp = $target.find('input'),

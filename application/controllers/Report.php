@@ -20,7 +20,8 @@ class Report extends MY_Controller {
                     $filter = $this->property_library->setup_search_filter($filter);
                     $this->load->model('property_model');
                     $where = array(
-                        'p.deleted' => 0
+                        'p.deleted' => 0,
+                        'p.status !=' => 'duplicate' 
                     );
                     if (!isset($filter['date_range'])) {
                         $filter['date_range'] = "pm.mailing_date = '" . date('Y-m-d') . "'";
@@ -58,7 +59,8 @@ class Report extends MY_Controller {
                     $this->load->model('property_model');
                     $where = array( 
                         'p.deleted' => 0,
-                        'p.active' => 1
+                        'p.active' => 1,
+                        'p.status !=' => 'duplicate' 
                     );
                     $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
                     foreach ($properties as $p) {

@@ -13,6 +13,7 @@ class Download extends MY_Controller {
     {
         $properties = array();
         $filter = $this->session->userdata('list_filter');
+        $filter['status != '] = 'duplicate';
         if (isset($filter)) {
             $this->load->model('property_model');
             switch ($type) {

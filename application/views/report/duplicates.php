@@ -1,8 +1,8 @@
 <div id="app">
-    <h2>Mailings</h2>
+    <h2>Duplicates</h2>
     <ol class="breadcrumb">
         <li><a>Reports</a></li>
-        <li><a class="active">Mailings</a></li>
+        <li><a class="active">Duplicates</a></li>
     </ol>
 
     <div class="row">
@@ -32,10 +32,10 @@
                                                                 <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
                                                                 <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
                                                                 <a class="small" data-value="Buy" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Buy</a>
-                                                                <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" />&nbsp;Pending</a>
-                                                                <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" />&nbsp;Change</a>
-                                                                <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" />&nbsp;Replacement</a>
-                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" />&nbsp;Stop</a>
+                                                                <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
+                                                                <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
+                                                                <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Replacement</a>
+                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -58,6 +58,26 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="control-label col-sm-4">ID</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" v-model="filter.id" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skip-traced" class="control-label col-sm-4">Skip Traced</label>
+                                        <div class="col-sm-8" style="padding-top: 5px;">
+                                            <input id="skip-traced" type="checkbox" v-model="filter.skip_traced" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                            <label for="resource" class="control-label col-sm-4">Resource</label>
+                                            <div class="col-sm-8">
+                                                <input id="resource" type="text" class="form-control" v-model="filter.resource" />
+                                            </div>
+                                        </div>
+                                    <div class="form-group">
                                         <label for="property-name" class="control-label col-sm-4">Property Name</label>
                                         <div class="col-sm-8">
                                             <input id="property-name" type="text" class="form-control" v-model="filter.property_name" />
@@ -70,23 +90,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="date-range" class="control-label col-sm-4">Date Range</label>
-                                        <div class="col-sm-8">
-                                            <input id="date-range" type="text" readonly="true" class="form-control" v-model="filter.date_range" />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="letter-no" class="control-label col-sm-4">Letter No.</label>
-                                        <div class="col-sm-8">
-                                            <input id="letter-no" type="number" class="form-control" v-model="filter.letter_no" />
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="col-sm-12">
                                     <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                                    <a target="_blank" href="<?php echo base_url() . 'download/properties/report_mailings'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
+                                    <a target="_blank" href="<?php echo base_url() . 'download/properties/report_properties'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
                                     <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
                                 </div>
                             </div>
@@ -101,10 +107,9 @@
                     <tr>
                         <th width="6%">ID</th>
                         <th width="20%">List</th>
-                        <th width="23%">Property Name</th>
-                        <th width="31%">Property Address</th>
-                        <th width="10%">Letter No</th>
-                        <th width="10%">Mailing Date</th>
+                        <th width="20%">Property Name</th>
+                        <th width="39%">Property Address</th>
+                        <th width="15%">Status</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -116,20 +121,20 @@
 
 <script>
     var dt;
-    var actionUrl = "<?php echo base_url() . 'report/mailings'; ?>";
+    var actionUrl = "<?php echo base_url() . 'report/properties'; ?>";
 
     var data = {
         filter : {
             list : 'all',
             property_name : '',
+            resource: '',
             property_address : '',
             id: '',
-            status_off: ['Pending', 'Change', 'Replacement', 'Stop'],
-            status_on: ['Active', 'Lead', 'Buy'],
-            date_range : '',
-            letter_no: ''
+            skip_traced: 0,
+            status_off: [],
+            status_on: ['Active', 'Lead', 'Pending', 'Change', 'Replacement', 'Stop', 'Buy'],
         },
-        statusText: 'Active, Lead, Buy'
+        statusText: 'All'
     };
 
     var vm = new Vue({
@@ -152,38 +157,19 @@
                     list : 'all',
                     property_name : '',
                     property_address : '',
-                    today : false,
-                    date_range : ''
+                    status: 'all',
+                    id: ''
                 }
             }
         }
     });
 
-    function setupFilterFields() {
-        $('#date-range').datepicker({
-            language: 'en',
-            range: true,
-            multipleDatesSeparator: ' - ',
-            dateFormat: 'yyyy-mm-dd',
-            onSelect: function(formattedDate, date, inst) {
-                if (formattedDate.length > 11) {
-                    data.filter.date_range = formattedDate;    
-                } else {
-                    data.filter.date_range = '';
-                    $('#date-range').val('');
-                }
-            }
-        });
-    }
-
     $(function() {
         $('#sidebar-reports-link').addClass('active');
-        $('#sidebar-reports-mailings-link').addClass('active');
+        $('#sidebar-reports-duplicates-link').addClass('active');
         $('#sidebar-reports').addClass('in');
 
-        setupFilterFields();
-
-        $('#status.dropdown-menu a').on('click', function( event ) {
+        $('#status.dropdown-menu a').on( 'click', function( event ) {
             var $target = $(event.currentTarget),
                 val = $target.attr('data-value'),
                 $inp = $target.find('input'),
@@ -210,15 +196,14 @@
         });
 
         dt = $('table').dataTable({
-            "order": [[ 5, "asc" ]],
+            "order": [[ 0, "asc" ]],
             "bDestroy": true,
             "filter": true,
             "ajax": {
                 "type": "POST",
                 "url": actionUrl,
                 "data":  {
-                    action: "list",
-                    filter: data.filter
+                    action: "list"
                 }
             },
             columns: [
@@ -238,8 +223,20 @@
                     }
                 },
                 { data: "property_address" },
-                { data: "letter_no" },
-                { data: "mailing_date" }
+                { data: "status", render: function(data, type, row) {
+                        if (data == "active" || data == "lead" || data == "buy") {
+                            return "<span class='label label-success'>" + capitalize(data) + "</span>";
+                        } else if (data == "pending" || data == "replacement") {
+                            return "<span class='label label-warning'>" + capitalize(data) + "</span>";
+                        } else if (data =="change") {
+                            return "<span class='label label-info'>" + capitalize(data) + "</span>";
+                        } else if (data =="inactive") {
+                            return "<span class='label label-default'>" + capitalize(data) + "</span>";
+                        } else if (data =="stop") {
+                            return "<span class='label label-danger'>" + capitalize(data) + "</span>";
+                        }
+                    } 
+                },
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();

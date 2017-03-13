@@ -101,7 +101,7 @@ class Management extends MY_Controller {
                     break;
                 case 'delete' :
                     $user_id = $this->input->post('user_id');
-                    $result = $this->user_model->save(array('deleted' => 1, 'id' => $user_id));
+                    $result = $this->user_model->delete($user_id, $this->logged_user->company_id);
                     echo json_encode($result);
                     break;
                 case 'change_password' :

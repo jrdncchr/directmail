@@ -49,14 +49,30 @@ class List_model extends CI_Model {
         return array('success' => true, 'id' =>  $list['id']);
     }
 
-    public function delete($list_id)
+    public function delete($list_id, $company_id)
     {
         $result = array('success' => false);
-        $this->db->where('id', $list_id);
-        if ($this->db->update('list', array('deleted' => 1))) {
+
+        $CI =& get_instance();
+        $CI->load->model('property_model');
+        $properties = $CI->property_model->get_by_list_id($list_id, $company_id);
+
+        $this->db->trans_begin();
+        foreach ($properties as $property) {
+            $this->db->delete('property_mailing', ['property_id' => $property->id]);
+            $this->db->delete('property_comment', ['property_id' => $property->id]);
+            $this->db->delete('property_history', ['property_id' => $property->id]);
+        }
+        $this->db->delete('property', ['list_id' => $list_id, 'company_id' => $company_id]);
+        $this->db->delete('list', ['id' => $list_id, 'company_id' => $company_id]);
+
+       if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+        } else {
+            $this->db->trans_commit();
             $result['success'] = true;
-        };
-       return $result;
+        }
+        return $result;
     }
 
     public function check_list_name_exists($list_name, $company_id) 

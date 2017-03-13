@@ -41,6 +41,11 @@ class Property_model extends CI_Model {
         return $list ? $result->result() : $result->row();
     }
 
+    public function get_by_list_id($list_id, $company_id)
+    {
+        return $this->db->get_where('property', ['list_id' => $list_id, 'company_id' => $company_id])->result();
+    }
+
     public function get_by_id($id, $company_id) {
         return $this->db->get_where('property', ['id' => $id, 'company_id' => $company_id])->row();
     }
@@ -80,11 +85,20 @@ class Property_model extends CI_Model {
 
     public function delete($id, $company_id, $status = 'pending')
     {
-        if ($status == 'replacement') {
+        if ($status == 'duplicate') {
             $this->db->delete('property_replacement', array('property_id' => $id, 'company_id' => $company_id));
         }
-        $this->db->where('id', $id);
-        $this->db->update('property', array('deleted' => 1));
+        $where = [
+            'id' => $id,
+            'company_id' => $company_id
+        ];
+        if ($this->db->delete('property', $where)) {
+            $this->db->where('property_id', $id);
+            $this->db->delete('property_mailing');
+            $this->db->where('property_id', $id);
+            $this->db->delete('property_comment');
+        }
+
         return array('success' => true);
     }
 
@@ -147,7 +161,7 @@ class Property_model extends CI_Model {
         return $result->result();
     }
 
-    public function get_replacement_properties($company_id) 
+    public function get_duplicate_properties($company_id) 
     {
         $this->db->select('p.*, 
             l.name as list_name, 
@@ -160,7 +174,7 @@ class Property_model extends CI_Model {
         $this->db->join('property_replacement pr', 'pr.property_id = p.id', 'left');
         $this->db->join('property p2', 'p2.id = pr.target_property_id', 'left');
         $this->db->join('list l2', 'l2.id = p2.list_id', 'left');
-        $this->db->where(array('l.company_id' => $company_id, 'p.status' => 'replacement', 'p.deleted' => 0, 'p.active' => 1));
+        $this->db->where(array('l.company_id' => $company_id, 'p.status' => 'duplicate', 'p.deleted' => 0));
         $result = $this->db->get('property p');
         return $result->result();
     }
@@ -222,21 +236,10 @@ class Property_model extends CI_Model {
         return $result->result();
     }
 
-    public function save_replacement_approval($replacement)
+    public function save_replacement($replacement)
     {
         $result = array('success' => false);
-        $exist = $this->db->get_where('property_replacement', array(
-            'property_id' => $replacement['property_id'],
-            'company_id' => $replacement['company_id']
-        ));
-        
-        if ($exist->num_rows() > 0) {
-            $this->db->where(array('target_property_id' => $replacement['target_property_id'], 'company_id' => $replacement['company_id']));
-            $save = $this->db->update('property_replacement', $replacement);
-        } else {
-            $save = $this->db->insert('property_replacement', $replacement);
-        }
-        if ($save) {
+        if ($this->db->insert('property_replacement', $replacement)) {
             $result['success'] = true;
         }
         return $result;
@@ -261,6 +264,7 @@ class Property_model extends CI_Model {
         $this->db->where('company_id', $company_id);
         $this->db->where('deleted', 0);
         $this->db->where('active', 1);
+        $this->db->where_not_in('status', ['replacement', 'duplicate']);
         if (isset($property['id'])) {
             $this->db->where('id !=', $property['id']);
         }

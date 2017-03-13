@@ -13,62 +13,21 @@ class Property_Library {
 		$this->CI->load->library('session');
 	}
 
-	public function replace_action($replace_action, $property, $target_property_id, $logged_user)
-	{
-		if ($replace_action === 'save') {
-			$property['status'] = 'replacement';
-            if (isset($property['check'])) {
-                unset($property['check']);
-            }
-            if (isset($property['row'])) {
-            	unset($property['row']);
-            }
-            if (isset($property['comment'])) {
-            	unset($property['comment']);
-            }
-            if (isset($property['mailing_date'])) {
-            	unset($property['mailing_date']);
-            }
-			$save = $this->CI->property_model->save($property);
-			$replacement = array(
-				'property_id' => $save['id'],
-				'target_property_id' => $target_property_id,
-				'status' => 'pending',
-				'company_id' => $logged_user->company_id,
-				'requested_by' => $logged_user->id
-			);
-			if ($save['success']) {
-				$result = $this->CI->property_model->save_replacement_approval($replacement);
-			} else {
-				$result = array('success' => false);
-			}
-		} else {
-			$result = $this->confrim_replacement_action(
-			$replace_action,
-			$property,
-			$target_property_id);
-		}
-		return $result;
-	}
-
-	public function confrim_replacement_action($action, $property_id, $target_property_id, $comment = '')
+	public function confrim_replacement_action($action, $property_id, $target_property_id)
 	{
 		$this->CI->load->model('property_model');
 		switch($action) {
-			case 1: // reject
-				return $this->replace('rejected', $property_id, $target_property_id, $comment);
-				break;
+			case 1: 
+				$id = !is_array($property_id) ? $property_id : $property_id['id'];
+				return $this->CI->property_model->delete($id, $this->CI->logged_user->company_id);
 			case 2: // replace the target property address only
-				return $this->replace('replaced_address_only', $property_id, $target_property_id, $comment);
+				return $this->replace('replaced_address_only', $property_id, $target_property_id);
 				break;
 			case 3: // replace the entire target property info only
-				return $this->replace('replaced_property_info_only', $property_id, $target_property_id, $comment);
+				return $this->replace('replaced_property_info_only', $property_id, $target_property_id);
 				break;
 			case 4: // replace the entire target property info including the list, mailings, comments it belongs to
-				return $this->replace('replaced_all', $property_id, $target_property_id, $comment, true);
-				break;
-			case 5: // keep both
-				return $this->replace('keep_both', $property_id, $target_property_id, $comment);
+				return $this->replace('replaced_all', $property_id, $target_property_id, true);
 				break;
 		}
 	}
@@ -79,13 +38,12 @@ class Property_Library {
 	 * @param (string) $status - rejected, replaced_address_only, replaced_all
 	 * @param (int/object) $property
 	 * @param (int) $target_property_id 
-	 * @param (string) $comment 
 	 * @param (boolean) $replace_list - if the method will also replace the list
 	 * @return (type)
 	 */
-	public function replace($status, $property, $target_property_id, $comment = '', $replace_list = false)
+	public function replace($status, $property, $target_property_id, $replace_list = false)
 	{
-		$message = "You have successfully rejected the replacement.";
+		$message = "";
 		if (!is_array($property)) {
 			$property = $this->CI->property_model->get(['p.id' => $property], false);
 		} else {
@@ -145,7 +103,7 @@ class Property_Library {
                     $this->CI->property_model->delete_comments(['property_id' => $target_property->id]);
                     $comment = [
                     	'property_id' => $target_property->id,
-                    	'comment' => $property_comments,
+                    	'comment' => $property_comments['comment'],
                     	'user_id' => $this->CI->logged_user->id
                     ];
                     $this->CI->property_model->save_comment($comment);
@@ -159,16 +117,9 @@ class Property_Library {
 				'company_id' => $this->CI->logged_user->company_id
 			]);
 
+			$this->CI->property_model->delete($property_id, $this->CI->logged_user->company_id);
+
 			$message = "Replacement successful!";
-		}
-		if ($property_id) {
-			$this->CI->property_model->update(['id' => $property_id], ['active' => 0]);
-			$this->CI->property_model->update_property_replacement(['property_id' => $property_id], [
-				'status' => $status,
-				'comment' => $comment,
-				'date_updated' => date('Y-m-d H:i:s')
-			]);
-			$this->CI->session->set_flashdata('message', $message);
 		}
 
 		return array(

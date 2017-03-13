@@ -42,7 +42,6 @@
                     <div class="form-group">
                         <label for="selected_property_action">{{ selectedProperty.property_address }}</label>
                         <select class="form-control" v-model="replacementAction">
-                            <option value="1">Reject</option>
                             <option v-show="selectedProperty.url && selectedProperty.target_url" value="2">Replace (Property Address only)</option>
                             <option v-show="selectedProperty.url && selectedProperty.target_url" value="3">Replace (All except list info)</option>
                             <option v-show="selectedProperty.url && selectedProperty.target_url" value="4">Replace (All)</option>
@@ -64,7 +63,7 @@
 
 <script>
     var dt;
-    var actionUrl = "<?php echo base_url() . 'approval/replacements'; ?>";
+    var actionUrl = "<?php echo base_url() . 'approval/duplicates'; ?>";
 
     var data = {
         selectedProperty: {

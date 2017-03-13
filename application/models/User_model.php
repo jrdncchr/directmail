@@ -85,7 +85,8 @@ class User_model extends CI_Model {
             $result['message'] = "Email address already exists.";
             return $result;
         }
-
+        
+        $confirmed = isset($info['confirmed']) && filter_var($info['confirmed'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
         $this->db->insert('user',
             array(
                 'email'         => $info['email'],
@@ -93,7 +94,8 @@ class User_model extends CI_Model {
                 'last_name'     => $info['last_name'],
                 'contact_no'    => $info['contact_no'],
                 'company_id'    => $info['company_id'],
-                'role_id'       => isset($info['role_id']) ? $info['role_id'] : ''
+                'role_id'       => isset($info['role_id']) ? $info['role_id'] : '',
+                'confirmed'     => $confirmed
             )
         );
         $user_id = $this->db->insert_id();
@@ -109,17 +111,19 @@ class User_model extends CI_Model {
             )
         );
 
-        $this->load->library('email_library');
-        $email_data = array(
-            'to' => $info['email'],
-            'name' => $info['first_name'],
-            'company' => $info['company_name'],
-            'confirmation_key' => $confirmation_key
-        );
-        if ($manually_added) {
-            $email_data['password'] = $info['password'];
+        if (!$confirmed) {
+            $this->load->library('email_library');
+            $email_data = array(
+                'to' => $info['email'],
+                'name' => $info['first_name'],
+                'company' => $info['company_name'],
+                'confirmation_key' => $confirmation_key
+            );
+            if ($manually_added) {
+                $email_data['password'] = $info['password'];
+            }
+            $this->email_library->send_email_confirmation($email_data);
         }
-        $this->email_library->send_email_confirmation($email_data);
 
         $result['success'] = true;
         $result['user_id'] = $user_id;
@@ -152,6 +156,23 @@ class User_model extends CI_Model {
             $result['success'] = true;
         } else {
             $result['message'] = 'Something went wrong.';
+        }
+        return $result;
+    }
+
+    public function delete($user_id, $company_id) 
+    {
+        $result = ['success' => false];
+        $this->db->trans_begin();
+        $this->db->delete('user_secret', ['user_id' => $user_id]);
+        $this->db->delete('user_list_permission', ['user_id' => $user_id]);
+        $this->db->delete('user_module_permission', ['user_id' => $user_id]);
+        $this->db->delete('user', ['id' => $user_id, 'company_id' => $company_id]);
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+        } else {
+            $this->db->trans_commit();
+            $result['success'] = true;
         }
         return $result;
     }

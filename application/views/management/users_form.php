@@ -95,6 +95,17 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                 <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" v-model="form.user_details.confirmed"> Confirmed
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -144,7 +155,8 @@
                 first_name: <?php echo isset($user) ? json_encode($user->first_name) : json_encode(''); ?>,
                 last_name: <?php echo isset($user) ? json_encode($user->last_name) : json_encode(''); ?>,
                 contact_no: <?php echo isset($user) ? json_encode($user->contact_no) : json_encode(''); ?>,
-                role_id: <?php echo isset($user) ? json_encode($user->role_id) : json_encode(''); ?>
+                role_id: <?php echo isset($user) ? json_encode($user->role_id) : 0; ?>,
+                confirmed: <?php echo isset($user) ? json_encode($user->confirmed) : 0; ?>
             },
             password: {
                 new_password: '',
@@ -198,7 +210,7 @@
             deleteUser: function() {
                 showModal('confirm', {
                     title: 'Delete User',
-                    body: 'Are you sure to delete this user?',
+                    body: '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> WARNING: This action cannot be undone.</span><br /> Are you sure to delete this user?',
                     callback: function() {
                         loading("info", "Deleting user...");
                         $.post(actionUrl, { action: 'delete', user_id: data.form.user_details.id }, function(res) {

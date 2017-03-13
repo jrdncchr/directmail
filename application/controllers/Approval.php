@@ -56,14 +56,14 @@ class Approval extends MY_Controller {
         }
     }
 
-    public function replacements($id = 0)
+    public function duplicates($id = 0)
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
             $action = $this->input->post('action');
             switch ($action) {
                 case 'property_list':
                     $this->load->model('property_model');
-                    $lists = $this->property_model->get_replacement_properties(
+                    $lists = $this->property_model->get_duplicate_properties(
                         $this->logged_user->company_id);
                     foreach ($lists as $l) {
                         $l->url = "";
@@ -92,7 +92,7 @@ class Approval extends MY_Controller {
             if ($id > 0) {
 
             } else {
-                 $this->_renderL('approval/replacements');
+                 $this->_renderL('approval/duplicates');
             }
         }
     }

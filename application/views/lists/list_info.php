@@ -109,7 +109,7 @@
                                                     <span class="input-group-btn">
                                                         <div class="button-group">
                                                             <button type="button" class="btn btn-dd btn-sm dropdown-toggle" data-toggle="dropdown"></span> <span class="fa fa-caret-down"></span></button>
-                                                            <ul class="dropdown-menu">
+                                                            <ul id="status" class="dropdown-menu">
                                                                 <li>
                                                                     <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
                                                                     <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
@@ -299,7 +299,7 @@
             deleteList: function() {
                 showModal('confirm', {
                     title: 'Delete List',
-                    body: 'Are you sure to delete this list?',
+                    body: '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> WARNING: This action cannot be undone.</span><br /> Are you sure to delete this list?',
                     callback: function() {
                         loading("info", "Deleting list...");
                         $.post(actionUrl, { 
@@ -338,7 +338,7 @@
         $('#sidebar-list-link').addClass('active');
         $('#sidebar-list').addClass('in');
 
-        $('.dropdown-menu a').on('click', function(event) {
+        $('#status.dropdown-menu a').on('click', function(event) {
             var $target = $(event.currentTarget),
                 val = $target.attr('data-value'),
                 $inp = $target.find('input'),
