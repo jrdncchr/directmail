@@ -50,8 +50,12 @@
                 <i class="fa fa-save"></i> Save Property
             </button>
 
+            <button v-on:click="draftProperty" class="btn btn-xs" style="margin-bottom: 20px;">
+                <i class="fa fa-save"></i> Save to Draft
+            </button>
+
             <div style="margin-bottom: 15px;" class="pull-right">
-                <span v-show="property.status == 'pending'" class="label label-warning" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
+                <span v-show="property.status == 'pending' || property.status == 'draft'" class="label label-warning" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'active' || property.status == 'lead' || property.status == 'buy'" class="label label-success" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'change'" class="label label-info" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'stop'" class="label label-danger" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
@@ -528,6 +532,30 @@
                         }
                     }, 'json');
                 }
+            },
+            draftProperty: function() {
+                loading("info", "Saving to draft...");
+                data.property.status = 'draft';
+                data.property.list_id = data.list.id;
+                $.post(actionUrl, { action: 'save_property', form: data.property, mailings: data.mailings }, function(res) {
+                    if (res.success && (undefined == data.property.id)) {
+                        window.location = actionUrl + '/' + data.list.id + '/info/' + res.id;
+                    }  else if (!res.success) {
+                        if (res.exist) {
+                            loading('warning', 'A similar existing property is detected.');
+                            data.similar_address = res.properties;
+
+                            var propertyExistModal = $('#property-exist-modal');
+                            propertyExistModal.modal({
+                                show: true,
+                                backdrop: 'static',
+                                keyboard: false
+                            });
+                        }
+                    } else {
+                        loading('success', 'Save successful!');
+                    }
+                }, 'json');
             },
             replaceConfirmAction: function() {
                 loading("info", "Taking action, please wait...");

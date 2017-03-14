@@ -254,6 +254,10 @@ class Property_model extends CI_Model {
     public function check_property_exists($property, $company_id)
     {
         $result = array('exist' => false);
+        if ($property['status'] == 'draft') {
+            return $result;
+        }
+        
         $similar_address = $this->generate_similar_address($property['property_address'], $company_id);
         $similar_address[] = strtolower($property['property_address']);
         $this->db->select('id, property_address, list_id, status');

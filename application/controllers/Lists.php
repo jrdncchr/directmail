@@ -52,8 +52,7 @@ class Lists extends MY_Controller {
                     $this->load->model('property_model');
                     $where = array(
                         'p.deleted' => 0,
-                        'p.active' => 1,
-                        'p.status !=' => 'duplicate'
+                        'p.active' => 1
                     );
                     $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
                     foreach ($properties as $p) {
@@ -214,7 +213,7 @@ class Lists extends MY_Controller {
                     $property = $this->input->post('form');
                     $property['created_by'] = $this->logged_user->id;
                     $property['company_id'] = $this->logged_user->company_id;
-                    if (isset($property['status']) && $property['status'] == 'replacement') {
+                    if (isset($property['status']) && $property['status'] == 'duplicate') {
                         $result = $this->property_model->save($property);
                     } else {
                         $check_property = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
@@ -309,7 +308,7 @@ class Lists extends MY_Controller {
                             $this->load->model('property_model');
                             $property = $this->property_model->get(
                                 array('p.id' => $property_id, 'p.list_id' => $list_id), false);
-                            $property->pr_url = base_url() . 'lists/property/' . $property->pr_list_id . '/info/' . $property->target_property_id;
+                            // $property->pr_url = base_url() . 'lists/property/' . $property->pr_list_id . '/info/' . $property->target_property_id;
                             $this->data['property'] = $property;
                             $this->data['comments'] = $this->property_model->get_comment(array('property_id' => $property_id));
                             $this->data['histories'] = $this->property_model->get_history(array('property_id' => $property_id));

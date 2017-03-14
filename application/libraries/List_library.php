@@ -91,6 +91,8 @@ class List_library {
                 $similar = $check_property['properties'][0];
                 $similar->permission = $this->CI->_checkListPermission($similar->list_id, 'retrieve');
                 $similar->url = base_url() . "lists/property/". $similar->list_id . "/info/" . $similar->id;
+                $similar->list = $this->CI->list_model->get(['l.id' => $similar->list_id], false);
+                $similar->list->url = base_url() . "lists/info/" . $similar->list_id;
                 $property['status'] = 'duplicate';
             }
             // setup data to be saved properly on there corresponding table 
@@ -130,7 +132,7 @@ class List_library {
                 $property['mailing_date'] = $mailing_date;
                 $property['comment'] = $comment;
                 $property['row'] = $row;
-                $property['property_link'] = base_url() . 'lists/property/' . $list_id . '/info/' . $save['id'];
+                $property['property_link'] = base_url() . 'lists/property/' . $list_id . '/info/' . $property['id'];
                 if ($property['status'] == 'duplicate') {
                     $property['similar'] = $similar;
                     $result['duplicates'][] = $property;

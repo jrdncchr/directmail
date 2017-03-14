@@ -116,8 +116,9 @@
                                                                     <a class="small" data-value="Buy" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Buy</a>
                                                                     <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
                                                                     <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
-                                                                    <a class="small" data-value="Replacement" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Replacement</a>
+                                                                    <a class="small" data-value="Duplicate" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Duplicate</a>
                                                                     <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
+                                                                    <a class="small" data-value="Draft" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Draft</a>
                                                                 </li>
                                                             </ul>
                                                         </div>
@@ -381,7 +382,7 @@
                 { data: "status", render: function(data, type, row) {
                         if (data.toLowerCase() == "active" || data.toLowerCase() == "lead" || data.toLowerCase() == "buy") {
                             return "<span class='label label-success'>" + capitalize(data) + "</span>";
-                        } else if (data.toLowerCase() == "pending" || data.toLowerCase() == "replacement") {
+                        } else if (data.toLowerCase() == "pending" || data.toLowerCase() == "duplicate" || data.toLowerCase() == "draft") {
                             return "<span class='label label-warning'>" + capitalize(data) + "</span>";
                         } else if (data.toLowerCase() =="change") {
                             return "<span class='label label-info'>" + capitalize(data) + "</span>";

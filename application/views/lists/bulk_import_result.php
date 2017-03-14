@@ -28,6 +28,7 @@
                             <th>Spreadsheet Row</th>
                             <th>Property Address</th>
                             <th></th>
+                            <th>Target List</th>
                             <th>Detected Similar Property</th>
                         </tr>
                     </thead>
@@ -138,16 +139,27 @@
                     }
                 },
                 { data: "row" },
-                { data: "property_address" },
+                { data: "property_address", render: function(data, type, row) {
+                        return '<a href="' + row.property_link + '" target="_blank">' + data + '</a>';
+                    }
+                },
                 { data: "id", render: function(data, type, row) {
                         return '<i class="fa fa-arrows-h fa-2x"></i>';
+                    }
+                },
+                { data: "similar", render: function(data, type, row) {
+                        return '<a href="' + data.list.url + '" target="_blank">' + data.list.name + '</a>';
                     }
                 },
                 { data: "similar", render: function(data, type, row) {
                         return '<a href="' + data.url + '" target="_blank">' + data.property_address + '</a>';
                     }
                 }
-            ],
+            ], 
+            "columnDefs": [ {
+                "targets": 4,
+                "orderable": false
+            }],
             "language": {
                 "emptyTable": "No property found for this list."
             }
