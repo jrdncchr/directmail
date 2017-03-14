@@ -36,6 +36,7 @@
                                                                 <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
                                                                 <a class="small" data-value="Duplicate" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Duplicate</a>
                                                                 <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
+                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Draft</a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -132,7 +133,7 @@
             id: '',
             skip_traced: 0,
             status_off: [],
-            status_on: ['Active', 'Lead', 'Pending', 'Change', 'Replacement', 'Stop', 'Buy'],
+            status_on: ['Active', 'Lead', 'Pending', 'Change', 'Duplicate', 'Stop', 'Buy', 'Draft'],
         },
         statusText: 'All'
     };
