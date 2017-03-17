@@ -61,7 +61,7 @@ class Approval extends MY_Controller {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
             $action = $this->input->post('action');
             switch ($action) {
-                case 'property_list':
+                case 'list':
                     $this->load->model('property_model');
                     $lists = $this->property_model->get_duplicate_properties(
                         $this->logged_user->company_id);
@@ -76,13 +76,22 @@ class Approval extends MY_Controller {
                     }
                     echo json_encode(array('data' => $lists));
                     break;
-                case 'confirm_replacement':
+                case 'replace_action':
+                    $replace_action = $this->input->post('replace_action');
+                    $property = $this->input->post('property');
+                    $target_property_id = $property['target_id'];
+                    unset($property['target_id']);
+                    unset($property['target_list_id']);
+                    unset($property['target_list_name']);
+                    unset($property['target_property_address']);
+                    unset($property['target_url']);
+                    unset($property['url']);
+                    unset($property['list_name']);
                     $this->load->library('property_library');
                     $result = $this->property_library->confrim_replacement_action(
-                        $this->input->post('replacement_action'),
-                        $this->input->post('property_id'),
-                        $this->input->post('target_property_id'),
-                        $this->input->post('comment'));
+                        $replace_action,
+                        $property,
+                        $target_property_id);
                     echo json_encode($result);
                     break;
                 default:

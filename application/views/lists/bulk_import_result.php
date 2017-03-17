@@ -85,10 +85,6 @@
                 break;
             }
         }
-        if (action == 5) {
-            alert("Not yet available.");
-            return;
-        }
         loading('info', 'Taking action, please wait...');
         $.post(actionUrl, {
             action: 'replace_action',

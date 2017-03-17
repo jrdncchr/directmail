@@ -175,8 +175,12 @@ class Property_model extends CI_Model {
         $this->db->join('property p2', 'p2.id = pr.target_property_id', 'left');
         $this->db->join('list l2', 'l2.id = p2.list_id', 'left');
         $this->db->where(array('l.company_id' => $company_id, 'p.status' => 'duplicate', 'p.deleted' => 0));
-        $result = $this->db->get('property p');
-        return $result->result();
+        $duplicates = $this->db->get('property p')->result();
+        foreach ($duplicates as $duplicate) {
+            $duplicate->comment['comment'] = $this->db->get_where('property_comment', ['property_id' => $duplicate->id])->row()->comment;
+            $duplicate->mailing_date = $this->db->get_where('property_mailing', ['property_id' => $duplicate->id])->row()->mailing_date;
+        }
+        return $duplicates;
     }
 
     public function get_properties($company_id, $where = array(), $filter = array(), $order_by = 'p.id')
