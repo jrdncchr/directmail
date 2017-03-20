@@ -284,6 +284,19 @@ class Property_Library {
 	        if (isset($filter['skip_traced']) && !filter_var($filter['skip_traced'], FILTER_VALIDATE_BOOLEAN)) {
 	        	unset($filter['skip_traced']);
 	        }
+	        // Used in Duplicates
+	        if (isset($filter['target_list']) && $filter['target_list'] === 'all') {
+	            unset($filter['target_list']);
+	        }
+	        if (isset($filter['target_address']) && $filter['target_address'] === '') {
+	            unset($filter['target_address']);
+	        }
+	        if (isset($filter['upload_by']) && $filter['upload_by'] === '') {
+	            unset($filter['upload_by']);
+	        }
+	        if (isset($filter['upload_date']) && $filter['upload_date'] === '') {
+	            unset($filter['upload_date']);
+	        }
 	    }
 	    $filter = $filter ? $filter : [];
 	    $CI =& get_instance();

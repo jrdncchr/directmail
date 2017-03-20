@@ -161,7 +161,7 @@ class Property_model extends CI_Model {
         return $result->result();
     }
 
-    public function get_duplicate_properties($company_id) 
+    public function get_duplicate_properties($filter, $company_id) 
     {
         $this->db->select('p.*, 
             l.name as list_name, 
@@ -169,12 +169,37 @@ class Property_model extends CI_Model {
             p2.id as target_id, 
             p2.property_address as target_property_address, 
             l2.name as target_list_name,
-            l2.id as target_list_id');
+            l2.id as target_list_id,
+            p2.status as target_status,
+            p.date_created as upload_date,
+            CONCAT(u.first_name, " ", u.last_name) as upload_by');
         $this->db->join('list l', 'l.id = p.list_id', 'left');
+        $this->db->join('user u', 'p.created_by = u.id', 'left');
         $this->db->join('property_replacement pr', 'pr.property_id = p.id', 'left');
         $this->db->join('property p2', 'p2.id = pr.target_property_id', 'left');
         $this->db->join('list l2', 'l2.id = p2.list_id', 'left');
         $this->db->where(array('l.company_id' => $company_id, 'p.status' => 'duplicate', 'p.deleted' => 0));
+        if (isset($filter['property_address'])) {
+            $this->db->like("p.property_address", $filter['property_address']);
+        }
+        if (isset($filter['upload_by'])) {
+            $this->db->like("p.created_by", $filter['upload_by']);
+        }
+        if (isset($filter['upload_date'])) {
+            $this->db->like("p.date_created", $filter['upload_date']);
+        }
+        if (isset($filter['target_list'])) {
+            $this->db->where('p2.list_id', $filter['target_list']);
+        }
+        if (isset($filter['target_address'])) {
+            $this->db->like("p2.property_address", $filter['target_address']);
+        }
+        if (isset($filter['target_status_off'])) {
+            foreach ($filter['target_status_off'] as $status) {
+                $this->db->where('p2.status !=', $status);
+            }
+            unset($filter['target_status_off']);
+        }
         $duplicates = $this->db->get('property p')->result();
         foreach ($duplicates as $duplicate) {
             $comment = $this->db->get_where('property_comment', ['property_id' => $duplicate->id])->row();
@@ -203,9 +228,6 @@ class Property_model extends CI_Model {
         }
         if (isset($filter['skip_traced'])) {
             $this->db->where('p.skip_traced', 1);
-        }
-        if (isset($filter['status'])) {
-            $this->db->where('status', $filter['status']);
         }
         if (isset($filter['id'])) {
             $this->db->where('p.id', $filter['id']);

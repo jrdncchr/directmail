@@ -62,8 +62,11 @@ class Approval extends MY_Controller {
             $action = $this->input->post('action');
             switch ($action) {
                 case 'list':
+                    $filter = $this->input->post('filter');
+                    $this->load->library('property_library');
+                    $filter = $this->property_library->setup_search_filter($filter);
                     $this->load->model('property_model');
-                    $lists = $this->property_model->get_duplicate_properties(
+                    $lists = $this->property_model->get_duplicate_properties($filter, 
                         $this->logged_user->company_id);
                     foreach ($lists as $l) {
                         $l->url = "";
