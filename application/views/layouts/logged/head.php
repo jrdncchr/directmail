@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/toastr/toastr.min.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/air-datepicker/dist/css/datepicker.min.css'; ?>" />
+<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/select2/dist/css/select2.min.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'resources/css/custom-bootstrap.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'resources/css/custom.css'; ?>" />
 
@@ -23,6 +24,7 @@
 <script src="<?php echo base_url() . 'bower_components/toastr/toastr.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'bower_components/air-datepicker/dist/js/datepicker.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'bower_components/air-datepicker/dist/js/i18n/datepicker.en.js'; ?>"></script>
+<script src="<?php echo base_url() . 'bower_components/select2/dist/js/select2.full.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'resources/js/fnReloadAjax.js'; ?>"></script>
 <script src="<?php echo base_url() . 'resources/js/danero-validator.js'; ?>"></script>
 <script src="<?php echo base_url() . 'resources/js/danero.js'; ?>"></script>

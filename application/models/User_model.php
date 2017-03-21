@@ -211,6 +211,13 @@ class User_model extends CI_Model {
         return $list ? $result->result() : $result->row();
     }
 
+    public function get_id_name($where) 
+    {
+        $this->db->select('u.id, CONCAT(u.first_name, " ", u.last_name) as text');
+        $result = $this->db->get_where('user u', $where);
+        return $result->result();
+    }
+
     public function save($user)
     {
         $result['success'] = false;

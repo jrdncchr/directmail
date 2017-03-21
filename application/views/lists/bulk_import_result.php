@@ -196,7 +196,7 @@
                 $('table#saved tbody tr').on('click', function () {
                     var pos = table.fnGetPosition(this);
                     var d = table.fnGetData(pos);
-                    window.open(baseUrl + 'lists/property/' + data.list_id + '/info/' + d.id, '_blank');
+                    window.open(d.property_link, '_blank');
                 });
             },
             "language": {

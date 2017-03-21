@@ -104,7 +104,14 @@ class Approval extends MY_Controller {
             if ($id > 0) {
 
             } else {
-                 $this->_renderL('approval/duplicates');
+                $this->load->model('user_model');
+                $where = [
+                    'company_id' => $this->logged_user->company_id, 
+                    'deleted' => 0,
+                    'confirmed' => 1
+                ];
+                $this->data['users'] = $this->user_model->get_id_name($where);
+                $this->_renderL('approval/duplicates');
             }
         }
     }

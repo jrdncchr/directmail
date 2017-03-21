@@ -262,11 +262,6 @@ class Lists extends MY_Controller {
                     $id = $this->input->post('id');
                     $status = $this->input->post('status');
                     $result = $this->property_model->delete($id, $this->logged_user->company_id, $status);
-                    $this->property_model->add_history([
-                        'property_id' => $property['id'],
-                        'company_id' => $property['company_id'],
-                        'message' => 'Property was deleted by ' . $this->logged_user->first_name . ' ' . $this->logged_user->last_name
-                    ]);
                     echo json_encode($result);
                     break;
                 case 'save_comment':

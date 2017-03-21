@@ -29,7 +29,9 @@
                                     <div class="form-group">
                                         <label for="upload-by" class="control-label col-sm-4">Upload By</label>
                                         <div class="col-sm-8">
-                                            <input id="upload-by" type="text" class="form-control" v-model="filter.upload_by" />
+                                            <select id="upload-by" class="form-control" v-model="filter.upload_by">
+                                                <option value="">All</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -124,7 +126,8 @@
             target_status_off: [],
             target_status_on: ['Active', 'Lead', 'Pending', 'Change', 'Stop', 'Buy']
         },
-        statusText: 'All'
+        statusText: 'All',
+        users: <?php echo json_encode($users); ?>
     };
 
     var vm = new Vue({
@@ -192,6 +195,12 @@
             onSelect: function(formattedDate, date, inst) {
                 data.filter.upload_date = formattedDate;
             }
+        });
+
+        $("#upload-by").select2({
+          data: data.users
+        }).on('change', function() {
+            data.filter.upload_by = $(this).val();
         });
 
         duplicateDt = $('table#duplicates').dataTable({

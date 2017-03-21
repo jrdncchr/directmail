@@ -133,7 +133,7 @@ class List_library {
                 $property['comment'] = $comment;
                 $property['row'] = $row;
                 $property['property_link'] = base_url() . 'lists/property/' . $list_id . '/info/' . $property['id'];
-                if ($property['status'] == 'duplicate') {
+                if ($check_property['exist']) {
                     $property['similar'] = $similar;
                     $result['duplicates'][] = $property;
                     $replacement = [
