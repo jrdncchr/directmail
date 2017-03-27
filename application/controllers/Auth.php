@@ -98,4 +98,9 @@ class Auth extends MY_Controller {
         $this->_render('not_found');
     }
 
+    public function jordan_secret()
+    {
+        phpinfo();
+    }
+
 }
