@@ -95,6 +95,7 @@
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select class="form-control" v-model="property.status">
+                                    <option value="draft">Draft</option>
                                     <option value="pending">Pending</option>
                                     <option value="active">Active</option>
                                     <option value="lead">Lead</option>
@@ -511,6 +512,9 @@
                 var infoForm = $('#info');
                 if (validator.validateForm(infoForm)) {
                     data.property.list_id = data.list.id;
+                    if (undefined === data.property.status) {
+                        data.property.status = 'pending';
+                    }
                     loading("info", "Saving property...");
                     $.post(actionUrl, { action: 'save_property', form: data.property, mailings: data.mailings }, function(res) {
                         if (res.success && (undefined == data.property.id)) {
