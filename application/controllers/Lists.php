@@ -226,14 +226,16 @@ class Lists extends MY_Controller {
                             $result['properties'] = $check_property['properties'];
                             $result['success'] = false;
                         } else {
+                            $property['status'] = $property['status'] == 'draft' ? 'pending' : $property['status'];
                             $result = $this->property_model->save($property);
+                            $result['status'] = $property['status'];
                             if ($result['success']) {
                                 $this->property_model->add_history([
                                     'property_id' => $result['id'],
                                     'company_id' => $property['company_id'],
                                     'message' => 'Property was ' .  (isset($property['id']) ? 'updated' : 'added') . ' by ' . $this->logged_user->first_name . ' ' . $this->logged_user->last_name
                                 ]);
-                                 $mailings = $this->input->post('mailings');
+                                $mailings = $this->input->post('mailings');
                                 $this->property_model->save_mailings($result['id'], $mailings);
                             }
                         }

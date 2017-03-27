@@ -34,9 +34,9 @@
                 <i class="fa fa-info-circle"></i>
                 This property is still pending for approval.
             </div>
-            <div class="alert alert-warning" v-show="property && property.status === 'replacement'" style="display: none;">
-                <i class="fa fa-info-circle"></i>
-                This property is saved for replacement approval for property <a target="_blank" :href="property.pr_url">{{ property.target_property_id }}</a>.
+            <div class="alert alert-warning" v-show="property && property.status === 'draft'" style="display: none;">
+                <i class="fa fa-exclamation-circle"></i>
+                This property is still on draft, please save it to edit mailings, comments and see history.
             </div>
 
             <?php if ($this->session->flashdata('message')): ?>
@@ -50,7 +50,7 @@
                 <i class="fa fa-save"></i> Save Property
             </button>
 
-            <button v-on:click="draftProperty" class="btn btn-xs" style="margin-bottom: 20px;">
+            <button v-on:click="draftProperty" v-show="!property.id" class="btn btn-xs" style="margin-bottom: 20px;">
                 <i class="fa fa-save"></i> Save to Draft
             </button>
 
@@ -65,9 +65,9 @@
             <!-- Nav tabs -->
               <ul class="nav nav-tabs nav-justified" role="tablist">
                 <li role="presentation" class="active"><a href="#info" aria-controls="info" role="tab" data-toggle="tab">Information</a></li>
-                <li role="presentation"><a href="#mailings" aria-controls="mailings" role="tab" data-toggle="tab">Mailings</a></li>
-                <li v-show="data.property.id" role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments</a></li>
-                <li v-show="data.property.id" role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
+                <li v-show="property.id && property.status !== 'draft'" role="presentation"><a href="#mailings" aria-controls="mailings" role="tab" data-toggle="tab">Mailings</a></li>
+                <li v-show="property.id && property.status !== 'draft'" role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments</a></li>
+                <li v-show="property.id && property.status !== 'draft'" role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
               </ul>
 
               <div class="tab-content">
@@ -90,8 +90,8 @@
                                 </div>
                             </div>
                         </div>
-                        <?php if (isset($property) && (($property->status !== 'pending' && $property->status !== 'replacement') || $mc->_checkModulePermission(MODULE_APPROVAL_ID, 'update'))): ?>
-                        <div class="col-sm-6">
+                        <?php if (isset($property) && (($property->status !== 'pending' && $property->status !== 'duplicate' && $property->status !== 'draft') || $mc->_checkModulePermission(MODULE_APPROVAL_ID, 'update'))): ?>
+                        <div class="col-sm-6" v-show="property.id && property.status !== 'draft' && property.status !== 'pending'">
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select class="form-control" v-model="property.status">
@@ -114,8 +114,8 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="d_first_name">* First Name</label>
-                                        <input name="d_first_name" type="text" class="form-control required" required
+                                        <label for="d_first_name">First Name</label>
+                                        <input name="d_first_name" type="text" class="form-control"
                                                title="First Name" v-model="property.property_first_name" />
                                     </div>
                                 </div>
@@ -129,7 +129,7 @@
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label for="d_last_name">Last Name</label>
-                                        <input name="d_last_name" type="text" class="form-control" required
+                                        <input name="d_last_name" type="text" class="form-control"
                                                title="Last Name" v-model="property.property_last_name" />
                                     </div>
                                 </div>
@@ -140,7 +140,7 @@
                                         <label for="d_address">* Address</label>
                                         <input name="d_address" type="text" class="form-control required" required
                                                title="Address" v-model="property.property_address"
-                                               :disabled="property.status == 'replacement' ? true : false" />
+                                               :disabled="property.status == 'duplicate' ? true : false" />
                                     </div>
                                 </div>
                             </div>
@@ -150,7 +150,7 @@
                                         <label for="d_city">* City</label>
                                         <input name="d_city" type="text" class="form-control required" required
                                                title="City" v-model="property.property_city" 
-                                               :disabled="property.status == 'replacement' ? true : false" />
+                                               :disabled="property.status == 'duplicate' ? true : false" />
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
@@ -158,7 +158,7 @@
                                         <label for="d_state">* State</label>
                                         <input name="d_state" type="text" class="form-control required" required
                                                title="State" v-model="property.property_state" 
-                                               :disabled="property.status == 'replacement' ? true : false" />
+                                               :disabled="property.status == 'duplicate' ? true : false" />
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
@@ -166,7 +166,7 @@
                                         <label for="d_zip_code">* Zip Code</label>
                                         <input name="d_zip_code" type="text" class="form-control required" required
                                                title="Zip Code" v-model="property.property_zipcode" 
-                                               :disabled="property.status == 'replacement' ? true : false" />
+                                               :disabled="property.status == 'duplicate' ? true : false" />
                                     </div>
                                 </div>
                             </div>
@@ -179,8 +179,8 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="pr_first_name">* First Name</label>
-                                        <input name="pr_first_name" type="text" class="form-control required" required
+                                        <label for="pr_first_name">First Name</label>
+                                        <input name="pr_first_name" type="text" class="form-control"
                                                title="First Name" v-model="property.pr_first_name" />
                                     </div>
                                 </div>
@@ -193,8 +193,8 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="pr_last_name">* Last Name</label>
-                                        <input name="pr_last_name" type="text" class="form-control required" required
+                                        <label for="pr_last_name">Last Name</label>
+                                        <input name="pr_last_name" type="text" class="form-control"
                                                title="Last Name" v-model="property.pr_last_name" />
                                     </div>
                                 </div>
@@ -240,8 +240,8 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label for="a_name">* Name</label>
-                                        <input name="a_name" type="text" class="form-control required" required
+                                        <label for="a_name">Name</label>
+                                        <input name="a_name" type="text" class="form-control"
                                                title="Name" v-model="property.attorney_name" />
                                     </div>
                                 </div>
@@ -250,7 +250,7 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label for="a_first_address">* First Address</label>
-                                        <input name="a_first_address" type="text" class="form-control required" required
+                                        <input name="a_first_address" type="text" class="form-control" required
                                                title="Address" v-model="property.attorney_first_address" />
                                     </div>
                                 </div>
@@ -296,15 +296,15 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label for="m_first_name">* First Name</label>
-                                        <input name="m_first_name" type="text" class="form-control required" required
+                                        <label for="m_first_name">First Name</label>
+                                        <input name="m_first_name" type="text" class="form-control"
                                                title="First Name" v-model="property.mail_first_name" />
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label for="m_last_name">* Last Name</label>
-                                        <input name="m_last_name" type="text" class="form-control required" required
+                                        <label for="m_last_name">Last Name</label>
+                                        <input name="m_last_name" type="text" class="form-control"
                                                title="Last Name" v-model="property.mail_last_name" />
                                     </div>
                                 </div>
@@ -528,6 +528,7 @@
                                 });
                             }
                         } else {
+                            data.property.status = res.status;
                             loading('success', 'Save successful!');
                         }
                     }, 'json');
