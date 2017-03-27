@@ -89,8 +89,9 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 | Custom
 |--------------------------------------------------------------------------
 */
+defined('DB_HOSTNAME')       OR define('DB_HOSTNAME', 'localhost');
 defined('DB_USERNAME')       OR define('DB_USERNAME', 'directmail');
-defined('DB_PASSWORD')       OR define('DB_PASSWORD', 'fasterhouse2017');
+defined('DB_PASSWORD')       OR define('DB_PASSWORD', 'pogiako123!');
 defined('DB_DATABASE')       OR define('DB_DATABASE', 'directmail');
 
 defined('ICON_PATH')         OR define('ICON_PATH', 'resources/images/icon/');

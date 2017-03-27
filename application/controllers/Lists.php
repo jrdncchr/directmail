@@ -209,6 +209,7 @@ class Lists extends MY_Controller {
             $action = $this->input->post('action');
             $this->load->model('property_model');
             switch ($action) {
+                case 'draft_property':
                 case 'save_property':
                     $property = $this->input->post('form');
                     $property['created_by'] = $this->logged_user->id;
@@ -226,7 +227,9 @@ class Lists extends MY_Controller {
                             $result['properties'] = $check_property['properties'];
                             $result['success'] = false;
                         } else {
-                            $property['status'] = $property['status'] == 'draft' ? 'pending' : $property['status'];
+                            if ($action !== 'draft_property') {
+                                $property['status'] = $property['status'] == 'draft' ? 'pending' : $property['status'];
+                            }
                             $result = $this->property_model->save($property);
                             $result['status'] = $property['status'];
                             if ($result['success']) {

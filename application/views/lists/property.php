@@ -538,7 +538,7 @@
                 loading("info", "Saving to draft...");
                 data.property.status = 'draft';
                 data.property.list_id = data.list.id;
-                $.post(actionUrl, { action: 'save_property', form: data.property, mailings: data.mailings }, function(res) {
+                $.post(actionUrl, { action: 'draft_property', form: data.property, mailings: data.mailings }, function(res) {
                     if (res.success && (undefined == data.property.id)) {
                         window.location = actionUrl + '/' + data.list.id + '/info/' + res.id;
                     }  else if (!res.success) {
