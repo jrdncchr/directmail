@@ -46,13 +46,9 @@ class Approval extends MY_Controller {
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));
             }
         } else {
-            if ($id > 0) {
-
-            } else {
-                $this->load->model('list_model');
-                $this->data['lists'] = $this->list_model->get(array('l.company_id' => $this->logged_user->company_id));
-            	$this->_renderL('approval/properties');
-            }
+            $this->load->library('dm_library');
+            $this->data['lists'] = $this->dm_library->getListsForSelect2($this->logged_user->company_id);
+            $this->_renderL('approval/properties');
         }
     }
 
@@ -101,18 +97,18 @@ class Approval extends MY_Controller {
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));
             }
         } else {
-            if ($id > 0) {
-
-            } else {
-                $this->load->model('user_model');
-                $where = [
-                    'company_id' => $this->logged_user->company_id, 
-                    'deleted' => 0,
-                    'confirmed' => 1
-                ];
-                $this->data['users'] = $this->user_model->get_id_name($where);
-                $this->_renderL('approval/duplicates');
-            }
+            $this->load->model('user_model');
+            $where = [
+                'company_id' => $this->logged_user->company_id, 
+                'deleted' => 0,
+                'confirmed' => 1
+            ];
+            $this->data['users'] = $this->user_model->get_id_name($where);
+            
+            $this->load->library('dm_library');
+            $this->data['lists'] = $this->dm_library->getListsForSelect2($this->logged_user->company_id);
+            $this->data['statuses'] = $this->dm_library->getStatusesForSelect2();
+            $this->_renderL('approval/duplicates');
         }
     }
 

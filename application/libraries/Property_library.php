@@ -257,9 +257,12 @@ class Property_Library {
 	function setup_search_filter($filter) 
 	{
 	    if (sizeof($filter) > 0) {
-	        if (isset($filter['list']) && $filter['list'] === 'all') {
+	        if (isset($filter['list']) && in_array('all', $filter['list'])) {
 	            unset($filter['list']);
 	        }
+            if (isset($filter['status']) && in_array('all', $filter['status'])) {
+                unset($filter['status']);
+            }
 	        if (isset($filter['resource']) && $filter['resource'] === '') {
 	            unset($filter['resource']);
 	        }
@@ -278,15 +281,15 @@ class Property_Library {
             } else {
                 unset($filter['date_range']);
             }
-	        if (isset($filter['status_on'])) {
-	        	unset($filter['status_on']);
-	        }
 	        if (isset($filter['skip_traced']) && !filter_var($filter['skip_traced'], FILTER_VALIDATE_BOOLEAN)) {
 	        	unset($filter['skip_traced']);
 	        }
 	        // Used in Duplicates
-	        if (isset($filter['target_list']) && $filter['target_list'] === 'all') {
+	        if (isset($filter['target_list']) && in_array('all', $filter['target_list'])) {
 	            unset($filter['target_list']);
+	        }
+	        if (isset($filter['target_status']) && in_array('all', $filter['target_status'])) {
+	            unset($filter['target_status']);
 	        }
 	        if (isset($filter['target_address']) && $filter['target_address'] === '') {
 	            unset($filter['target_address']);

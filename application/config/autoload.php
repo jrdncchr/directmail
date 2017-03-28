@@ -9,7 +9,7 @@ $autoload['drivers'] = array();
 
 $autoload['helper'] = array('danero_helper', 'url');
 
-$autoload['config'] = array();
+$autoload['config'] = array('directmail');
 
 $autoload['language'] = array();
 

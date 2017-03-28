@@ -189,16 +189,13 @@ class Property_model extends CI_Model {
             $this->db->like("p.date_created", $filter['upload_date']);
         }
         if (isset($filter['target_list'])) {
-            $this->db->where('p2.list_id', $filter['target_list']);
+            $this->db->where_in('p2.list_id', $filter['target_list']);
+        }
+        if (isset($filter['target_status'])) {
+            $this->db->where_in('p2.status', $filter['target_status']);
         }
         if (isset($filter['target_address'])) {
             $this->db->like("p2.property_address", $filter['target_address']);
-        }
-        if (isset($filter['target_status_off'])) {
-            foreach ($filter['target_status_off'] as $status) {
-                $this->db->where('p2.status !=', $status);
-            }
-            unset($filter['target_status_off']);
         }
         $duplicates = $this->db->get('property p')->result();
         foreach ($duplicates as $duplicate) {
@@ -221,7 +218,10 @@ class Property_model extends CI_Model {
         $this->db->join('list l', 'l.id = p.list_id');
         $this->db->where($where);
         if (isset($filter['status'])) {
-            $this->db->where('status', $filter['status']);
+            $this->db->where_in('status', $filter['status']);
+        }
+        if (isset($filter['list'])) {
+            $this->db->where_in('p.list_id', $filter['list']);
         }
         if (isset($filter['resource'])) {
             $this->db->like('p.resource', $filter['resource']);
@@ -232,9 +232,6 @@ class Property_model extends CI_Model {
         if (isset($filter['id'])) {
             $this->db->where('p.id', $filter['id']);
         }
-        if (isset($filter['list'])) {
-            $this->db->where('p.list_id', $filter['list']);
-        }
         if (isset($filter['property_name'])) {
             $this->db->like("CONCAT(p.property_first_name, ' ', p.property_last_name)", $filter['property_name']);
         }
@@ -243,12 +240,6 @@ class Property_model extends CI_Model {
         }
         if (isset($filter['date_range'])) {
             $this->db->where($filter['date_range']);
-        }
-        if (isset($filter['status_off'])) {
-            foreach ($filter['status_off'] as $status) {
-                $this->db->where('p.status !=', $status);
-            }
-            unset($filter['status_off']);
         }
         if (isset($filter['date_range'])) {
             $this->db->where($filter['date_range']);
@@ -261,6 +252,7 @@ class Property_model extends CI_Model {
         }
         $this->db->order_by($order_by, 'asc');
         $result = $this->db->get('property p');
+        // echo $this->db->last_query();exit;
         return $result->result();
     }
 

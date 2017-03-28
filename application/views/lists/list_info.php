@@ -101,33 +101,15 @@
                         <div class="panel-body">
                             <div class="form-horizontal">
                                 <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label for="date-to" class="control-label col-sm-2">Status</label>
-                                            <div class="col-sm-10">
-                                                <div class="input-group">
-                                                    <span class="input-group-btn">
-                                                        <div class="button-group">
-                                                            <button type="button" class="btn btn-dd btn-sm dropdown-toggle" data-toggle="dropdown"></span> <span class="fa fa-caret-down"></span></button>
-                                                            <ul id="status" class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
-                                                                    <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
-                                                                    <a class="small" data-value="Buy" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Buy</a>
-                                                                    <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
-                                                                    <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
-                                                                    <a class="small" data-value="Duplicate" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Duplicate</a>
-                                                                    <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
-                                                                    <a class="small" data-value="Draft" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Draft</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </span>
-                                                    <input type="text" class="form-control" v-model="statusText" disabled />
-                                                </div>
-                                            </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="status" class="control-label col-sm-2">Status</label>
+                                        <div class="col-sm-10">
+                                            <select id="status" class="form-control" multiple="multiple">
+                                            </select>
                                         </div>
                                     </div>
+                                </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label for="resource" class="control-label col-sm-4">Resource</label>
@@ -228,15 +210,13 @@
     var data = {
         list : <?php echo json_encode($list); ?>,
         filter : {
+            status: ['active'],
             resource: '',
             property_name : '',
             property_address : '',
             id: '',
-            skip_traced: 0,
-            status_off: [],
-            status_on: ['Active', 'Lead', 'Pending', 'Change', 'Duplicate', 'Stop', 'Buy', 'Draft'],
-        },
-        statusText: 'All'
+            skip_traced: 0
+        }
     };
     var oldMailingType = data.list.mailing_type;
     var oldNoLetters = data.list.no_of_letters;
@@ -326,11 +306,15 @@
             },
             clearFilter: function() {
                 data.filter = {
+                    status: ['active'],
+                    resource: '',
                     property_name : '',
                     property_address : '',
-                    status: 'all',
-                    id: ''
-                }
+                    id: '',
+                    skip_traced: 0
+                };
+                $("#status").val(null).trigger("change");
+                $("#status").val('active').trigger("change");
             }
         }
     });
@@ -339,32 +323,39 @@
         $('#sidebar-list-link').addClass('active');
         $('#sidebar-list').addClass('in');
 
-        $('#status.dropdown-menu a').on('click', function(event) {
-            var $target = $(event.currentTarget),
-                val = $target.attr('data-value'),
-                $inp = $target.find('input'),
-                idx;
+        setupSelect2Fields();
+        $("#status").val(null).trigger("change");
+        $("#status").val('active').trigger("change");
 
-            if ((idx = data.filter.status_on.indexOf(val)) > -1) {
-                data.filter.status_off.push(val);
-                data.filter.status_on.splice(idx, 1);
-                setTimeout(function() {$inp.prop('checked', false)}, 0);
-            } else {
-                idx = data.filter.status_off.indexOf(val);
-                data.filter.status_on.push(val);
-                data.filter.status_off.splice(idx, 1);
-                setTimeout(function() {$inp.prop('checked', true)}, 0);
-            }
+        setupDataTables();
+    });
 
-            $(event.target).blur();
-            if (data.filter.status_off.length) {
-                data.statusText = data.filter.status_on.join(', ');
-            } else {
-                data.statusText = "All";
+    function setupSelect2Fields() {
+        $('#status').select2({
+            allowClear: true,
+            data: <?php echo json_encode($statuses); ?>,
+            closeOnSelect: false,
+            placeholder: {
+                id: "",
+                placeholder: "Select a status"
             }
-            return false;
+        }).on('change', function() {
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && data.statusAll) {
+                var selected = $(this).val();
+                $("#status").val(null).trigger("change");
+                $("#status").val(selected[1]).trigger("change");
+                data.statusAll = false;
+            }
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && !data.statusAll) {
+                $("#status").val(null).trigger("change");
+                $("#status").val('all').trigger("change");
+                data.statusAll = true;
+            }
+            data.filter.status = $(this).val();
         });
+    }
 
+    function setupDataTables() {
         dt = $('table').dataTable({
             "order": [[ 0, "desc" ]],
             "bDestroy": true,
@@ -374,7 +365,8 @@
                 "url": actionUrl,
                 "data":  {
                     action: "property_list",
-                    list_id: <?php echo json_encode($list->id); ?>
+                    list_id: <?php echo json_encode($list->id); ?>,
+                    filter: data.filter
                 }
             },
             columns: [
@@ -415,5 +407,5 @@
                 "emptyTable": "No property found for this list."
             }
         });
-    });
+    }
 </script>

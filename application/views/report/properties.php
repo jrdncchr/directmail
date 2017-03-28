@@ -21,43 +21,23 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label for="date-to" class="control-label col-sm-2">Status</label>
+                                        <label for="status" class="control-label col-sm-2">Status</label>
                                         <div class="col-sm-10">
-                                            <div class="input-group">
-                                                <span class="input-group-btn">
-                                                    <div class="button-group">
-                                                        <button type="button" class="btn btn-dd btn-sm dropdown-toggle" data-toggle="dropdown"></span> <span class="fa fa-caret-down"></span></button>
-                                                        <ul id="status" class="dropdown-menu">
-                                                            <li>
-                                                                <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
-                                                                <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
-                                                                <a class="small" data-value="Buy" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Buy</a>
-                                                                <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
-                                                                <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
-                                                                <a class="small" data-value="Duplicate" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Duplicate</a>
-                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
-                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Draft</a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </span>
-                                                <input type="text" class="form-control" v-model="statusText" disabled />
-                                            </div>
+                                            <select id="status" class="form-control" multiple="multiple">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="list" class="control-label col-sm-2">List</label>
+                                        <div class="col-sm-10">
+                                            <select id="list" class="form-control" multiple="multiple">
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="date-to" class="control-label col-sm-4">List</label>
-                                        <div class="col-sm-8">
-                                            <select class="form-control" v-model="filter.list">
-                                                <option value="all">All</option>
-                                                <?php foreach ($lists as $list): ?>
-                                                    <option value="<?php echo $list->id ?>"><?php echo $list->name; ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">ID</label>
                                         <div class="col-sm-8">
@@ -106,10 +86,11 @@
                 <table class="table table-bordered table-hover" width="100%">
                     <thead>
                     <tr>
-                        <th width="6%">ID</th>
+                        <th width="8%">ID</th>
                         <th width="20%">List</th>
+                        <th width="17%">Resource</th>
                         <th width="20%">Property Name</th>
-                        <th width="39%">Property Address</th>
+                        <th width="20%">Property Address</th>
                         <th width="15%">Status</th>
                     </tr>
                     </thead>
@@ -126,16 +107,16 @@
 
     var data = {
         filter : {
-            list : 'all',
+            status: ['active'],
+            list : ['all'],
             property_name : '',
             resource: '',
             property_address : '',
             id: '',
-            skip_traced: 0,
-            status_off: [],
-            status_on: ['Active', 'Lead', 'Pending', 'Change', 'Duplicate', 'Stop', 'Buy', 'Draft'],
+            skip_traced: 0
         },
-        statusText: 'All'
+        statusAll: false,
+        listAll: true
     };
 
     var vm = new Vue({
@@ -143,6 +124,10 @@
         data: data,
         methods: {
             filterList: function() {
+                if (!data.filter.status || !data.filter.list) {
+                    loading('danger', 'Please select a status and a list.')
+                    return;
+                }
                 loading('info', 'Filtering, please wait...');
                 $.post(actionUrl, { action: 'list', filter: data.filter }, function(res) {
                     dt.fnClearTable();
@@ -155,12 +140,19 @@
             },
             clearFilter: function() {
                 data.filter = {
-                    list : 'all',
+                    status: ['active'],
+                    list : ['all'],
                     property_name : '',
+                    resource: '',
                     property_address : '',
-                    status: 'all',
-                    id: ''
-                }
+                    id: '',
+                    skip_traced: 0
+                };
+                $("#status").val(null).trigger("change");
+                $("#status").val('active').trigger("change");
+
+                $("#list").val(null).trigger("change");
+                $("#list").val('all').trigger("change");
             }
         }
     });
@@ -170,32 +162,62 @@
         $('#sidebar-reports-properties-link').addClass('active');
         $('#sidebar-reports').addClass('in');
 
-        $('#status.dropdown-menu a').on( 'click', function( event ) {
-            var $target = $(event.currentTarget),
-                val = $target.attr('data-value'),
-                $inp = $target.find('input'),
-                idx;
+        setupSelect2Fields();
+        $('#list').val('all').trigger('change');
+        $('#status').val('active').trigger('change');
 
-            if ((idx = data.filter.status_on.indexOf(val)) > -1) {
-                data.filter.status_off.push(val);
-                data.filter.status_on.splice(idx, 1);
-                setTimeout(function() {$inp.prop('checked', false)}, 0);
-            } else {
-                idx = data.filter.status_off.indexOf(val);
-                data.filter.status_on.push(val);
-                data.filter.status_off.splice(idx, 1);
-                setTimeout(function() {$inp.prop('checked', true)}, 0);
-            }
+        setupDataTables();
+    });
 
-            $(event.target).blur();
-            if (data.filter.status_off.length) {
-                data.statusText = data.filter.status_on.join(', ');
-            } else {
-                data.statusText = "All";
+    function setupSelect2Fields() {
+        $('#status').select2({
+            allowClear: true,
+            data: <?php echo json_encode($statuses); ?>,
+            closeOnSelect: false,
+            placeholder: {
+                id: "",
+                placeholder: "Select a status"
             }
-            return false;
+        }).on('change', function() {
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && data.statusAll) {
+                var selected = $(this).val();
+                $("#status").val(null).trigger("change");
+                $("#status").val(selected[1]).trigger("change");
+                data.statusAll = false;
+            }
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && !data.statusAll) {
+                $("#status").val(null).trigger("change");
+                $("#status").val('all').trigger("change");
+                data.statusAll = true;
+            }
+            data.filter.status = $(this).val();
         });
 
+        $('#list').select2({
+            allowClear: true,
+            data: <?php echo json_encode($lists); ?>,
+            closeOnSelect: false,
+            placeholder: {
+                id: "",
+                placeholder: "Select a list"
+            }
+        }).on('change', function() {
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && data.listAll) {
+                var selected = $(this).val();
+                $("#list").val(null).trigger("change");
+                $("#list").val(selected[1]).trigger("change");
+                data.listAll  = false;
+            }
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && !data.listAll) {
+                $("#list").val(null).trigger("change");
+                $("#list").val('all').trigger("change");
+                data.listAll  = true;
+            }
+            data.filter.list = $(this).val();
+        });
+    }
+
+    function setupDataTables() {
         dt = $('table').dataTable({
             "order": [[ 0, "asc" ]],
             "bDestroy": true,
@@ -204,7 +226,8 @@
                 "type": "POST",
                 "url": actionUrl,
                 "data":  {
-                    action: "list"
+                    action: "list",
+                    filter: data.filter
                 }
             },
             columns: [
@@ -218,6 +241,7 @@
                         return row.list_url ? "<a target='_blank' href='" + row.list_url + "'>" + data + "</a>" : data;
                     }
                 },
+                { data: "resource" },
                 { data: "property_last_name", render:
                     function(data, type, row) {
                         return row.property_last_name + " " + row.property_first_name + ", " + row.property_middle_name;
@@ -250,5 +274,5 @@
                 "emptyTable": "No property found."
             }
         });
-    });
+    }
 </script>

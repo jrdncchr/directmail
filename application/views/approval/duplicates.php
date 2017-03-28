@@ -1,8 +1,8 @@
 <div id="app">
-    <h2>Replacement Properties</h2>
+    <h2>Duplicates</h2>
     <ol class="breadcrumb">
         <li><a>Approval</a></li>
-        <li><a class="active">Replacement Properties</a></li>
+        <li><a class="active">Duplicates</a></li>
     </ol>
 
     <div class="row">
@@ -19,6 +19,40 @@
                     <div class="panel-body">
                         <div class="form-horizontal">
                             <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="status" class="control-label col-sm-2">Target Status</label>
+                                        <div class="col-sm-10">
+                                            <select id="target-status" class="form-control" multiple="multiple">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="list" class="control-label col-sm-2">Target List</label>
+                                        <div class="col-sm-10">
+                                            <select id="target-list" class="form-control" multiple="multiple">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="property-address" class="control-label col-sm-4">Target Address</label>
+                                        <div class="col-sm-8">
+                                            <input id="property-address" type="text" class="form-control" v-model="filter.target_address" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="upload-by" class="control-label col-sm-4">Upload By</label>
+                                        <div class="col-sm-8">
+                                            <select id="upload-by" class="form-control">
+                                                <option value="all">All</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="property-address" class="control-label col-sm-4">Address</label>
@@ -27,59 +61,9 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="upload-by" class="control-label col-sm-4">Upload By</label>
-                                        <div class="col-sm-8">
-                                            <select id="upload-by" class="form-control" v-model="filter.upload_by">
-                                                <option value="">All</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
                                         <label for="upload-date" class="control-label col-sm-4">Upload Date</label>
                                         <div class="col-sm-8">
                                             <input id="upload-date" type="text" class="form-control" v-model="filter.upload_date" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="date-to" class="control-label col-sm-4">Target Status</label>
-                                        <div class="col-sm-8">
-                                            <div class="input-group">
-                                                <span class="input-group-btn">
-                                                    <div class="button-group">
-                                                        <button type="button" class="btn btn-dd btn-sm dropdown-toggle" data-toggle="dropdown"></span> <span class="fa fa-caret-down"></span></button>
-                                                        <ul id="status" class="dropdown-menu">
-                                                            <li>
-                                                                <a class="small" data-value="Active" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Active</a>
-                                                                <a class="small" data-value="Lead" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Lead</a>
-                                                                <a class="small" data-value="Buy" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Buy</a>
-                                                                <a class="small" data-value="Pending" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Pending</a>
-                                                                <a class="small" data-value="Change" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Change</a>
-                                                                <a class="small" data-value="Stop" tabIndex="-1"><input type="checkbox" checked="true" />&nbsp;Stop</a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </span>
-                                                <input type="text" class="form-control" v-model="statusText" disabled />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="date-to" class="control-label col-sm-4">Target List</label>
-                                        <div class="col-sm-8">
-                                            <select class="form-control" v-model="filter.target_list">
-                                                <option value="all">All</option>
-                                                <?php foreach ($target_lists as $list): ?>
-                                                    <option value="<?php echo $list->id ?>"><?php echo $list->name; ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="property-address" class="control-label col-sm-4">Target Address</label>
-                                        <div class="col-sm-8">
-                                            <input id="property-address" type="text" class="form-control" v-model="filter.target_address" />
                                         </div>
                                     </div>
                                 </div>
@@ -119,15 +103,16 @@
 
     var data = {
         filter : {
+            target_status: ['all'],
+            target_list : ['all'],
+            target_address: '',
             property_address : '',
             upload_date: '',
-            upload_by: '',
-            target_list : 'all',
-            target_status_off: [],
-            target_status_on: ['Active', 'Lead', 'Pending', 'Change', 'Stop', 'Buy']
+            upload_by: ''
         },
-        statusText: 'All',
-        users: <?php echo json_encode($users); ?>
+        users: <?php echo json_encode($users); ?>,
+        targetStatusAll: true,
+        targetListAll: true
     };
 
     var vm = new Vue({
@@ -135,6 +120,10 @@
         data: data,
         methods: {
             filterList: function() {
+                if (!data.filter.target_status || !data.filter.target_list) {
+                    loading('danger', 'Please select a status and a list.')
+                    return;
+                }
                 loading('info', 'Filtering, please wait...');
                 $.post(actionUrl, { action: 'list', filter: data.filter }, function(res) {
                     duplicateDt.fnClearTable();
@@ -147,47 +136,28 @@
             },
             clearFilter: function() {
                 data.filter = {
+                    target_status: ['all'],
+                    target_list: ['all'],
+                    target_address: '',
                     property_address : '',
                     upload_date: '',
-                    upload_by: '',
-                    target_list : 'all',
-                    target_status_off: [],
-                    target_status_on: ['Active', 'Lead', 'Pending', 'Change', 'Stop', 'Buy']
-                }
+                    upload_by: ''
+                };
+                $("#target-status").val(null).trigger("change");
+                $("#target-status").val('all').trigger("change");
+
+                $("#target-list").val(null).trigger("change");
+                $("#target-list").val('all').trigger("change");
+
+                $("#upload-by").val('all').trigger("change");
             }
         }
     });
 
     $(function() {
         $('#sidebar-approval-link').addClass('active');
-        $('#sidebar-approval-replacements-link').addClass('active');
+        $('#sidebar-approval-duplicates-link').addClass('active');
         $('#sidebar-approval').addClass('in');
-
-        $('#status.dropdown-menu a').on( 'click', function( event ) {
-            var $target = $(event.currentTarget),
-                val = $target.attr('data-value'),
-                $inp = $target.find('input'),
-                idx;
-
-            if ((idx = data.filter.target_status_on.indexOf(val)) > -1) {
-                data.filter.target_status_off.push(val);
-                data.filter.target_status_on.splice(idx, 1);
-                setTimeout(function() {$inp.prop('checked', false)}, 0);
-            } else {
-                idx = data.filter.target_status_off.indexOf(val);
-                data.filter.target_status_on.push(val);
-                data.filter.target_status_off.splice(idx, 1);
-                setTimeout(function() {$inp.prop('checked', true)}, 0);
-            }
-
-            $(event.target).blur();
-            if (data.filter.target_status_off.length) {
-                data.statusText = data.filter.target_status_on.join(', ');
-            } else {
-                data.statusText = "All";
-            }
-            return false;
-        });
 
         $('#upload-date').datepicker({
             language: 'en',
@@ -197,12 +167,82 @@
             }
         });
 
-        $("#upload-by").select2({
+        setupSelect2Fields();
+        $('#target-list').val('all').trigger('change');
+        $('#target-status').val('all').trigger('change');
+
+        setupDataTables();
+    });
+
+    function replaceAction(action, property) {
+        loading('info', 'Taking action, please wait...');
+        $.post(actionUrl, {
+            action: 'replace_action',
+            replace_action: action,
+            property: property
+        }, function(res) {
+            if (res.success) {
+                duplicateDt.fnReloadAjax();
+                loading('success', 'Replacement action complete.');
+            }
+        }, 'json');
+    }
+
+    function setupSelect2Fields() {
+         $("#upload-by").select2({
           data: data.users
         }).on('change', function() {
             data.filter.upload_by = $(this).val();
         });
 
+        $('#target-status').select2({
+            allowClear: true,
+            data: <?php echo json_encode($statuses); ?>,
+            closeOnSelect: false,
+            placeholder: {
+                id: "",
+                placeholder: "Select a status"
+            }
+        }).on('change', function() {
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && data.targetStatusAll) {
+                var selected = $(this).val();
+                $("#target-status").val(null).trigger("change");
+                $("#target-status").val(selected[1]).trigger("change");
+                data.targetStatusAll = false;
+            }
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && !data.targetStatusAll) {
+                $("#target-status").val(null).trigger("change");
+                $("#target-status").val('all').trigger("change");
+                data.targetStatusAll = true;
+            }
+            data.filter.target_status = $(this).val();
+        });
+
+        $('#target-list').select2({
+            allowClear: true,
+            data: <?php echo json_encode($lists); ?>,
+            closeOnSelect: false,
+            placeholder: {
+                id: "",
+                placeholder: "Select a list"
+            }
+        }).on('change', function() {
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && data.targetListAll) {
+                var selected = $(this).val();
+                $("#target-list").val(null).trigger("change");
+                $("#target-list").val(selected[1]).trigger("change");
+                data.targetListAll  = false;
+            }
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && !data.targetListAll) {
+                $("#target-list").val(null).trigger("change");
+                $("#target-list").val('all').trigger("change");
+                data.targetListAll  = true;
+            }
+            data.filter.target_list = $(this).val();
+        });
+    }
+
+    function setupDataTables() {
         duplicateDt = $('table#duplicates').dataTable({
             "order": [[ 0, "desc" ]],
             "filter": true,
@@ -282,21 +322,5 @@
             var property = table.row( $(this).closest('tr') ).data();
             replaceAction($(this).data('source'), property);
         });
-
-
-        function replaceAction(action, property) {
-            loading('info', 'Taking action, please wait...');
-            $.post(actionUrl, {
-                action: 'replace_action',
-                replace_action: action,
-                property: property
-            }, function(res) {
-                if (res.success) {
-                    duplicateDt.fnReloadAjax();
-                    loading('success', 'Replacement action complete.');
-                }
-            }, 'json');
-        }
-
-    });
+    }
 </script>

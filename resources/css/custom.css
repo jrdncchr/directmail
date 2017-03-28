@@ -59,7 +59,7 @@ h2 {
     text-shadow: 0 1px 2px grey;
 }
 
-input, textarea, select {
+input:not(.select2-search__field), textarea, select {
     border-radius: 0 !important;
     background-color: #FDFDFD !important;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.2), 0 -1px 1px #FFF, 0 1px 0 #FFF !important;
@@ -451,4 +451,16 @@ td {
     font-size: 22px;
     font-weight: bold;
     color: #2B2B2B;
+}
+
+li.select2-selection__choice, li.select2-results__option {
+    font-size: 14px !important;
+}
+
+.select2-selection select2-selection--multiple {
+    border-radius: 0 !important;
+}
+
+.select2-container--default {
+    width: 99% !important;
 }

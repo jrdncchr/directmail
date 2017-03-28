@@ -42,8 +42,9 @@ class Report extends MY_Controller {
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));
             }
         } else {
-            $this->load->model('list_model');
-            $this->data['lists'] = $this->list_model->get(array('l.company_id' => $this->logged_user->company_id));
+            $this->load->library('dm_library');
+            $this->data['lists'] = $this->dm_library->getListsForSelect2($this->logged_user->company_id);
+            $this->data['statuses'] = $this->dm_library->getStatusesForSelect2(['duplicate', 'draft']);
             $this->_renderL('report/mailings');
         }
 	}
@@ -77,8 +78,9 @@ class Report extends MY_Controller {
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));
             }
         } else {
-            $this->load->model('list_model');
-            $this->data['lists'] = $this->list_model->get(array('l.company_id' => $this->logged_user->company_id));
+            $this->load->library('dm_library');
+            $this->data['lists'] = $this->dm_library->getListsForSelect2($this->logged_user->company_id);
+            $this->data['statuses'] = $this->dm_library->getStatusesForSelect2();
             $this->_renderL('report/properties');
         }
     }

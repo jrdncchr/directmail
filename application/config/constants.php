@@ -89,10 +89,17 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 | Custom
 |--------------------------------------------------------------------------
 */
-defined('DB_HOSTNAME')       OR define('DB_HOSTNAME', 'localhost');
-defined('DB_USERNAME')       OR define('DB_USERNAME', 'directmail');
-defined('DB_PASSWORD')       OR define('DB_PASSWORD', 'pogiako123!');
-defined('DB_DATABASE')       OR define('DB_DATABASE', 'directmail');
+if ($_SERVER['HTTP_HOST'] === '127.0.1.1:8080') {
+    defined('DB_HOSTNAME')       OR define('DB_HOSTNAME', '172.18.0.1');
+    defined('DB_USERNAME')       OR define('DB_USERNAME', 'root');
+    defined('DB_PASSWORD')       OR define('DB_PASSWORD', 'root');
+    defined('DB_DATABASE')       OR define('DB_DATABASE', 'directmail');
+} else {
+    defined('DB_HOSTNAME')       OR define('DB_HOSTNAME', 'localhost');
+    defined('DB_USERNAME')       OR define('DB_USERNAME', 'directmail');
+    defined('DB_PASSWORD')       OR define('DB_PASSWORD', 'pogiako123!');
+    defined('DB_DATABASE')       OR define('DB_DATABASE', 'directmail'); 
+}
 
 defined('ICON_PATH')         OR define('ICON_PATH', 'resources/images/icon/');
 

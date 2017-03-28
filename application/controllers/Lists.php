@@ -34,7 +34,6 @@ class Lists extends MY_Controller {
         } else {
             $this->_renderL('lists/index');
         }
-        
     }
 
     public function info($id = 0, $sub = "index")
@@ -46,7 +45,7 @@ class Lists extends MY_Controller {
             switch ($action) {
                 case 'property_list':
                     $filter = $this->input->post('filter');
-                    $filter['list'] = $this->input->post('list_id');
+                    $filter['list'] = [$this->input->post('list_id')];
                     $this->load->library('property_library');
                     $filter = $this->property_library->setup_search_filter($filter);
                     $this->load->model('property_model');
@@ -168,6 +167,9 @@ class Lists extends MY_Controller {
                                 // bullet points
                                 $this->data['testimonials'] = $this->list_model
                                     ->get_testimonials(array('list_id' => $id));
+
+                                $this->load->library('dm_library');
+                                $this->data['statuses'] = $this->dm_library->getStatusesForSelect2(['duplicate']);
                                 $this->_renderL('lists/list_info');
                                 return;
                             }

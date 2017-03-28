@@ -21,18 +21,16 @@
                     <div class="panel-body">
                         <div class="form-horizontal">
                             <div class="row">
-                                <div class="col-sm-6">
+                                <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label for="date-to" class="control-label col-sm-4">List</label>
-                                        <div class="col-sm-8">
-                                            <select class="form-control" v-model="filter.list">
-                                                <option value="all">All</option>
-                                                <?php foreach ($lists as $list): ?>
-                                                    <option value="<?php echo $list->id ?>"><?php echo $list->name; ?></option>
-                                                <?php endforeach; ?>
+                                        <label for="list" class="control-label col-sm-2">List</label>
+                                        <div class="col-sm-10">
+                                            <select id="list" class="form-control" multiple="multiple">
                                             </select>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">ID</label>
                                         <div class="col-sm-8">
@@ -89,11 +87,12 @@
 
     var data = {
         filter : {
-            list : 'all',
+            list : ['all'],
             property_name : '',
             property_address : '',
             id: ''
-        }
+        },
+        listAll: true
     };
 
     var vm = new Vue({
@@ -101,6 +100,10 @@
         data: data,
         methods: {
             filterList: function() {
+                if (!data.filter.target_list) {
+                    loading('danger', 'Please select a status and a list.')
+                    return;
+                }
                 loading('info', 'Filtering, please wait...');
                 $.post(actionUrl, { action: 'list', filter: data.filter }, function(res) {
                     dt.fnClearTable();
@@ -113,11 +116,13 @@
             },
             clearFilter: function() {
                 data.filter = {
-                    list : 'all',
+                    list : ['all'],
                     property_name : '',
                     property_address : '',
                     id: ''
                 }
+                $("#list").val(null).trigger("change");
+                $("#list").val('all').trigger("change");
             }
         }
     });
@@ -127,6 +132,49 @@
         $('#sidebar-approval-properties-link').addClass('active');
         $('#sidebar-approval').addClass('in');
 
+        setupSelect2Fields();
+        $('#list').val('all').trigger('change');
+
+        setupDataTables();
+    });
+
+    function setupSelect2Fields() {
+        $('#list').select2({
+            allowClear: true,
+            data: <?php echo json_encode($lists); ?>,
+            closeOnSelect: false,
+            placeholder: {
+                id: "",
+                placeholder: "Select a list"
+            }
+        }).on('change', function() {
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && data.listAll) {
+                var selected = $(this).val();
+                $("#list").val(null).trigger("change");
+                $("#list").val(selected[1]).trigger("change");
+                data.listAll  = false;
+            }
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && !data.listAll) {
+                $("#list").val(null).trigger("change");
+                $("#list").val('all').trigger("change");
+                data.listAll  = true;
+            }
+            data.filter.list = $(this).val();
+        });
+    }
+
+    function saveProperty(property) {
+        $.post(actionUrl, { 
+            action: 'save_property', 
+            form: property
+        }, function(res) {
+            hideModal();
+            loading('success', 'Done');
+            dt.fnReloadAjax();
+        }, 'json');
+    }
+
+    function setupDataTables() {
         dt = $('table').dataTable({
             "order": [[ 0, "desc" ]],
             "bDestroy": true,
@@ -190,16 +238,5 @@
                 "emptyTable": "No pending properties found."
             }
         });
-    });
-
-    function saveProperty(property) {
-        $.post(actionUrl, { 
-            action: 'save_property', 
-            form: property
-        }, function(res) {
-            hideModal();
-            loading('success', 'Done');
-            dt.fnReloadAjax();
-        }, 'json');
     }
 </script>

@@ -18,7 +18,7 @@
                 </div>
                 <div id="filterBox" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="filterHeading">
                     <div class="panel-body">
-                        <form class="form-horizontal" action="<?php echo base_url() . 'download/mailings/download' ?>" method="post">
+                        <form class="form-horizontal" action="<?php echo base_url() . 'download/mailings/download' ?>" method="post" onsubmit="return validateForm();">
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
@@ -144,4 +144,18 @@
 
         setupFilterFields();
     });
+
+    function validateForm() {
+        if (!data.filter.list) {
+            loading('danger', 'Please select a list.')
+            return false;
+        }
+        if (data.filter.report_type === 'Date Range') {
+            if (!data.filter.date_from || !data.filter.date_to) {
+                loading('danger', 'Date from and to is required on this report type.')
+                return false;
+            }
+        }
+        return true;
+    }
 </script>
