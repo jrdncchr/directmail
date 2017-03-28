@@ -100,7 +100,7 @@
         data: data,
         methods: {
             filterList: function() {
-                if (!data.filter.target_list) {
+                if (!data.filter.list) {
                     loading('danger', 'Please select a status and a list.')
                     return;
                 }
