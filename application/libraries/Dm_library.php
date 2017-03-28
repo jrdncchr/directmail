@@ -5,7 +5,7 @@ if (!defined('BASEPATH'))
 
 class Dm_library {
 
-    public function getStatusesForSelect2(array $exclude = []): array 
+    public function getStatusesForSelect2($exclude = []) 
     {
         $result = [];
         $CI =& get_instance();
@@ -26,7 +26,7 @@ class Dm_library {
         return $result;
     }
 
-    public function getListsForSelect2(int $companyId): array
+    public function getListsForSelect2($companyId)
     {
         $result = [['id' => 'all', 'text' => 'All']];
         $CI =& get_instance();
