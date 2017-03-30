@@ -59,8 +59,6 @@ class Download_model extends CI_Model {
 
                 $property_mailings = $this->db->query($sql)->result();
 
-                echo $this->db->last_query() . "<br /><br />";
-
                 foreach ($property_mailings as $pm) {
                     $letter['mail_qty']++;
                     $letter['costs']++;
@@ -73,7 +71,6 @@ class Download_model extends CI_Model {
                 }
                 $mail['letters'][] = $letter;
             }
-            exit;
             $mailings[] = $mail;
         }
         return $mailings;
