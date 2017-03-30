@@ -134,7 +134,11 @@ class Lists extends MY_Controller {
                         $list = new stdClass();
                         $list->id = 0;
                         $list->content = '';
+                        $list->no_of_letters = '';
+                        $list->mailing_type = '';
                         $this->data['list'] = $list;
+                        $this->load->library('dm_library');
+                        $this->data['statuses'] = $this->dm_library->getStatusesForSelect2(['duplicate']);
                         $this->_renderL('lists/list_info');
                         return;            
                     } else {
@@ -230,7 +234,7 @@ class Lists extends MY_Controller {
                             $result['success'] = false;
                         } else {
                             if ($action !== 'draft_property') {
-                                $property['status'] = $property['status'] == 'draft' ? 'pending' : $property['status'];
+                                $property['status'] = $property['status'] == 'draft' ? 'active' : $property['status'];
                             }
                             $result = $this->property_model->save($property);
                             $result['status'] = $property['status'];

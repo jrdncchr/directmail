@@ -1,8 +1,8 @@
 <div id="app">
-    <h2>Properties</h2>
+    <h2>Mailings</h2>
     <ol class="breadcrumb">
-        <li><a>Reports</a></li>
-        <li><a class="active">Properties</a></li>
+        <li><a>Downloads</a></li>
+        <li><a class="active">Letters</a></li>
     </ol>
 
     <div class="row">
@@ -39,26 +39,6 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label class="control-label col-sm-4">ID</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" class="form-control" v-model="filter.id" />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="skip-traced" class="control-label col-sm-4">Skip Traced</label>
-                                        <div class="col-sm-8" style="padding-top: 5px;">
-                                            <input id="skip-traced" type="checkbox" v-model="filter.skip_traced" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                            <label for="resource" class="control-label col-sm-4">Resource</label>
-                                            <div class="col-sm-8">
-                                                <input id="resource" type="text" class="form-control" v-model="filter.resource" />
-                                            </div>
-                                        </div>
-                                    <div class="form-group">
                                         <label for="property-name" class="control-label col-sm-4">Property Name</label>
                                         <div class="col-sm-8">
                                             <input id="property-name" type="text" class="form-control" v-model="filter.property_name" />
@@ -71,9 +51,24 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="date-range" class="control-label col-sm-4">Date Range</label>
+                                        <div class="col-sm-8">
+                                            <input id="date-range" type="text" readonly="true" class="form-control" v-model="filter.date_range" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="letter-no" class="control-label col-sm-4">Letter No.</label>
+                                        <div class="col-sm-8">
+                                            <select id="letter-no" class="form-control" multiple="multiple">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-sm-12">
                                     <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                                    <a target="_blank" href="<?php echo base_url() . 'download/properties/report_properties'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
+                                    <a target="_blank" href="<?php echo base_url() . 'download/download/downloads_letters'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
                                     <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
                                 </div>
                             </div>
@@ -86,12 +81,12 @@
                 <table class="table table-bordered table-hover" width="100%">
                     <thead>
                     <tr>
-                        <th width="8%">ID</th>
+                        <th width="6%">ID</th>
                         <th width="20%">List</th>
-                        <th width="17%">Resource</th>
-                        <th width="20%">Property Name</th>
-                        <th width="20%">Property Address</th>
-                        <th width="15%">Status</th>
+                        <th width="23%">Property Name</th>
+                        <th width="31%">Property Address</th>
+                        <th width="10%">Letter No</th>
+                        <th width="10%">Mailing Date</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -103,20 +98,21 @@
 
 <script>
     var dt;
-    var actionUrl = "<?php echo base_url() . 'report/properties'; ?>";
+    var actionUrl = "<?php echo base_url() . 'download/letters'; ?>";
 
     var data = {
         filter : {
-            status: ['active'],
+            status: ['active', 'lead', 'buy'],
             list : ['all'],
             property_name : '',
-            resource: '',
             property_address : '',
             id: '',
-            skip_traced: 0
+            date_range : '',
+            letter_no: ['all']
         },
         statusAll: false,
-        listAll: true
+        listAll: true,
+        letterNoAll: true
     };
 
     var vm = new Vue({
@@ -124,8 +120,8 @@
         data: data,
         methods: {
             filterList: function() {
-                if (!data.filter.status || !data.filter.list) {
-                    loading('danger', 'Please select a status and a list.')
+                if (!data.filter.status || !data.filter.list || !data.filter.letter_no) {
+                    loading('danger', 'Please select a status, list and a letter no.');
                     return;
                 }
                 loading('info', 'Filtering, please wait...');
@@ -140,33 +136,38 @@
             },
             clearFilter: function() {
                 data.filter = {
-                    status: ['active'],
+                    status: ['active', 'lead', 'buy'],
                     list : ['all'],
                     property_name : '',
-                    resource: '',
                     property_address : '',
                     id: '',
-                    skip_traced: 0
-                };
+                    date_range : '',
+                    letter_no: ['all']
+                }
                 $("#status").val(null).trigger("change");
                 $("#status").val('active').trigger("change");
 
                 $("#list").val(null).trigger("change");
                 $("#list").val('all').trigger("change");
+
+                $("#letter-no").val(null).trigger("change");
+                $("#letter-no").val('all').trigger("change");
             }
         }
     });
 
     $(function() {
-        $('#sidebar-reports-link').addClass('active');
-        $('#sidebar-reports-properties-link').addClass('active');
-        $('#sidebar-reports').addClass('in');
-
-        setupSelect2Fields();
-        $('#list').val('all').trigger('change');
-        $('#status').val('active').trigger('change');
+        $('#sidebar-downloads-link').addClass('active');
+        $('#sidebar-downloads-letters-link').addClass('active');
+        $('#sidebar-downloads').addClass('in');
 
         setupDataTables();
+        setupSelect2Fields();
+        $('#list').val('all').trigger('change');
+        $('#status').val(data.filter.status).trigger('change');
+        $('#letter-no').val('all').trigger('change');
+
+        setupDatepickerFields();
     });
 
     function setupSelect2Fields() {
@@ -215,11 +216,51 @@
             }
             data.filter.list = $(this).val();
         });
+
+        $('#letter-no').select2({
+            allowClear: true,
+            data: ['all', 1, 2, 3, 4, 5, 6, 7, 8, 9 ,10],
+            closeOnSelect: false,
+            placeholder: {
+                id: "",
+                placeholder: "Select a letter no"
+            }
+        }).on('change', function() {
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && data.letterNoAll) {
+                var selected = $(this).val();
+                $("#letter-no").val(null).trigger("change");
+                $("#letter-no").val(selected[1]).trigger("change");
+                data.letterNoAll = false;
+            }
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && !data.letterNoAll) {
+                $("#letter-no").val(null).trigger("change");
+                $("#letter-no").val('all').trigger("change");
+                data.letterNoAll = true;
+            }
+            data.filter.letter_no = $(this).val();
+        });
+    }
+
+    function setupDatepickerFields() {
+        $('#date-range').datepicker({
+            language: 'en',
+            range: true,
+            multipleDatesSeparator: ' - ',
+            dateFormat: 'yyyy-mm-dd',
+            onSelect: function(formattedDate, date, inst) {
+                if (formattedDate.length > 11) {
+                    data.filter.date_range = formattedDate;    
+                } else {
+                    data.filter.date_range = '';
+                    $('#date-range').val('');
+                }
+            }
+        });
     }
 
     function setupDataTables() {
         dt = $('table').dataTable({
-            "order": [[ 0, "asc" ]],
+            "order": [[ 5, "asc" ]],
             "bDestroy": true,
             "filter": true,
             "ajax": {
@@ -241,27 +282,14 @@
                         return row.list_url ? "<a target='_blank' href='" + row.list_url + "'>" + data + "</a>" : data;
                     }
                 },
-                { data: "resource" },
                 { data: "property_last_name", render:
                     function(data, type, row) {
                         return row.property_last_name + " " + row.property_first_name + ", " + row.property_middle_name;
                     }
                 },
                 { data: "property_address" },
-                { data: "status", render: function(data, type, row) {
-                        if (data == "active" || data == "lead" || data == "buy") {
-                            return "<span class='label label-success'>" + capitalize(data) + "</span>";
-                        } else if (data == "pending" || data == "duplicate" || data == "draft") {
-                            return "<span class='label label-warning'>" + capitalize(data) + "</span>";
-                        } else if (data =="change") {
-                            return "<span class='label label-info'>" + capitalize(data) + "</span>";
-                        } else if (data =="inactive") {
-                            return "<span class='label label-default'>" + capitalize(data) + "</span>";
-                        } else if (data =="stop") {
-                            return "<span class='label label-danger'>" + capitalize(data) + "</span>";
-                        }
-                    } 
-                },
+                { data: "letter_no" },
+                { data: "mailing_date" }
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();

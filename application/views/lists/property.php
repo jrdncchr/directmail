@@ -29,11 +29,6 @@
     <?php if ($list->id > 0): ?>
     <div class="row" style="margin-top: 20px;">
         <div class="col-sm-12">
-
-            <div class="alert alert-warning" v-show="property && property.status === 'pending'" style="display: none;">
-                <i class="fa fa-info-circle"></i>
-                This property is still pending for approval.
-            </div>
             <div class="alert alert-warning" v-show="property && property.status === 'draft'" style="display: none;">
                 <i class="fa fa-exclamation-circle"></i>
                 This property is still on draft, please save it to edit mailings, comments and see history.
@@ -55,7 +50,7 @@
             </button>
 
             <div style="margin-bottom: 15px;" class="pull-right">
-                <span v-show="property.status == 'pending' || property.status == 'draft'" class="label label-warning" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
+                <span v-show="property.status == 'draft'" class="label label-warning" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'active' || property.status == 'lead' || property.status == 'buy'" class="label label-success" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'change'" class="label label-info" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
                 <span v-show="property.status == 'stop'" class="label label-danger" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
@@ -90,13 +85,12 @@
                                 </div>
                             </div>
                         </div>
-                        <?php if (isset($property) && (($property->status !== 'pending' && $property->status !== 'duplicate' && $property->status !== 'draft') || $mc->_checkModulePermission(MODULE_APPROVAL_ID, 'update'))): ?>
-                        <div class="col-sm-6" v-show="property.id && property.status !== 'draft' && property.status !== 'pending'">
+                        <?php if (isset($property) && (($property->status !== 'duplicate' && $property->status !== 'draft') || $mc->_checkModulePermission(MODULE_APPROVAL_ID, 'update'))): ?>
+                        <div class="col-sm-6" v-show="property.id && property.status !== 'draft'">
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select class="form-control" v-model="property.status">
                                     <option value="draft">Draft</option>
-                                    <option value="pending">Pending</option>
                                     <option value="active">Active</option>
                                     <option value="lead">Lead</option>
                                     <option value="buy">Buy</option>
@@ -513,7 +507,7 @@
                 if (validator.validateForm(infoForm)) {
                     data.property.list_id = data.list.id;
                     if (undefined === data.property.status) {
-                        data.property.status = 'pending';
+                        data.property.status = 'draft';
                     }
                     loading("info", "Saving property...");
                     $.post(actionUrl, { action: 'save_property', form: data.property, mailings: data.mailings }, function(res) {

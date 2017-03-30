@@ -26,6 +26,10 @@ class Download_model extends CI_Model {
             $where_list['id'] = $filter['list'];
             $lists = $this->db->get_where('list', $where_list)->result();
         }
+
+        $date_split = explode(' - ', $filter['date_range']);
+        $filter['from'] = $date_split[0];
+        $filter['to'] = $date_split[1];
         
         // generate mailings by list
         foreach ($lists as $list) {
@@ -43,11 +47,9 @@ class Download_model extends CI_Model {
                     LEFT JOIN property p ON pm.property_id = p.id 
                     WHERE pm.letter_no = " . $this->db->escape($i) . "
                     AND p.company_id = " . $filter['company_id'] . " 
-                    AND p.status NOT IN ('stop', 'pending')";
+                    AND p.status NOT IN ('stop', 'draft', 'duplicate')";
 
-                if ($filter['list'] != 'all') {
-                    $sql .= " AND p.list_id = " . $this->db->escape($list->id);
-                }
+                $sql .= " AND p.list_id = " . $this->db->escape($list->id);
 
                 if ($filter['report_type'] == 'Date Range') {
                     $sql .= " AND pm.mailing_date BETWEEN " 
@@ -56,6 +58,9 @@ class Download_model extends CI_Model {
                 }
 
                 $property_mailings = $this->db->query($sql)->result();
+
+                echo $this->db->last_query() . "<br /><br />";
+
                 foreach ($property_mailings as $pm) {
                     $letter['mail_qty']++;
                     $letter['costs']++;
@@ -68,6 +73,7 @@ class Download_model extends CI_Model {
                 }
                 $mail['letters'][] = $letter;
             }
+            exit;
             $mailings[] = $mail;
         }
         return $mailings;

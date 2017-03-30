@@ -171,7 +171,7 @@
                 { data: "status", render: function(data, type, row) {
                         if (data.toLowerCase() == "active" || data.toLowerCase() == "lead" || data.toLowerCase() == "buy") {
                             return "<span class='label label-success'>" + capitalize(data) + "</span>";
-                        } else if (data.toLowerCase() == "pending" || data.toLowerCase() == "replacement") {
+                        } else if (data.toLowerCase() == "draft" || data.toLowerCase() == "replacement") {
                             return "<span class='label label-warning'>" + capitalize(data) + "</span>";
                         } else if (data.toLowerCase() =="change") {
                             return "<span class='label label-info'>" + capitalize(data) + "</span>";

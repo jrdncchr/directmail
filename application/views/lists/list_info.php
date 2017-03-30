@@ -146,7 +146,7 @@
                                     </div>
                                     <div class="col-sm-12">
                                         <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                                        <a target="_blank" href="<?php echo base_url() . 'download/properties/list_properties'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
+                                        <a target="_blank" href="<?php echo base_url() . 'download/download/list_properties'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
                                         <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
                                     </div>
                                 </div>
@@ -218,6 +218,7 @@
             skip_traced: 0
         }
     };
+
     var oldMailingType = data.list.mailing_type;
     var oldNoLetters = data.list.no_of_letters;
 
@@ -374,7 +375,7 @@
                 { data: "status", render: function(data, type, row) {
                         if (data.toLowerCase() == "active" || data.toLowerCase() == "lead" || data.toLowerCase() == "buy") {
                             return "<span class='label label-success'>" + capitalize(data) + "</span>";
-                        } else if (data.toLowerCase() == "pending" || data.toLowerCase() == "duplicate" || data.toLowerCase() == "draft") {
+                        } else if (data.toLowerCase() == "duplicate" || data.toLowerCase() == "draft") {
                             return "<span class='label label-warning'>" + capitalize(data) + "</span>";
                         } else if (data.toLowerCase() =="change") {
                             return "<span class='label label-info'>" + capitalize(data) + "</span>";

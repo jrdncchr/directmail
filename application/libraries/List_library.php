@@ -69,7 +69,7 @@ class List_library {
                     case 26 : $property['mail_state'] = $val; break;
                     case 27 : $property['mail_zipcode'] = $val; break;
                     case 28 : $property['mailing_date'] = gmdate('Y-m-d', (($val - 25569) * 86400)); break;
-                    case 29 : $property['status'] = $val ? strtolower($val) : 'pending'; break;
+                    case 29 : $property['status'] = $val ? strtolower($val) : 'draft'; break;
                     case 30 : $property['comment'] = $val; break;
                     case 31 : $property['skip_traced'] = $val != 1 ? 0 : 1; break;
                 }

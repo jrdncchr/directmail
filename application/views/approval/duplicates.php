@@ -292,7 +292,7 @@
                 { data: "target_status", render: function(data, type, row) {
                         if (data == "active" || data == "lead" || data == "buy") {
                             return "<span class='label label-success'>" + capitalize(data) + "</span>";
-                        } else if (data == "pending" || data == "duplicate" || data == "draft") {
+                        } else if (data == "duplicate" || data == "draft") {
                             return "<span class='label label-warning'>" + capitalize(data) + "</span>";
                         } else if (data =="change") {
                             return "<span class='label label-info'>" + capitalize(data) + "</span>";
@@ -309,7 +309,7 @@
                 }
             ], 
             "columnDefs": [ {
-                "targets": 3,
+                "targets": 5,
                 "orderable": false
             }],
             "language": {

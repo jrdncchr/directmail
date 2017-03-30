@@ -9,7 +9,7 @@ class Download extends MY_Controller {
         $this->data['page_title'] = "Downloads";
     }
 
-    public function properties($type)
+    public function download($type)
     {
         $properties = array();
         $filter = $this->session->userdata('list_filter');
@@ -17,66 +17,141 @@ class Download extends MY_Controller {
         if (isset($filter)) {
             $this->load->model('property_model');
             switch ($type) {
-                case 'report_mailings' :
-                    $where = array(
-                            'p.deleted' => 0
-                        );
-                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter, 'pm.mailing_date');
-                    break;
-                case 'report_properties' :
-                    $where = array( 
-                        'p.deleted' => 0,
-                    );
-                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
-                    break;
-                case 'approval_properties' :
-                    $where = array(
-                        'p.status' => 'pending', 
-                        'p.deleted' => 0
-                    );
-                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
-                    break;
                 case 'list_properties' :
+                case 'downloads_properties' :
                     $where = array(
                         'p.deleted' => 0,
                         'p.active' => 1
                     );
-                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
+                    break;
+                case 'downloads_letters' :
+                case 'downloads_postcards' :
+                    $where = array(
+                        'p.deleted' => 0,
+                        'p.status !=' => 'duplicate',
+                        'p.status !=' => 'draft' 
+                    );
+                    break;
             }
+            $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
         } else {
             die('Cannot find filter, please contact administrator.');
         }
-        $this->load->library('property_library');
-        $this->property_library->download_list($type, $properties, $this->logged_user);
+        $this->load->library('download_library');
+        $this->download_library->download_list($type, $properties, $this->logged_user);
     }
 
-    public function mailings($sub = "index")
+    public function properties()
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
-            if ($sub == 'download') {
-                $filter = $this->input->post();
-                // validate filter
-                if ($filter['report_type'] == 'Date Range') {
-                    if (strtotime($filter['to']) < strtotime($filter['from'])) {
-                        $alert = create_alert_message(array('success' => false, 'message' => 'Date from cannot be greater than date to.'));
-                        $this->session->set_flashdata('message', $alert);
-                        $this->load->model('list_model');
-                        $this->data['lists'] = $this->list_model->get(array('l.company_id' => $this->logged_user->company_id));
-                        $this->_renderL('download/mailings');
-                        return;
+            $action = $this->input->post('action');
+            switch ($action) {
+                case 'list':
+                    $filter = $this->input->post('filter');
+                    $this->load->library('property_library');
+                    $filter = $this->property_library->setup_search_filter($filter);
+                    $this->load->model('property_model');
+                    $where = array( 
+                        'p.deleted' => 0,
+                        'p.active' => 1
+                    );
+                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
+                    foreach ($properties as $p) {
+                        $p->url = "";
+                        $p->list_url = "";
+                        if ($this->_checkListPermission($p->list_id, 'retrieve')) {
+                            $p->url = base_url() . 'lists/property/' . $p->list_id . '/info/' . $p->id;
+                            $p->list_url = base_url() . 'lists/info/' . $p->list_id;
+                        }
                     }
-                }
-                $this->load->library('download_library');
-                $this->download_library->download_mailings($filter);
-            } else {
-                $action = $this->input->post('action');
+                    echo json_encode(array('data' => $properties));
+                    break;
+                default:
+                    echo json_encode(array('result' => false, 'message' => 'Action not found.'));
             }
         } else {
-            if ($sub == 'index') {
-                $this->load->model('list_model');
-                $this->data['lists'] = $this->list_model->get(array('l.company_id' => $this->logged_user->company_id));
-                $this->_renderL('download/mailings');
+            $this->load->library('dm_library');
+            $this->data['lists'] = $this->dm_library->getListsForSelect2($this->logged_user->company_id);
+            $this->data['statuses'] = $this->dm_library->getStatusesForSelect2();
+            $this->_renderL('download/properties');
+        }
+    }
+
+    public function letters()
+    {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $action = $this->input->post('action');
+            switch ($action) {
+                case 'list':
+                    $filter = $this->input->post('filter');
+                    $this->load->library('property_library');
+                    $filter = $this->property_library->setup_search_filter($filter);
+                    $this->load->model('property_model');
+                    $where = array(
+                        'p.deleted' => 0,
+                        'p.status !=' => 'duplicate',
+                        'p.status !=' => 'draft' 
+                    );
+                    if (!isset($filter['date_range'])) {
+                        $filter['date_range'] = "pm.mailing_date = '" . date('Y-m-d') . "'";
+                    }
+                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
+                    foreach ($properties as $p) {
+                        $p->url = "";
+                        $p->list_url = "";
+                        if ($this->_checkListPermission($p->list_id, 'retrieve')) {
+                            $p->url = base_url() . 'lists/property/' . $p->list_id . '/info/' . $p->id;
+                            $p->list_url = base_url() . 'lists/info/' . $p->list_id;
+                        }
+                    }
+                    echo json_encode(array('data' => $properties));
+                    break;
+                default:
+                    echo json_encode(array('result' => false, 'message' => 'Action not found.'));
             }
+        } else {
+            $this->load->library('dm_library');
+            $this->data['lists'] = $this->dm_library->getListsForSelect2($this->logged_user->company_id);
+            $this->data['statuses'] = $this->dm_library->getStatusesForSelect2(['duplicate', 'draft']);
+            $this->_renderL('download/letters');
+        }
+    }
+
+    public function postcards()
+    {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $action = $this->input->post('action');
+            switch ($action) {
+                case 'list':
+                    $filter = $this->input->post('filter');
+                    $filter['postcards'] = true;
+                    $this->load->library('property_library');
+                    $filter = $this->property_library->setup_search_filter($filter);
+                    $this->load->model('property_model');
+                    $where = array(
+                        'p.deleted' => 0,
+                        'p.status !=' => 'duplicate',
+                        'p.status !=' => 'draft'
+                    );
+                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
+                    foreach ($properties as $p) {
+                        $p->url = "";
+                        $p->list_url = "";
+                        if ($this->_checkListPermission($p->list_id, 'retrieve')) {
+                            $p->url = base_url() . 'lists/property/' . $p->list_id . '/info/' . $p->id;
+                            $p->list_url = base_url() . 'lists/info/' . $p->list_id;
+                        }
+                    }
+                    echo json_encode(array('data' => $properties));
+                    break;
+                default:
+                    echo json_encode(array('result' => false, 'message' => 'Action not found.'));
+            }
+        } else {
+            $this->load->library('dm_library');
+            $this->data['lists'] = $this->dm_library->getListsForSelect2($this->logged_user->company_id);
+            $this->data['statuses'] = $this->dm_library->getStatusesForSelect2(['duplicate', 'draft']);
+            $this->_renderL('download/postcards');
         }
     }
 

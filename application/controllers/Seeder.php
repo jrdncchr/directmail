@@ -48,7 +48,7 @@ class Seeder extends CI_Controller {
             for ($i = 0; $i < $count; $i++) {
                 $property = array(
                     'list_id' => rand(1, 3),
-                    'status' => 'pending',
+                    'status' => 'active',
                     'resource' => $faker->bank,
                     'property_first_name' => $faker->firstName,
                     'property_middle_name' => $faker->lastName,

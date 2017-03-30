@@ -83,7 +83,7 @@ class Property_model extends CI_Model {
         return $this->db->update('property', $update);
     }
 
-    public function delete($id, $company_id, $status = 'pending')
+    public function delete($id, $company_id, $status = 'draft')
     {
         if ($status == 'duplicate') {
             $this->db->delete('property_replacement', array('property_id' => $id, 'company_id' => $company_id));
@@ -150,15 +150,6 @@ class Property_model extends CI_Model {
             }
         }
         return array('success' => true);
-    }
-
-    public function get_pending_properties($company_id) 
-    {
-        $this->db->select('p.*, l.name as list_name, l.id as list_id');
-        $this->db->join('list l', 'l.id = p.list_id');
-        $this->db->where(array('l.company_id' => $company_id, 'p.status' => 'pending', 'p.deleted' => 0));
-        $result = $this->db->get('property p');
-        return $result->result();
     }
 
     public function get_duplicate_properties($filter, $company_id) 
@@ -244,15 +235,18 @@ class Property_model extends CI_Model {
         if (isset($filter['date_range'])) {
             $this->db->where($filter['date_range']);
         }
-        if (isset($filter['letter_no']) && (int)$filter['letter_no'] > 0) {
-            $this->db->where('pm.letter_no', $filter['letter_no']);
+        if (isset($filter['letter_no'])) {
+            $this->db->where_in('pm.letter_no', $filter['letter_no']);
         }
         if (isset($filter['date_range']) || isset($filter['letter_no'])) {
             $this->db->join('property_mailing pm', 'pm.property_id = p.id', 'left');
         }
+        if (isset($filter['postcards']))  {
+            $this->db->join('(SELECT MAX(property_mailing.mailing_date) as mailing_date, property_mailing.property_id FROM property_mailing WHERE property_mailing.company_id = ' . $company_id . ' AND property_mailing.mailing_date < "' . date('Y-m-d') . '" GROUP BY property_id) pm', 
+                'pm.property_id = p.id', 'right');
+        }
         $this->db->order_by($order_by, 'asc');
         $result = $this->db->get('property p');
-        // echo $this->db->last_query();exit;
         return $result->result();
     }
 
@@ -321,9 +315,10 @@ class Property_model extends CI_Model {
             }
             if (is_numeric($address[$i][0])) {
                 $address[$i][] = "#" . $address[$i][0];
-            } else if ($address[$i][0][0] == "#") {
+            } else if (!empty($address[$i][0][0]) && $address[$i][0][0] == "#") {
                 $address[$i][] = ltrim($address[$i][0], "#");
             }
+            
         }
 
         $generated_address = $this->cartesian($address);
