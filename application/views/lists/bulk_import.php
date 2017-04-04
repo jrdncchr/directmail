@@ -17,7 +17,9 @@
                 <i class="fa fa-exclamation-circle"></i> {{ error }}
             </div>
             <p>List ID: <b><?php echo $list->id; ?></b></p>
-            <form action="<?php echo base_url() . 'lists/info/' . $list->id . '/bulk_import_result'; ?>" method="post" enctype="multipart/form-data" onsubmit="return validate()">
+            <form action="<?php  echo base_url() . 'lists/info/' . $list->id . '/bulk_import_result'; ?>" method="post" enctype="multipart/form-data" onsubmit="return validate()"> 
+
+                        <!-- <form action="<?php  // echo base_url() . 'download/upload'; ?>" method="post" enctype="multipart/form-data" onsubmit="return validate()">  -->
                 <div class="form-group">
                     <label for="file">Select File</label>
                     <div class="input-group">
@@ -75,5 +77,18 @@
             browse.focus();
             return false;
         }
+        // var i = 0;
+        // var x = setInterval(function() {
+        //     i++;
+        //     $.ajax({
+        //         url: baseUrl + 'download/check',
+        //         method: 'GET',
+        //         async: true,
+        //         success: function(res) {
+        //             console.log(res);
+        //         }
+        //     });
+        // }, 1000);
+        // return true;
     }
 </script>

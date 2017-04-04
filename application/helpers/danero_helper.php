@@ -46,3 +46,28 @@ function json_response($code = 200, $message = null)
     'message' => $message
     ));
 }
+
+function setTemporaryFile($name, $content)
+{
+    $file = DIRECTORY_SEPARATOR .
+            trim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) .
+            DIRECTORY_SEPARATOR .
+            ltrim($name, DIRECTORY_SEPARATOR);
+
+    $x = file_put_contents($file, $content);
+
+    // register_shutdown_function(function() use($file) {
+    //     unlink($file);
+    // });
+
+    // return $file;
+}
+
+function getTemporaryFileContent($name)
+{
+    $file = DIRECTORY_SEPARATOR .
+            trim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) .
+            DIRECTORY_SEPARATOR .
+            ltrim($name, DIRECTORY_SEPARATOR);
+    return file_get_contents($file);
+}

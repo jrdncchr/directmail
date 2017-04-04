@@ -146,7 +146,7 @@
                                     </div>
                                     <div class="col-sm-12">
                                         <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                                        <a target="_blank" href="<?php echo base_url() . 'download/download/list_properties'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
+                                        <a v-on:click="download" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
                                         <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
                                     </div>
                                 </div>
@@ -246,7 +246,7 @@
                     }
                     var adjust = false;
                     if ((oldMailingType !== list.mailing_type || oldNoLetters !== list.no_of_letters) && data.list.id > 0) {
-                         showModal('yesno', {
+                        showModal('yesno', {
                             title: 'Auto Adjust',
                             body: 'You have changed the mailing interval or no. of letters, do you want to adjust all existing properties with this setup?',
                             callback: function() {
@@ -316,6 +316,20 @@
                 };
                 $("#status").val(null).trigger("change");
                 $("#status").val('active').trigger("change");
+            },
+            download: function() {
+                showModal('yesno', {
+                    title: 'Save Download History',
+                    body: 'Do you want this download to be saved in the download history?',
+                    callback: function() {
+                        $('#global-modal').modal('hide');
+                        window.open(baseUrl + 'download/download/list_properties/1', '_blank');
+                    },
+                    cancelCallback: function() {
+                        $('#global-modal').modal('hide');
+                        window.open(baseUrl + 'download/download/list_properties', '_blank');
+                    }
+                });
             }
         }
     });

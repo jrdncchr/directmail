@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="col-sm-12">
                                     <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                                    <a target="_blank" href="<?php echo base_url() . 'download/download/downloads_properties'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
+                                    <a v-on:click="download" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
                                     <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
                                 </div>
                             </div>
@@ -153,6 +153,20 @@
 
                 $("#list").val(null).trigger("change");
                 $("#list").val('all').trigger("change");
+            },
+            download: function() {
+                showModal('yesno', {
+                    title: 'Save Download History',
+                    body: 'Do you want this download to be saved in the download history?',
+                    callback: function() {
+                        $('#global-modal').modal('hide');
+                        window.open(baseUrl + 'download/download/downloads_properties/1', '_blank');
+                    },
+                    cancelCallback: function() {
+                        $('#global-modal').modal('hide');
+                        window.open(baseUrl + 'download/download/downloads_properties', '_blank');
+                    }
+                });
             }
         }
     });

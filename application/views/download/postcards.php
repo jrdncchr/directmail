@@ -1,5 +1,5 @@
 <div id="app">
-    <h2>Mailings</h2>
+    <h2>Postcards</h2>
     <ol class="breadcrumb">
         <li><a>Downloads</a></li>
         <li><a class="active">Postcards</a></li>
@@ -55,7 +55,7 @@
                                 </div>
                                 <div class="col-sm-12">
                                     <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                                    <a target="_blank" href="<?php echo base_url() . 'download/download/downloads_postcards'; ?>" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
+                                    <a v-on:click="download" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
                                     <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
                                 </div>
                             </div>
@@ -129,6 +129,20 @@
 
                 $("#list").val(null).trigger("change");
                 $("#list").val('all').trigger("change");
+            },
+            download: function() {
+                showModal('yesno', {
+                    title: 'Save Download History',
+                    body: 'Do you want this download to be saved in the download history?',
+                    callback: function() {
+                        $('#global-modal').modal('hide');
+                        window.open(baseUrl + 'download/download/downloads_postcards/1', '_blank');
+                    },
+                    cancelCallback: function() {
+                        $('#global-modal').modal('hide');
+                        window.open(baseUrl + 'download/download/downloads_postcards', '_blank');
+                    }
+                });
             }
         }
     });

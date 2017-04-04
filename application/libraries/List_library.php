@@ -14,6 +14,9 @@ class List_library {
 
     public function bulk_import($list_id)
     {
+        set_time_limit(0);
+        ini_set('max_execution_time', 30000);
+        
         $result = array(
             'similars' => array(),
             'saved' => array()
@@ -84,7 +87,11 @@ class List_library {
 
         $this->CI->load->model('property_model');
         $result['duplicates'] = [];
+        $progress = 0;
         foreach ($properties as $property) {
+            // $progress++;
+            // $this->send_message($progress);
+
             // check if its a duplicate or similar to a property
             $check_property = $this->CI->property_model->check_property_exists($property, $this->CI->logged_user->company_id);
             if ($check_property['exist']) {
@@ -149,4 +156,13 @@ class List_library {
         return $result;
     }
 
+    function send_message($progress) {
+        $d = array('progress' => $progress);
+         
+        echo "data: " . json_encode($d) . PHP_EOL;
+        echo PHP_EOL;
+         
+        ob_flush();
+        flush();
+    }
 }
