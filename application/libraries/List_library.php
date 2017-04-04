@@ -14,9 +14,8 @@ class List_library {
 
     public function bulk_import($list_id)
     {
-        set_time_limit(0);
         ini_set('max_execution_time', 30000);
-        
+
         $result = array(
             'similars' => array(),
             'saved' => array()
