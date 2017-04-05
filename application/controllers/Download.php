@@ -41,22 +41,14 @@ class Download extends MY_Controller {
         $filter = $this->session->userdata('list_filter');
         if (isset($filter)) {
             $this->load->model('property_model');
+            $where = [
+                'p.deleted' => 0,
+                'p.active' => 1
+            ];
             switch ($type) {
-                case 'list' :
-                case 'downloads_properties' :
-                    $where = array(
-                        'p.deleted' => 0,
-                        'p.active' => 1
-                    );
-                    break;
                 case 'downloads_letters' :
                 case 'downloads_post_letters' :
-                    $where = array(
-                        'p.deleted' => 0,
-                        'p.active' => 1,
-                        'p.status !=' => 'draft',
-                        'p.status !=' => 'duplicate'
-                    );
+                    $filter['status_not_in'] = ['draft', 'duplicate'];
                     break;
             }
             $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
@@ -128,10 +120,9 @@ class Download extends MY_Controller {
                     $filter = $this->property_library->setup_search_filter($filter);
                     $this->load->model('property_model');
                     $where = array(
-                        'p.deleted' => 0,
-                        'p.status !=' => 'duplicate',
-                        'p.status !=' => 'draft' 
+                        'p.deleted' => 0
                     );
+                    $filter['status_not_in'] = ['draft', 'duplicate'];
                     if (!isset($filter['date_range'])) {
                         $filter['date_range'] = "pm.mailing_date = '" . date('Y-m-d') . "'";
                     }
@@ -173,10 +164,9 @@ class Download extends MY_Controller {
                     $filter = $this->property_library->setup_search_filter($filter);
                     $this->load->model('property_model');
                     $where = array(
-                        'p.deleted' => 0,
-                        'p.status !=' => 'duplicate',
-                        'p.status !=' => 'draft'
+                        'p.deleted' => 0
                     );
+                    $filter['status_not_in'] = ['draft', 'duplicate'];
                     $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
                     foreach ($properties as $p) {
                         $p->url = "";

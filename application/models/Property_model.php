@@ -207,7 +207,6 @@ class Property_model extends CI_Model {
         }
         $this->db->select($select);
         $this->db->join('list l', 'l.id = p.list_id');
-        $this->db->where($where);
         if (isset($filter['status'])) {
             $this->db->where_in('status', $filter['status']);
         }
@@ -248,8 +247,11 @@ class Property_model extends CI_Model {
             $this->db->join('(SELECT MAX(property_mailing.mailing_date) as mailing_date, property_mailing.property_id FROM property_mailing WHERE property_mailing.company_id = ' . $company_id . ' GROUP BY property_id) pm', 
                 'pm.property_id = p.id', 'right');
         }
+        if (isset($filter['status_not_in'])) {
+            $this->db->where_not_in('p.status', $filter['status_not_in']);
+        }
         $this->db->order_by($order_by, 'asc');
-        $result = $this->db->get('property p');
+        $result = $this->db->get_where('property p', $where);
         return $result->result();
     }
 
