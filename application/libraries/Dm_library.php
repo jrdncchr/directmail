@@ -42,4 +42,22 @@ class Dm_library {
         return $result;
     }
 
+    public function getFromModulesForDownloadHistory()
+    {
+        $result = [['id' => 'all', 'text' => 'All']];
+        $CI =& get_instance();
+        $CI->load->model('module_model');
+
+        $modules = $CI->module_model->get_where(array('active' => 1, 'track_download_history' => 1));
+        foreach ($modules as $module) {
+            $code = explode('-', $module->code);
+            $text = implode(' ', array_map('ucfirst', $code));
+            $result[] = [
+                'id' => $module->code,
+                'text' => $text
+            ];
+        }
+        return $result;
+    }
+
 }

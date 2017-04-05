@@ -38,4 +38,10 @@ class Module_model extends CI_Model {
         return $modules;
     }
 
+    public function get_where($where)
+    {
+        $this->db->order_by('code');
+        return $this->db->get_where('modules', $where)->result();
+    }
+
 } 

@@ -238,11 +238,14 @@ class Property_model extends CI_Model {
         if (isset($filter['letter_no'])) {
             $this->db->where_in('pm.letter_no', $filter['letter_no']);
         }
+        if (isset($filter['post_letters'])) {
+            $this->db->where('pm.mailing_date < ', date('Y-m-d'));
+        }
         if (isset($filter['date_range']) || isset($filter['letter_no'])) {
             $this->db->join('property_mailing pm', 'pm.property_id = p.id', 'left');
         }
-        if (isset($filter['postcards']))  {
-            $this->db->join('(SELECT MAX(property_mailing.mailing_date) as mailing_date, property_mailing.property_id FROM property_mailing WHERE property_mailing.company_id = ' . $company_id . ' AND property_mailing.mailing_date < "' . date('Y-m-d') . '" GROUP BY property_id) pm', 
+        if (isset($filter['post_letters']))  {
+            $this->db->join('(SELECT MAX(property_mailing.mailing_date) as mailing_date, property_mailing.property_id FROM property_mailing WHERE property_mailing.company_id = ' . $company_id . ' GROUP BY property_id) pm', 
                 'pm.property_id = p.id', 'right');
         }
         $this->db->order_by($order_by, 'asc');

@@ -25,11 +25,23 @@ class Download_model extends CI_Model {
         $this->db->insert_batch('download_history_property', $download_history_properties);
     }
 
-    public function get_download_history($company_id, $where = [])
+    public function get_download_history($company_id, $filter, $where = [])
     {
         $where['dh.company_id'] = $company_id;
         $this->db->select('dh.*, CONCAT(u.first_name, " ", u.last_name) as full_name');
-        $this->db->join('user u', 'dh.uploaded_by_user_id = u.id', 'left');
+        $this->db->join('user u', 'dh.downloaded_by_user_id = u.id', 'left');
+
+        if (isset($filter['from_module']) && !in_array('all', $filter['from_module'])) {
+            $this->db->where_in('dh.type', $filter['from_module']);
+        }
+        if (isset($filter['downloaded_by']) && $filter['downloaded_by'] !== 'all') {
+            $this->db->where('dh.downloaded_by_user_id', $filter['downloaded_by']);
+        }
+        if (isset($filter['download_date']) && $filter['download_date'] !== '') {
+            $date_split = explode(' - ', $filter['download_date']);
+            $this->db->where("dh.download_date BETWEEN '$date_split[0]' AND '$date_split[1]'"); 
+        }
+
         $download_history = $this->db->get_where('download_history dh', $where)->result();
         if ($download_history) {
             foreach ($download_history as $history) {
@@ -107,12 +119,4 @@ class Download_model extends CI_Model {
         }
         return $mailings;
     }
-
-    public function setBulkImportRowsCount($user_id, $count)
-    {
-        $this->load->dbforge();
-        $this->dbforge->drop_table('temp_bulk_import_' . $user_id, true);
-        $this->dbforge->create_table('temp_bulk_import_' . $user_id, FALSE, $attributes);
-    }
-
 } 

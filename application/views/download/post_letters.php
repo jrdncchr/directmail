@@ -1,8 +1,8 @@
 <div id="app">
-    <h2>Postcards</h2>
+    <h2>Post Letters</h2>
     <ol class="breadcrumb">
         <li><a>Downloads</a></li>
-        <li><a class="active">Postcards</a></li>
+        <li><a class="active">Post Letters</a></li>
     </ol>
 
     <div class="row">
@@ -83,11 +83,11 @@
 
 <script>
     var dt;
-    var actionUrl = "<?php echo base_url() . 'download/postcards'; ?>";
+    var actionUrl = "<?php echo base_url() . 'download/post_letters'; ?>";
 
     var data = {
         filter : {
-            status: ['active', 'lead', 'buy'],
+            status: ['all'],
             list : ['all'],
             property_name : '',
             property_address : '',
@@ -118,14 +118,14 @@
             },
             clearFilter: function() {
                 data.filter = {
-                    status: ['active', 'lead', 'buy'],
+                    status: ['all'],
                     list : ['all'],
                     property_name : '',
                     property_address : '',
                     id: ''
                 }
                 $("#status").val(null).trigger("change");
-                $("#status").val('active').trigger("change");
+                $("#status").val('all').trigger("change");
 
                 $("#list").val(null).trigger("change");
                 $("#list").val('all').trigger("change");
@@ -136,11 +136,11 @@
                     body: 'Do you want this download to be saved in the download history?',
                     callback: function() {
                         $('#global-modal').modal('hide');
-                        window.open(baseUrl + 'download/download/downloads_postcards/1', '_blank');
+                        window.open(baseUrl + 'download/download/downloads_post_letters/1', '_blank');
                     },
                     cancelCallback: function() {
                         $('#global-modal').modal('hide');
-                        window.open(baseUrl + 'download/download/downloads_postcards', '_blank');
+                        window.open(baseUrl + 'download/download/downloads_post_letters', '_blank');
                     }
                 });
             }

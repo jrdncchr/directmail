@@ -107,7 +107,7 @@
 
     var data = {
         filter : {
-            status: ['active'],
+            status: ['all'],
             list : ['all'],
             property_name : '',
             resource: '',
@@ -140,7 +140,7 @@
             },
             clearFilter: function() {
                 data.filter = {
-                    status: ['active'],
+                    status: ['all'],
                     list : ['all'],
                     property_name : '',
                     resource: '',
@@ -149,7 +149,7 @@
                     skip_traced: 0
                 };
                 $("#status").val(null).trigger("change");
-                $("#status").val('active').trigger("change");
+                $("#status").val('all').trigger("change");
 
                 $("#list").val(null).trigger("change");
                 $("#list").val('all').trigger("change");

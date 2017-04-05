@@ -54,9 +54,11 @@
             <div class="col-sm-6">
                 <div class="form-group">
                     <label for="name">* Actions</label>
+                    <?php if (($list->id > 0 && $mc->_checkListPermission($list->id, 'update')) || $list->id === 0):  ?>
                     <button v-on:click="saveList" class="btn btn-sm btn-block btn-main">
                         <i class="fa fa-save"></i> Save
                     </button>
+                    <?php endif; ?>
                     <?php endif; ?>
                     <?php if (($list->id > 0 && $mc->_checkListPermission($list->id, 'create'))):  ?>
                     <a href="<?php echo base_url() . 'lists/property/' . $list->id . '/new'; ?>" class="btn btn-sm btn-default btn-block">
@@ -210,7 +212,7 @@
     var data = {
         list : <?php echo json_encode($list); ?>,
         filter : {
-            status: ['active'],
+            status: ['all'],
             resource: '',
             property_name : '',
             property_address : '',
@@ -307,7 +309,7 @@
             },
             clearFilter: function() {
                 data.filter = {
-                    status: ['active'],
+                    status: ['all'],
                     resource: '',
                     property_name : '',
                     property_address : '',
@@ -315,7 +317,7 @@
                     skip_traced: 0
                 };
                 $("#status").val(null).trigger("change");
-                $("#status").val('active').trigger("change");
+                $("#status").val('all').trigger("change");
             },
             download: function() {
                 showModal('yesno', {
@@ -323,11 +325,11 @@
                     body: 'Do you want this download to be saved in the download history?',
                     callback: function() {
                         $('#global-modal').modal('hide');
-                        window.open(baseUrl + 'download/download/list_properties/1', '_blank');
+                        window.open(baseUrl + 'download/download/list/1', '_blank');
                     },
                     cancelCallback: function() {
                         $('#global-modal').modal('hide');
-                        window.open(baseUrl + 'download/download/list_properties', '_blank');
+                        window.open(baseUrl + 'download/download/list', '_blank');
                     }
                 });
             }
@@ -340,7 +342,7 @@
 
         setupSelect2Fields();
         $("#status").val(null).trigger("change");
-        $("#status").val('active').trigger("change");
+        $("#status").val('all').trigger("change");
 
         setupDataTables();
     });

@@ -102,7 +102,7 @@
 
     var data = {
         filter : {
-            status: ['active', 'lead', 'buy'],
+            status: ['all'],
             list : ['all'],
             property_name : '',
             property_address : '',
@@ -136,7 +136,7 @@
             },
             clearFilter: function() {
                 data.filter = {
-                    status: ['active', 'lead', 'buy'],
+                    status: ['all'],
                     list : ['all'],
                     property_name : '',
                     property_address : '',
@@ -145,7 +145,7 @@
                     letter_no: ['all']
                 }
                 $("#status").val(null).trigger("change");
-                $("#status").val('active').trigger("change");
+                $("#status").val('all').trigger("change");
 
                 $("#list").val(null).trigger("change");
                 $("#list").val('all').trigger("change");

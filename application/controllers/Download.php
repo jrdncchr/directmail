@@ -42,7 +42,7 @@ class Download extends MY_Controller {
         if (isset($filter)) {
             $this->load->model('property_model');
             switch ($type) {
-                case 'list_properties' :
+                case 'list' :
                 case 'downloads_properties' :
                     $where = array(
                         'p.deleted' => 0,
@@ -50,21 +50,21 @@ class Download extends MY_Controller {
                     );
                     break;
                 case 'downloads_letters' :
-                case 'downloads_postcards' :
+                case 'downloads_post_letters' :
                     $where = array(
                         'p.deleted' => 0,
-                        'p.status !=' => 'duplicate',
-                        'p.status !=' => 'draft' 
+                        'p.active' => 1,
+                        'p.status !=' => 'draft',
+                        'p.status !=' => 'duplicate'
                     );
                     break;
             }
-            $where['status != '] = 'duplicate';
             $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
             if ($save == 1 && sizeof($properties) > 0) {
                 $history = [
-                    'type' => $type,
+                    'type' => str_replace('_', '-', $type),
                     'filters' => json_encode($filter),
-                    'uploaded_by_user_id' => $this->logged_user->id,
+                    'downloaded_by_user_id' => $this->logged_user->id,
                     'company_id' => $this->logged_user->company_id
                 ];
                 $this->load->model('download_model');
@@ -161,14 +161,14 @@ class Download extends MY_Controller {
         }
     }
 
-    public function postcards()
+    public function post_letters()
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
             $action = $this->input->post('action');
             switch ($action) {
                 case 'list':
                     $filter = $this->input->post('filter');
-                    $filter['postcards'] = true;
+                    $filter['post_letters'] = true;
                     $this->load->library('property_library');
                     $filter = $this->property_library->setup_search_filter($filter);
                     $this->load->model('property_model');
@@ -195,7 +195,7 @@ class Download extends MY_Controller {
             $this->load->library('dm_library');
             $this->data['lists'] = $this->dm_library->getListsForSelect2($this->logged_user->company_id);
             $this->data['statuses'] = $this->dm_library->getStatusesForSelect2(['duplicate', 'draft']);
-            $this->_renderL('download/postcards');
+            $this->_renderL('download/post_letters');
         }
     }
 
@@ -205,14 +205,24 @@ class Download extends MY_Controller {
             $action = $this->input->post('action');
             switch ($action) {
                 case 'list':
+                    $filter = $this->input->post('filter');
                     $this->load->model('download_model');
-                    $history = $this->download_model->get_download_history($this->logged_user->company_id);
+                    $history = $this->download_model->get_download_history($this->logged_user->company_id, $filter);
                     echo json_encode(array('data' => $history));
                     break;
                 default:
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));
             }
         } else {
+            $this->load->model('user_model');
+            $where = [
+                'company_id' => $this->logged_user->company_id, 
+                'deleted' => 0,
+                'confirmed' => 1
+            ];
+            $this->data['users'] = $this->user_model->get_id_name($where);
+            $this->load->library('dm_library');
+            $this->data['from_modules'] = $this->dm_library->getFromModulesForDownloadHistory();
             $this->_renderL('download/history');
         }
     }
