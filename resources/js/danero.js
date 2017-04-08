@@ -9,6 +9,10 @@ $(function() {
     toastr.options = {
         positionClass: "toast-bottom-right"
     };
+
+    $('span#toggleNav').on('click', function() {
+        $('#wrapper').toggleClass('toggled');
+    });
 });
 
 function activateTooltips() {

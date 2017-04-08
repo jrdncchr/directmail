@@ -77,21 +77,19 @@
                 </div>
             </div>
 
-            <div class="table-responsive" style="width: 100%;">
-                <table class="table table-bordered table-hover" width="100%">
-                    <thead>
-                    <tr>
-                        <th width="6%">ID</th>
-                        <th width="20%">List</th>
-                        <th width="23%">Property Name</th>
-                        <th width="31%">Property Address</th>
-                        <th width="10%">Letter No</th>
-                        <th width="10%">Mailing Date</th>
-                    </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <table class="table table-bordered table-hover dt-responsive nowrap" width="100%" cellspacing="0">
+                <thead>
+                <tr>
+                <th width="20%" class="td-col-first">ID</th>
+                    <th width="20%">List</th>
+                    <th width="23%">Property Name</th>
+                    <th width="31%">Property Address</th>
+                    <th width="10%">Letter No</th>
+                    <th width="10%">Mailing Date</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -312,9 +310,9 @@
                     var d = table.fnGetData(pos);
                 });
             },
-            "language": {
-                "emptyTable": "No property found."
-            }
+            "columnDefs": [
+                { className: "dt-align-toggle", "targets": [0] }
+            ]
         });
     }
 </script>

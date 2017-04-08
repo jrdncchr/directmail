@@ -1,4 +1,5 @@
 <div id="top-bar">
+	<span id="toggleNav" class="fa fa-2x fa-list"></span>
 	<span><?php echo $page_title; ?></span>
 	
 	<div class="btn-group pull-right">

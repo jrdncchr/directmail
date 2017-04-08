@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap/dist/css/bootstrap.min.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/font-awesome/css/font-awesome.min.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css'; ?>" />
+<link rel="stylesheet" href="<?php echo base_url() . 'resources/css/responsive.bootstrap.min.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/toastr/toastr.min.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/air-datepicker/dist/css/datepicker.min.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/select2/dist/css/select2.min.css'; ?>" />
@@ -19,6 +20,8 @@
 <script src="<?php echo base_url() . 'bower_components/jquery/dist/jquery.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'bower_components/datatables.net/js/jquery.dataTables.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js'; ?>"></script>
+<script src="<?php echo base_url() . 'resources/js/dataTables.responsive.min.js'; ?>"></script>
+<script src="<?php echo base_url() . 'resources/js/responsive.bootstrap.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'bower_components/vue/dist/vue.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'bower_components/bootstrap/dist/js/bootstrap.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'bower_components/toastr/toastr.min.js'; ?>"></script>

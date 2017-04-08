@@ -435,4 +435,36 @@ class Property_model extends CI_Model {
         return $this->db->insert('property_history', $history);
     }
 
+    public function get_download_history($company_id, $property_id)
+    {
+        $this->db->select('dh.*, CONCAT(u.first_name, " ", u.last_name) as downloaded_by');
+        $this->db->join('download_history dh', 'dh.id = dhp.history_id');
+        $this->db->join('user u', 'u.id = dh.downloaded_by_user_id');
+        return $this->db->get_where(
+            'download_history_property dhp', 
+            ['dh.company_id' => $company_id, 'dhp.property_id' => $property_id]
+        )->result();
+    }
+
+    public function get_property_duplicates($company_id, $property_id)
+    {
+        $this->db->select('
+            p.id as property_id, 
+            p.property_address, 
+            l.name as list_name,
+            l.id as list_id,
+            p.status as property_status,
+            p.date_created as upload_date,
+            CONCAT(u.first_name, " ", u.last_name) as upload_by');
+        $this->db->join('list l', 'l.id = p.list_id', 'left');
+        $this->db->join('user u', 'p.created_by = u.id', 'left');
+        $this->db->join('property_replacement pr', 'pr.property_id = p.id', 'left');
+        $this->db->join('property p2', 'p2.id = pr.target_property_id', 'left');
+        $this->db->join('list l2', 'l2.id = p2.list_id', 'left');
+        return $this->db->get_where(
+            'property p' ,
+            ['l.company_id' => $company_id, 'pr.target_property_id' => $property_id, 'p.deleted' => 0]
+        )->result();
+    }
+
 } 

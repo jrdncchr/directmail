@@ -63,6 +63,8 @@
                 <li v-show="property.id && property.status !== 'draft'" role="presentation"><a href="#mailings" aria-controls="mailings" role="tab" data-toggle="tab">Mailings</a></li>
                 <li v-show="property.id && property.status !== 'draft'" role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments</a></li>
                 <li v-show="property.id && property.status !== 'draft'" role="presentation"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li>
+                <li v-show="property.id && property.status !== 'draft'" role="presentation"><a href="#downloads" aria-controls="downloads" role="tab" data-toggle="tab">Downloads</a>
+                <li v-show="property.id && property.status !== 'draft'" role="presentation"><a href="#duplicates" aria-controls="duplicates" role="tab" data-toggle="tab">Duplicates</a></li>
               </ul>
 
               <div class="tab-content">
@@ -382,10 +384,42 @@
                         </div>
                     </section>
                     <section v-else>
-                        <div class="well">No comments found.</div>
+                        <div class="well">No History found.</div>
                     </section>
                 </div>
 
+                <!-- Downloads -->
+                <div role="tabpanel" class="tab-pane" id="downloads">
+                    <table id="downloads" class="table table-bordered table-hover dt-responsive nowrap" width="100%" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th width="25%" class="td-col-first">Download Date</th>
+                            <th width="20%">Downloaded By</th>
+                            <th width="20%">From Module</th>
+                            <th width="20%">Variable</th>
+                            <th width="15%">Cost</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Duplicates -->
+                <div role="tabpanel" class="tab-pane" id="duplicates">
+                    <table id=duplicates class="table table-bordered table-hover dt-responsive nowrap" width="100%" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th width="15%" class="td-col-first">ID</th>
+                            <th width="15%">List</th>
+                            <th width="20%">Property Address</th>
+                            <th width="15%">Status</th>
+                            <th width="20%">Uploaded By</th>
+                            <th width="15%">Upload Date</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
 
             <?php if (isset($property)): ?>
@@ -472,6 +506,7 @@
 
 <script>
     var actionUrl = "<?php echo base_url() . 'lists/property'; ?>";
+    var downloadsDt, duplicatesDt;
 
     var data = {
         similar_address: [],
@@ -635,5 +670,84 @@
                 }
             }
         });
+        if (undefined !== data.property.id) {
+            setupDataTables();    
+        }
     });
+
+    function setupDataTables() {
+        downloadsDt = $('table#downloads').dataTable({
+            "order": [[ 0, "desc" ]],
+            "bDestroy": true,
+            "filter": true,
+            "ajax": {
+                "type": "POST",
+                "url": actionUrl,
+                "data":  {
+                    action: "download_list",
+                    property_id: data.property.id
+                }
+            },
+            columns: [
+                { data: "download_date" },
+                { data: "downloaded_by" },
+                { data: "type" },
+                { data: "variable" },
+                { data: "cost" }
+            ],
+            "language": {
+                "emptyTable": "No download history for this property yet."
+            },
+            "columnDefs": [
+                { className: "dt-align-toggle", "targets": [0] }
+            ]
+        });
+
+        duplicatesDt = $('table#duplicates').dataTable({
+            "order": [[ 0, "desc" ]],
+            "bDestroy": true,
+            "filter": true,
+            "ajax": {
+                "type": "POST",
+                "url": actionUrl,
+                "data":  {
+                    action: "duplicate_list",
+                    property_id: data.property.id
+                }
+            },
+            columns: [
+                { data: "property_id", render: function(data, type, row) {
+                        return '<a href="' + row.url + '" target="_blank">' + data + '</a>';
+                    } 
+                },
+                { data: "list_name", render: function(data, type, row) {
+                        return '<a href="' + row.list_url + '" target="_blank">' + data + '</a>';
+                    } 
+                },
+                { data: "property_address" },
+                { data: "property_status", render: function(data, type, row) {
+                        if (data == "active" || data == "lead" || data == "buy") {
+                            return "<span class='label label-success'>" + capitalize(data) + "</span>";
+                        } else if (data == "duplicate" || data == "draft") {
+                            return "<span class='label label-warning'>" + capitalize(data) + "</span>";
+                        } else if (data =="change") {
+                            return "<span class='label label-info'>" + capitalize(data) + "</span>";
+                        } else if (data =="inactive") {
+                            return "<span class='label label-default'>" + capitalize(data) + "</span>";
+                        } else if (data =="stop") {
+                            return "<span class='label label-danger'>" + capitalize(data) + "</span>";
+                        }
+                    } 
+                },
+                { data: "upload_by" },
+                { data: "upload_date" }
+            ],
+            "language": {
+                "emptyTable": "No duplicates for this property yet."
+            },
+            "columnDefs": [
+                { className: "dt-align-toggle", "targets": [0] }
+            ]
+        });
+    }
 </script>

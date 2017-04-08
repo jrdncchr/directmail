@@ -157,14 +157,14 @@
                     </div>
                 </div>
 
-                <div class="table-responsive" style="width: 100%; margin-top: 20px;">
-                    <table class="table table-bordered table-hover" width="100%">
+                <div style="margin-top: 20px;">
+                    <table class="table table-bordered table-hover dt-responsive nowrap" width="100%" cellspacing="0">
                         <thead>
                         <tr>
-                            <th width="10%">ID</th>
-                            <th width="10%">Status</th>
-                            <th width="20%">Property Name</th>
-                            <th width="35%">Property Address</th>
+                            <th width="15%" class="td-col-first">ID</th>
+                            <th width="15%">Status</th>
+                            <th width="25%">Property Name</th>
+                            <th width="25%">Property Address</th>
                             <th width="20%">Date Created</th>
                         </tr>
                         </thead>
@@ -414,7 +414,10 @@
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();
-                $('table tbody tr').on('click', function () {
+                $('table tbody tr').on('click', function (e) {
+                    if ($(e.target).attr('class') && $(e.target).attr('class').includes('dt-align-toggle')) {
+                        return;
+                    }
                     var pos = table.fnGetPosition(this);
                     var d = table.fnGetData(pos);
                     window.location = baseUrl + 'lists/property/' + data.list.id + '/info/' + d.id; 
@@ -422,7 +425,10 @@
             },
             "language": {
                 "emptyTable": "No property found for this list."
-            }
+            },
+            "columnDefs": [
+                { className: "dt-align-toggle", "targets": [0] }
+            ]
         });
     }
 </script>

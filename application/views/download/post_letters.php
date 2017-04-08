@@ -64,19 +64,17 @@
                 </div>
             </div>
 
-            <div class="table-responsive" style="width: 100%;">
-                <table class="table table-bordered table-hover" width="100%">
-                    <thead>
-                    <tr>
-                        <th width="10%">ID</th>
-                        <th width="30%">List</th>
-                        <th width="30%">Property Name</th>
-                        <th width="30%">Property Address</th>
-                    </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <table class="table table-bordered table-hover dt-responsive nowrap" width="100%" cellspacing="0">
+                <thead>
+                <tr>
+                    <th width="20%" class="td-col-first">ID</th>
+                    <th width="20%">List</th>
+                    <th width="30%">Property Name</th>
+                    <th width="30%">Property Address</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -246,7 +244,10 @@
             },
             "language": {
                 "emptyTable": "No property found."
-            }
+            },
+            "columnDefs": [
+                { className: "dt-align-toggle", "targets": [0] }
+            ]
         });
     }
 </script>

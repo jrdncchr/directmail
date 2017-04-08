@@ -141,7 +141,39 @@ input:focus, textarea:focus {
     margin-right: -270px;
 }
 
+#toggleNav {
+    margin-right: 10px;
+    cursor: pointer;
+    display: inline-block;
+    color: #BD3738 !important;
+    font-size: 30px !important;
+}
+
+.dt-align-toggle {
+    text-align: right !important;
+}
+
+.td-col-first {
+    text-align: left !important;
+}
+
+span.dtr-title, span.dtr-data {
+    font-size: 14px !important;
+}
+
 @media(min-width:768px) {
+
+    .dt-align-toggle {
+        text-align: right !important;
+    }
+
+    .td-col-first {
+        text-align: left !important;
+    }
+
+    #toggleNav {
+        display: none;
+    }
 
     #wrapper {
         padding-left: 260px;

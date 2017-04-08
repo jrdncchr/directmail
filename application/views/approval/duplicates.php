@@ -77,10 +77,10 @@
                 </div>
             </div>
 
-            <table id="duplicates" class="table table-bordered table-hover" width="100%">
+            <table class="table table-bordered table-hover dt-responsive nowrap" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>Action</th>
+                        <th class="td-col-first">Action</th>
                         <th>Status</th>
                         <th>Property Address</th>
                         <th>Upload By</th>
@@ -243,7 +243,7 @@
     }
 
     function setupDataTables() {
-        duplicateDt = $('table#duplicates').dataTable({
+        duplicateDt = $('table').dataTable({
             "order": [[ 0, "desc" ]],
             "filter": true,
             "ajax": {
@@ -308,10 +308,16 @@
                     }
                 }
             ], 
-            "columnDefs": [ {
-                "targets": 5,
-                "orderable": false
-            }],
+            "columnDefs": [
+                {
+                    "targets": 5,
+                    "orderable": false
+                }, 
+                { 
+                className: "dt-align-toggle", 
+                "targets": [0] 
+                }
+            ],
             "language": {
                 "emptyTable": "No property found for this list."
             }

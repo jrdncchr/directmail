@@ -223,30 +223,30 @@ class Lists extends MY_Controller {
                     if (isset($property['status']) && $property['status'] == 'duplicate') {
                         $result = $this->property_model->save($property);
                     } else {
-                        $check_property = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
-                        if ($check_property['exist']) {
-                            foreach ($check_property['properties'] as $cp) {
-                                $cp->permission = $this->_checkListPermission($cp->list_id, 'retrieve');
-                                $cp->url = base_url() . "lists/property/". $cp->list_id . "/info/" . $cp->id;
-                            }
-                            $result['exist'] = true;
-                            $result['properties'] = $check_property['properties'];
-                            $result['success'] = false;
-                        } else {
-                            if ($action !== 'draft_property') {
-                                $property['status'] = $property['status'] == 'draft' ? 'active' : $property['status'];
-                            }
-                            $result = $this->property_model->save($property);
-                            $result['status'] = $property['status'];
-                            if ($result['success']) {
-                                $this->property_model->add_history([
-                                    'property_id' => $result['id'],
-                                    'company_id' => $property['company_id'],
-                                    'message' => 'Property was ' .  (isset($property['id']) ? 'updated' : 'added') . ' by ' . $this->logged_user->first_name . ' ' . $this->logged_user->last_name
-                                ]);
-                                $mailings = $this->input->post('mailings');
-                                $this->property_model->save_mailings($result['id'], $mailings);
-                            }
+                        // $check_property = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
+                        // if ($check_property['exist']) {
+                        //     foreach ($check_property['properties'] as $cp) {
+                        //         $cp->permission = $this->_checkListPermission($cp->list_id, 'retrieve');
+                        //         $cp->url = base_url() . "lists/property/". $cp->list_id . "/info/" . $cp->id;
+                        //     }
+                        //     $result['exist'] = true;
+                        //     $result['properties'] = $check_property['properties'];
+                        //     $result['success'] = false;
+                        //     exit;
+                        // }
+                        if ($action !== 'draft_property') {
+                            $property['status'] = $property['status'] == 'draft' ? 'active' : $property['status'];
+                        }
+                        $result = $this->property_model->save($property);
+                        $result['status'] = $property['status'];
+                        if ($result['success']) {
+                            $this->property_model->add_history([
+                                'property_id' => $result['id'],
+                                'company_id' => $property['company_id'],
+                                'message' => 'Property was ' .  (isset($property['id']) ? 'updated' : 'added') . ' by ' . $this->logged_user->first_name . ' ' . $this->logged_user->last_name
+                            ]);
+                            $mailings = $this->input->post('mailings');
+                            $this->property_model->save_mailings($result['id'], $mailings);
                         }
                     }
                     echo json_encode($result);
@@ -294,6 +294,23 @@ class Lists extends MY_Controller {
                     $property = $this->input->post('property');
                     $result = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
                     echo json_encode($result);
+                    break;
+                case 'download_list' :
+                    $property_id = $this->input->post('property_id');
+                    $result = $this->property_model->get_download_history($this->logged_user->company_id, $property_id);
+                    echo json_encode(['data' => $result]);
+                    break;
+                case 'duplicate_list' :
+                    $property_id = $this->input->post('property_id');
+                    $lists = $this->property_model->get_property_duplicates($this->logged_user->company_id, $property_id);
+                    foreach ($lists as $l) {
+                        $l->url = "";
+                        if ($this->_checkListPermission($l->list_id, 'retrieve')) {
+                            $l->url = base_url() . 'lists/property/' . $l->list_id . '/info/' . $l->property_id;
+                            $l->list_url = base_url() . 'lists/info/' . $l->list_id;
+                        }
+                    }
+                    echo json_encode(['data' => $lists]);
                     break;
                 default:
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));

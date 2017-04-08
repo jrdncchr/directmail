@@ -82,21 +82,19 @@
                 </div>
             </div>
 
-            <div class="table-responsive" style="width: 100%;">
-                <table class="table table-bordered table-hover" width="100%">
-                    <thead>
-                    <tr>
-                        <th width="8%">ID</th>
-                        <th width="20%">List</th>
-                        <th width="17%">Resource</th>
-                        <th width="20%">Property Name</th>
-                        <th width="20%">Property Address</th>
-                        <th width="15%">Status</th>
-                    </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <table class="table table-bordered table-hover dt-responsive nowrap" width="100%" cellspacing="0">
+                <thead>
+                <tr>
+                    <th width="15%" class="td-col-first">ID</th>
+                    <th width="20%">List</th>
+                    <th width="15%">Resource</th>
+                    <th width="20%">Property Name</th>
+                    <th width="20%">Property Address</th>
+                    <th width="15%">Status</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -232,7 +230,7 @@
     }
 
     function setupDataTables() {
-        dt = $('table').dataTable({
+        dt = $('table').DataTable({
             "order": [[ 0, "asc" ]],
             "bDestroy": true,
             "filter": true,
@@ -286,7 +284,10 @@
             },
             "language": {
                 "emptyTable": "No property found."
-            }
+            },
+            "columnDefs": [
+                { className: "dt-align-toggle", "targets": [0] }
+            ]
         });
     }
 </script>
