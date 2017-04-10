@@ -60,15 +60,48 @@
                 <thead>
                 <tr>
                     <th width="20%" class="td-col-first">From Module</th>
-                    <th width="30%">Downloaded By</th>
-                    <th width="30%">Download Date</th>
-                    <th width="20%">Propeties</th>
+                    <th width="20%">Downloaded By</th>
+                    <th width="20%">Download Date</th>
+                    <th width="20%">Variable</th>
+                    <th width="10%">Cost</th>
+                    <th width="10%">Propeties</th>
                 </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
     </div>
+
+    <div class="modal fade" id="history-modal" tabindex="-1" role="dialog" aria-labelledby="history-modal-label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="history-modal-label">History Action</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="variable">Variable</label>
+                                <input id="variable" type="text" class="form-control" v-model="modalForm.variable" /> 
+                            </div>
+                            <div class="form-group">
+                                <label for="cost">Cost</label>
+                                <input id="cost" type="text" class="form-control" v-model="modalForm.cost" /> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" v-on:click="deleteDownloadHistory" class="btn btn-sm pull-left">Delete</button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                    <button type="button" v-on:click="saveDownloadHistory" class="btn btn-main btn-sm">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -80,6 +113,10 @@
             from_module : ['all'],
             downloaded_by : 'all',
             download_date : ''
+        },
+        modalForm : {
+            cost: 1,
+            variable: ''
         },
         users: <?php echo json_encode($users); ?>,
         fromModuleAll: true
@@ -112,6 +149,26 @@
                 }
                 $("#from-module").val(null).trigger("change");
                 $("#from-module").val('all').trigger("change");
+            },
+            saveDownloadHistory: function() {
+                loading('info', 'Saving download history...');
+                $.post(actionUrl, { action: 'update', history: data.modalForm }, function(res) {
+                    console.log(res);
+                    if (res.success) {
+                        loading('success', 'Save successful.');
+                        dt.fnReloadAjax();
+                    }
+                }, 'json');
+            },
+            deleteDownloadHistory: function() {
+                loading('info', 'Deleting download history...');
+                $.post(actionUrl, { action: 'delete', id: data.modalForm.id }, function(res) {
+                    if (res.success) {
+                        loading('success', 'Delete successful.');
+                        dt.fnReloadAjax();
+                        $('#history-modal').modal('hide');
+                    }
+                }, 'json');
             }
         }
     });
@@ -194,13 +251,27 @@
                 { data: "type" },
                 { data: "full_name" },
                 { data: "download_date" },
-                { data: "property_count" }
+                { data: "variable" },
+                { data: "cost" },
+                { data: "property_count" },
+                { data: "id", visible: false }
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();
-                $('table tbody tr').on('click', function () {
+                $('table tbody tr').on('click', function (e) {
+                    if ($(e.target).attr('class') && $(e.target).attr('class').includes('dt-align-toggle')) {
+                        return;
+                    }
                     var pos = table.fnGetPosition(this);
                     var d = table.fnGetData(pos);
+                    data.modalForm.id = d.id;
+                    data.modalForm.variable = d.variable;
+                    data.modalForm.cost = d.cost;
+                    $('#history-modal').modal({
+                        show: true,
+                        backdrop: 'static',
+                        keyboard: false
+                    });
                 });
             },
             "language": {

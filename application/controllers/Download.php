@@ -193,12 +193,24 @@ class Download extends MY_Controller {
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
             $action = $this->input->post('action');
+            $this->load->model('download_model');
             switch ($action) {
                 case 'list':
                     $filter = $this->input->post('filter');
-                    $this->load->model('download_model');
                     $history = $this->download_model->get_download_history($this->logged_user->company_id, $filter);
                     echo json_encode(array('data' => $history));
+                    break;
+                case 'update' :
+                    $history = $this->input->post('history');
+                    $history['company_id'] = $this->logged_user->company_id;
+                    $result = $this->download_model->update_download_history($history);
+                    echo json_encode($result);
+                    break;
+                case 'delete' :
+                    $id = $this->input->post('id');
+                    $company_id = $this->logged_user->company_id;
+                    $result = $this->download_model->delete_download_history($id, $company_id);
+                    echo json_encode($result);
                     break;
                 default:
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));

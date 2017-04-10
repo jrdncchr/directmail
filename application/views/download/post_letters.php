@@ -237,7 +237,10 @@
             ],
             "fnDrawCallback": function (oSettings) {
                 var table = $("table").dataTable();
-                $('table tbody tr').on('click', function () {
+                $('table tbody tr').on('click', function (e) {
+                    if ($(e.target).attr('class') && $(e.target).attr('class').includes('dt-align-toggle')) {
+                        return;
+                    }
                     var pos = table.fnGetPosition(this);
                     var d = table.fnGetData(pos);
                 });

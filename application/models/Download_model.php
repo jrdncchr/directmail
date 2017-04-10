@@ -54,6 +54,32 @@ class Download_model extends CI_Model {
         return $download_history;
     }
 
+    public function update_download_history($history)
+    {
+        $result = ['success' => false];
+        if (isset($history['id'])) {
+            $this->db->where('id', $history['id']);
+            $this->db->update('download_history', $history);
+            $result['success'] = true;
+        }
+        return $result;
+    }
+
+    public function delete_download_history($id, $company_id)
+    {
+        $result = ['success' => false];
+        $this->db->trans_start();
+        $this->db->where(['id' => $id, 'company_id' => $company_id]);
+        $this->db->delete('download_history');
+        $this->db->where(['history_id' => $id]);
+        $this->db->delete('download_history_property');
+        $this->db->trans_complete();
+        if ($this->db->trans_status()) {
+            $result['success'] = true;
+        }
+        return $result;
+    }
+
     public function generate_mailings($filter) 
     {
         $mailings = [];
