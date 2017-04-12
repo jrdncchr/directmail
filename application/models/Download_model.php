@@ -110,14 +110,23 @@ class Download_model extends CI_Model {
                     'mail_qty' => 0,
                     'leads' => 0,
                     'buys' => 0,
-                    'costs' => 0
+                    'costs' => 0,
+                    'variables' => []
                 ];
 
-                $sql = "SELECT * FROM property_mailing pm 
-                    LEFT JOIN property p ON pm.property_id = p.id 
+                $sql = "SELECT 
+                        p.id,
+                        p.status,
+                        dh.variable,
+                        dh.cost
+                    FROM property_mailing pm
+                    LEFT JOIN property p ON pm.property_id = p.id
+                    RIGHT JOIN download_history_property dhp ON dhp.property_id = p.id
+                    LEFT JOIN download_history dh ON dh.id = dhp.history_id
                     WHERE pm.letter_no = " . $this->db->escape($i) . "
                     AND p.company_id = " . $filter['company_id'] . " 
-                    AND p.status NOT IN ('stop', 'draft', 'duplicate')";
+                    AND p.status NOT IN ('stop', 'draft', 'duplicate') 
+                    AND dh.type = 'downloads-letters'";
 
                 $sql .= " AND p.list_id = " . $this->db->escape($list->id);
 
@@ -127,22 +136,54 @@ class Download_model extends CI_Model {
                     . $this->db->escape($filter['to']);
                 }
 
+                $sql .= "GROUP BY id, variable";
+
                 $property_mailings = $this->db->query($sql)->result();
+
+                // echo $this->db->last_query();exit;
 
                 foreach ($property_mailings as $pm) {
                     $letter['mail_qty']++;
-                    $letter['costs']++;
+                    $letter['costs'] += $pm->cost;
                     if ($pm->status == 'buy') {
                         $letter['buys']++;
+                        $letter['variables'][$pm->variable]['buys']++;
                     }
                     if ($pm->status == 'lead') {
                         $letter['leads']++;
+                        $letter['variables'][$pm->variable]['leads']++;
+                    }
+
+                    if ($pm->variable) {
+                        if (!isset($letter['variables'][$pm->variable])) {
+                            $letter['variables'][$pm->variable] = [
+                                'mail_qty' => 0,
+                                'leads' => 0,
+                                'buys' => 0,
+                                'costs' => 0
+                            ];
+                        }
+                        $letter['variables'][$pm->variable]['mail_qty']++;
+                        $letter['variables'][$pm->variable]['costs'] += $pm->cost;
+                        if ($pm->status == 'buy') {
+                            $letter['variables'][$pm->variable]['buys']++;
+                        }
+                        if ($pm->status == 'lead') {
+                            $letter['variables'][$pm->variable]['leads']++;
+                        }
                     }
                 }
                 $mail['letters'][] = $letter;
             }
+            // compute total
+            $total = 0;
+            foreach ($mail['letters'] as $letter) {
+                $total += $letter['costs']; 
+            }
+            $mail['total'] = $total;
             $mailings[] = $mail;
         }
+        
         return $mailings;
     }
 } 

@@ -148,26 +148,53 @@ class Download_Library {
 
 
          $objPHPExcel->setActiveSheetIndex(0)
-                    ->setCellValue('C2', 'Mail Qty')
-                    ->setCellValue('D2', 'Leads')
-                    ->setCellValue('E2', 'Buys')
-                    ->setCellValue('F2', 'Costs');
+                    ->setCellValue('C2', 'Variable')
+                    ->setCellValue('D2', 'Mail Qty')
+                    ->setCellValue('E2', 'Leads')
+                    ->setCellValue('F2', 'Buys')
+                    ->setCellValue('G2', 'Variable Costs')
+                    ->setCellValue('H2', 'Letter Total Cost');
 
         // Add the data
         $row = 3;
+        $overall_total = 0;
         foreach ($mailings as $mailing) {
             $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A' . $row, $mailing['list']);
             $row++;
-            foreach ($mailing['letters'] as $letter) {
-                $objPHPExcel->setActiveSheetIndex(0)
-                    ->setCellValue('B' . $row, 'Letter ' . $letter['number'])
-                    ->setCellValue('C' . $row, $letter['mail_qty'])
-                    ->setCellValue('D' . $row, $letter['leads'])
-                    ->setCellValue('E' . $row, $letter['buys'])
-                    ->setCellValue('F' . $row, $letter['costs']);
+            if ($mailing['letters']) {
+                foreach ($mailing['letters'] as $letter) {
+                    $objPHPExcel->setActiveSheetIndex(0)
+                        ->setCellValue('B' . $row, 'Letter ' . $letter['number'])
+                        ->setCellValue('D' . $row, $letter['mail_qty'])
+                        ->setCellValue('E' . $row, $letter['leads'])
+                        ->setCellValue('F' . $row, $letter['buys'])
+                        ->setCellValue('H' . $row, $letter['costs']);
+                    $row++;
+                    foreach ($letter['variables'] as $key => $value) {
+                        $objPHPExcel->setActiveSheetIndex(0)
+                            ->setCellValue('c' . $row, $key)
+                            ->setCellValue('D' . $row, $value['mail_qty'])
+                            ->setCellValue('E' . $row, $value['leads'])
+                            ->setCellValue('F' . $row, $value['buys'])
+                            ->setCellValue('G' . $row, $value['costs']);
+                        $row++; 
+                    }
+                }
+                if ($mailing['total'] > 0) {
+                    $objPHPExcel->setActiveSheetIndex(0)
+                        ->setCellValue('G' . $row, 'Total:')
+                        ->setCellValue('H' . $row, $mailing['total']);
+                    
+                    $overall_total += $mailing['total'];
+                }
                 $row++;
             }
+            $row++;
         }
+
+        $objPHPExcel->setActiveSheetIndex(0)
+                ->setCellValue('G' . $row, 'Overall Total:')
+                ->setCellValue('H' . $row, $mailing['total']);
 
         // Rename worksheet
         // $objPHPExcel->getActiveSheet()->setTitle('Simple');

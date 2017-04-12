@@ -130,7 +130,7 @@
                 $.post(actionUrl, { action: 'list', filter: data.filter }, function(res) {
                     dt.fnClearTable();
                     if (res.data.length) {
-                        dt.fnAddData(res.data)   
+                        dt.fnAddData(res.data);
                     }
                     dt.fnDraw();
                     loading('success', 'Filter Complete');
@@ -176,7 +176,7 @@
 
         setupSelect2Fields();
         $('#list').val('all').trigger('change');
-        $('#status').val('active').trigger('change');
+        $('#status').val('all').trigger('change');
 
         setupDataTables();
     });
@@ -230,18 +230,10 @@
     }
 
     function setupDataTables() {
-        dt = $('table').DataTable({
+        dt = $('table').dataTable({
             "order": [[ 0, "asc" ]],
             "bDestroy": true,
             "filter": true,
-            "ajax": {
-                "type": "POST",
-                "url": actionUrl,
-                "data":  {
-                    action: "list",
-                    filter: data.filter
-                }
-            },
             columns: [
                 { data: "id", render: 
                     function(data, type, row) {
@@ -286,7 +278,7 @@
                 });
             },
             "language": {
-                "emptyTable": "No property found."
+                "emptyTable": "Setup your filter options and click the filter button to show properties."
             },
             "columnDefs": [
                 { className: "dt-align-toggle", "targets": [0] }

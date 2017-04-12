@@ -26,6 +26,7 @@ class MY_Controller extends CI_Controller
 
     function __construct($logged = false)
     {
+        ini_set('memory_limit', '512M');
         parent::__construct();
         $this->logged_user = $this->session->userdata('user');
         if ($logged) {
