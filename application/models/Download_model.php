@@ -147,11 +147,9 @@ class Download_model extends CI_Model {
                     $letter['costs'] += $pm->cost;
                     if ($pm->status == 'buy') {
                         $letter['buys']++;
-                        $letter['variables'][$pm->variable]['buys']++;
                     }
                     if ($pm->status == 'lead') {
                         $letter['leads']++;
-                        $letter['variables'][$pm->variable]['leads']++;
                     }
 
                     if ($pm->variable) {
