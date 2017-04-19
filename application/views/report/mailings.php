@@ -20,18 +20,17 @@
                     <div class="panel-body">
                         <form class="form-horizontal" action="<?php echo base_url() . 'report/mailings/download' ?>" method="post" onsubmit="return validateForm();">
                             <div class="row">
-                                <div class="col-sm-6">
+
+                                <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label for="date-to" class="control-label col-sm-4">List</label>
-                                        <div class="col-sm-8">
-                                            <select class="form-control" v-model="filter.list" name="list">
-                                                <option value="all">All</option>
-                                                <?php foreach ($lists as $list): ?>
-                                                    <option value="<?php echo $list->id ?>"><?php echo $list->name; ?></option>
-                                                <?php endforeach; ?>
+                                        <label for="list" class="control-label col-sm-2">List</label>
+                                        <div class="col-sm-10">
+                                            <select id="list" class="form-control" multiple="multiple" name="list[]">
                                             </select>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="type" class="control-label col-sm-4">Type</label>
                                         <div class="col-sm-8">
@@ -79,12 +78,13 @@
 
     var data = {
         filter : {
-            list : 'all',
+            list : ['all'],
             date_range : '',
             type: 'letter',
             report_type: 'Date Range'
         },
-        statusText: 'Active'
+        statusText: 'Active',
+        statusAll: true
     };
 
     var vm = new Vue({
@@ -93,11 +93,13 @@
         methods: {
             clearFilter: function() {
                 data.filter = {
-                    list : 'all',
+                    list : ['all'],
                     date_range : '',
                     type: 'letter',
                     report_type: 'Date Range'
                 }
+                $("#list").val(null).trigger("change");
+                $("#list").val('all').trigger("change");
             }
         }
     });
@@ -125,7 +127,35 @@
         $('#sidebar-reports').addClass('in');
 
         setupFilterFields();
+        setupSelect2Fields();
+
+        $('#list').val('all').trigger('change');
     });
+
+    function setupSelect2Fields() {
+        $('#list').select2({
+            allowClear: true,
+            data: <?php echo json_encode($lists); ?>,
+            closeOnSelect: false,
+            placeholder: {
+                id: "",
+                placeholder: "Select a list"
+            }
+        }).on('change', function() {
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && data.listAll) {
+                var selected = $(this).val();
+                $("#list").val(null).trigger("change");
+                $("#list").val(selected[1]).trigger("change");
+                data.listAll  = false;
+            }
+            if ($.inArray('all', $(this).val()) > -1 && $(this).val().length > 1 && !data.listAll) {
+                $("#list").val(null).trigger("change");
+                $("#list").val('all').trigger("change");
+                data.listAll  = true;
+            }
+            data.filter.list = $(this).val();
+        });
+    }
 
     function validateForm() {
         if (!data.filter.list) {

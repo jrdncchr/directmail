@@ -90,16 +90,17 @@ class Download_model extends CI_Model {
             'active' => 1,
             'deleted' => 0
         );
-        if ($filter['list'] == 'all') {
-            $lists = $this->db->get_where('list', $where_list)->result();
-        } else {
-            $where_list['id'] = $filter['list'];
-            $lists = $this->db->get_where('list', $where_list)->result();
-        }
 
-        $date_split = explode(' - ', $filter['date_range']);
-        $filter['from'] = $date_split[0];
-        $filter['to'] = $date_split[1];
+        if (!in_array('all', $filter['list'])) {
+            $this->db->where_in('id', $filter['list']);
+        }
+        $lists = $this->db->get_where('list', $where_list)->result();
+
+        if ($filter['report_type'] == 'Date Range') {
+            $date_split = explode(' - ', $filter['date_range']);
+            $filter['from'] = $date_split[0];
+            $filter['to'] = $date_split[1];
+        }
         
         // generate mailings by list
         foreach ($lists as $list) {
@@ -134,13 +135,15 @@ class Download_model extends CI_Model {
                     $sql .= " AND pm.mailing_date BETWEEN " 
                     . $this->db->escape($filter['from']) . " AND " 
                     . $this->db->escape($filter['to']);
+                } else if ($filter['report_type'] == 'Last 4 Months') {
+                    $sql .= " AND pm.mailing_date BETWEEN NOW()-INTERVAL 3 MONTH AND NOW()";
+                } else if ($filter['report_type'] == 'Last 12 Months') {
+                    $sql .= " AND pm.mailing_date BETWEEN NOW()-INTERVAL 12 MONTH AND NOW()";
                 }
 
                 $sql .= "GROUP BY id, variable";
 
                 $property_mailings = $this->db->query($sql)->result();
-
-                // echo $this->db->last_query();exit;
 
                 foreach ($property_mailings as $pm) {
                     $letter['mail_qty']++;

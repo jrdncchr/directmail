@@ -142,9 +142,13 @@ class Download_Library {
 
         // Set Headers
         $objPHPExcel->setActiveSheetIndex(0)
-                    ->mergeCells('A1:B1')->setCellValue('A1', $filter['report_type'])
-                    ->mergeCells('C1:D1')->setCellValue('C1', $filter['from'])
-                    ->mergeCells('E1:F1')->setCellValue('E1', $filter['to']);
+                    ->mergeCells('A1:B1')->setCellValue('A1', $filter['report_type']);
+
+        if ($filter['report_type'] === 'Date Range') {
+            $objPHPExcel->setActiveSheetIndex(0)
+                        ->mergeCells('C1:D1')->setCellValue('C1', $filter['from'])
+                        ->mergeCells('E1:F1')->setCellValue('E1', $filter['to']);
+        }
 
 
          $objPHPExcel->setActiveSheetIndex(0)
