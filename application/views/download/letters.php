@@ -7,75 +7,19 @@
 
     <div class="row">
         <div class="col-sm-12 panel-white">
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="filterHeading">
-                    <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" href="#filterBox" aria-expanded="true" aria-controls="filterBox" >
-                        <a role="button" style="font-size: 16px !important; font-weight: bold;">
-                            FILTER
-                        </a>
-                    </h4>
-                </div>
-                <div id="filterBox" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="filterHeading">
-                    <div class="panel-body">
-                        <div class="form-horizontal">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="status" class="control-label col-sm-2">Status</label>
-                                        <div class="col-sm-10">
-                                            <select id="status" class="form-control" multiple="multiple">
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="list" class="control-label col-sm-2">List</label>
-                                        <div class="col-sm-10">
-                                            <select id="list" class="form-control" multiple="multiple">
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="property-name" class="control-label col-sm-4">Property Name</label>
-                                        <div class="col-sm-8">
-                                            <input id="property-name" type="text" class="form-control" v-model="filter.property_name" />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="property-address" class="control-label col-sm-4">Property Address</label>
-                                        <div class="col-sm-8">
-                                            <input id="property-address" type="text" class="form-control" v-model="filter.property_address" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="date-range" class="control-label col-sm-4">Date Range</label>
-                                        <div class="col-sm-8">
-                                            <input id="date-range" type="text" readonly="true" class="form-control" v-model="filter.date_range" />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="letter-no" class="control-label col-sm-4">Letter No.</label>
-                                        <div class="col-sm-8">
-                                            <select id="letter-no" class="form-control" multiple="multiple">
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                                    <a v-on:click="download" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
-                                    <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        
+            <?php 
+            $this->load->view('blocks/filter', [
+                'filter_fields' => [
+                    'status',
+                    'list',
+                    'property-name',
+                    'property-address',
+                    'date-range',
+                    'letter-no'
+                ]
+            ]); 
+            ?>
 
             <table class="table table-bordered table-hover dt-responsive nowrap" width="100%" cellspacing="0">
                 <thead>
