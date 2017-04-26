@@ -13,6 +13,26 @@ class Property_Library {
 		$this->CI->load->library('session');
 	}
 
+    public function bulk_action()
+    {
+        $bulk_action = $this->CI->input->post('bulk_action');
+        if ($bulk_action == 'delete') {
+            $properties = $this->_get_filtered_properties();
+            return $this->CI->property_model->bulk_delete_properties(
+                $this->CI->logged_user->company_id, 
+                $properties
+            );
+        } else if ($bulk_action == 'change_status') {
+            $status = $this->CI->input->post('status');
+            $properties = $this->_get_filtered_properties();
+            return $this->CI->property_model->bulk_change_status_properties(
+                $this->CI->logged_user->company_id, 
+                $properties,
+                $status
+            );
+        }
+    }
+
 	public function confrim_replacement_action($action, $property_id, $target_property_id)
 	{
 		$this->CI->load->model('property_model');
@@ -216,5 +236,45 @@ class Property_Library {
 	    $nmd = date('Y-m-d', strtotime("+" . $type, $date));
 	    return $nmd;
 	}
+
+    public function _get_filtered_properties()
+    {
+        $filter = $this->CI->input->post('filter');
+        $filter = $this->setup_search_filter($filter);
+        $where = array( 
+            'p.deleted' => 0,
+            'p.active' => 1
+        );
+        $properties = $this->CI->property_model->get_properties(
+            $this->CI->logged_user->company_id, 
+            $where, 
+            $filter
+        );
+        return $properties;
+    }
+
+    public function _get_filtered_properties_from_session()
+    {
+        $filter = $this->CI->session->userdata('list_filter');
+        if (isset($filter)) {
+            $where = [
+                'p.deleted' => 0,
+                'p.active' => 1
+            ];
+            switch ($type) {
+                case 'downloads_letters' :
+                case 'downloads_post_letters' :
+                    $filter['status_not_in'] = ['draft', 'duplicate'];
+                    break;
+            }
+            $properties = $this->CI->property_model->get_properties(
+                $this->logged_user->company_id, 
+                $where, 
+                $filter
+            );
+            return $properties;
+        }
+        return false;
+    }
 
 }

@@ -145,9 +145,10 @@ class Download_Library {
                     ->mergeCells('A1:B1')->setCellValue('A1', $filter['report_type']);
 
         if ($filter['report_type'] === 'Date Range') {
+            $date_split = explode(' - ', $filter['date_range']);
             $objPHPExcel->setActiveSheetIndex(0)
-                        ->mergeCells('C1:D1')->setCellValue('C1', $filter['from'])
-                        ->mergeCells('E1:F1')->setCellValue('E1', $filter['to']);
+                        ->mergeCells('C1:D1')->setCellValue('C1', $date_split[0])
+                        ->mergeCells('E1:F1')->setCellValue('E1', $date_split[1]);
         }
 
 

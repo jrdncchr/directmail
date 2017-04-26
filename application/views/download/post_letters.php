@@ -19,6 +19,8 @@
             ]); 
             ?>
 
+            <?php $this->load->view('blocks/bulk_action'); ?>
+
             <table class="table table-bordered table-hover dt-responsive nowrap" width="100%" cellspacing="0">
                 <thead>
                 <tr>
@@ -46,6 +48,7 @@
             property_address : '',
             id: ''
         },
+        bulkStatus: '',
         statusAll: false,
         listAll: true
     };
@@ -96,13 +99,49 @@
                         window.open(baseUrl + 'download/download/downloads_post_letters', '_blank');
                     }
                 });
+            },
+            bulkDelete: function() {
+                showModal('confirm', {
+                    title: 'Bulk Delete Property',
+                    body: 'Are you sure to delete this properties?',
+                    callback: function() {
+                        loading('info', 'Deleting properties, please wait...');
+                        $.post(baseUrl + 'property/bulk_action', { 
+                            action: 'bulk_action', 
+                            filter: data.filter, 
+                            bulk_action: 'delete' 
+                        }, function(res) {
+                            if (res.success) {
+                                loading('success', 'Action Complete');
+                                hideModal();
+                                vm.filterList();
+                                
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            bulkChangeStatus: function() {
+                loading('info', 'Updating Status of properties, please wait...');
+                $.post(baseUrl + 'property/bulk_action', { 
+                    action: 'bulk_action', 
+                    filter: data.filter, 
+                    bulk_action: 'change_status', 
+                    status: data.bulkStatus 
+                }, function(res) {
+                    if (res.success) {
+                        loading('success', 'Action Complete');
+                        vm.filterList();
+                        $('#bulk-change-status-modal').modal('hide');
+                    }
+                }, 'json');
             }
         }
     });
 
     $(function() {
         $('#sidebar-downloads-link').addClass('active');
-        $('#sidebar-downloads-postcards-link').addClass('active');
+        $('#sidebar-downloads-post-letters-link').addClass('active');
         $('#sidebar-downloads').addClass('in');
 
         setupDataTables();

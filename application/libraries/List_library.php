@@ -88,10 +88,7 @@ class List_library {
 
         $this->CI->load->model('property_model');
         $result['duplicates'] = [];
-        $progress = 0;
         foreach ($properties as $property) {
-            // $progress++;
-            // $this->send_message($progress);
 
             // check if its a duplicate or similar to a property
             $check_property = $this->CI->property_model->check_property_exists($property, $this->CI->logged_user->company_id);

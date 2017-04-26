@@ -467,4 +467,63 @@ class Property_model extends CI_Model {
         )->result();
     }
 
+    public function bulk_delete_properties($company_id, $properties)
+    {
+        $property_ids = [];
+        foreach ($properties as $property) {
+            $property_ids[] = is_array($property) ? $property['id'] : $property->id;
+        }
+
+        $start = 0;
+        $end = 200;
+        $size = sizeof($property_ids);
+
+        while ($start < $size) {
+            $batch = array_slice($property_ids, $start, $end);
+            $this->db->where_in('id', $batch);
+            $this->db->delete('property');
+
+            $this->db->where_in('property_id', $batch);
+            $this->db->delete('property_history');
+
+            $this->db->where_in('property_id', $batch);
+            $this->db->delete('property_comment');
+
+            $this->db->where_in('property_id', $batch);
+            $this->db->delete('property_mailing');
+
+            $start = $end;
+            $end += 200;
+            if ($end > $size) {
+                $end = $size;
+            }
+        } 
+        return true;
+    }
+
+    public function bulk_change_status_properties($company_id, $properties, $status)
+    {
+        $property_ids = [];
+        foreach ($properties as $property) {
+            $property_ids[] = is_array($property) ? $property['id'] : $property->id;
+        }
+
+        $start = 0;
+        $end = 200;
+        $size = sizeof($property_ids);
+
+        while ($start < $size) {
+            $batch = array_slice($property_ids, $start, $end);
+            $this->db->where_in('id', $batch);
+            $this->db->update('property', ['status' => $status]);
+
+            $start = $end;
+            $end += 200;
+            if ($end > $size) {
+                $end = $size;
+            }
+        } 
+        return true;
+    }
+
 } 

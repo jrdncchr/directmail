@@ -108,40 +108,9 @@
                     <div class="col-sm-12">
                         <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
                         <a v-on:click="download" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
-                        <a class="btn btn-default btn-sm" data-toggle="modal" data-target="#bulk-action-modal"><i class="fa fa-fire"></i></a>
                         <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Global Confirm Modal -->
-<div class="modal fade" id="bulk-action-modal" tabindex="-1" role="dialog" aria-labelledby="bulk-action-modal-label">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="bulk-action-modal-label">Bulk Action</h4>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="form-group">
-                            <label>Delete Properties</label>
-                            <button class="btn btn-sm btn-block">Delete</button>
-                        </div>
-                        <div class="form-group">
-                            <label>Update Properties Status</label>
-                            <input type="text" class="form-control" />
-                            <button class="btn btn-sm btn-block">Save</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal" id="global-modal-no">Close</button>
             </div>
         </div>
     </div>

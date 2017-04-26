@@ -22,6 +22,8 @@
             ]); 
             ?>
 
+            <?php $this->load->view('blocks/bulk_action'); ?>
+
             <table class="table table-bordered table-hover dt-responsive nowrap" width="100%" cellspacing="0">
                 <thead>
                 <tr>
@@ -53,6 +55,7 @@
             id: '',
             skip_traced: 0
         },
+        bulkStatus: '',
         statusAll: false,
         listAll: true
     };
@@ -105,6 +108,42 @@
                         window.open(baseUrl + 'download/download/downloads_properties', '_blank');
                     }
                 });
+            },
+            bulkDelete: function() {
+                showModal('confirm', {
+                    title: 'Bulk Delete Property',
+                    body: 'Are you sure to delete this properties?',
+                    callback: function() {
+                        loading('info', 'Deleting properties, please wait...');
+                        $.post(baseUrl + 'property/bulk_action', { 
+                            action: 'bulk_action', 
+                            filter: data.filter, 
+                            bulk_action: 'delete' 
+                        }, function(res) {
+                            if (res.success) {
+                                loading('success', 'Action Complete');
+                                hideModal();
+                                vm.filterList();
+                                
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            bulkChangeStatus: function() {
+                loading('info', 'Updating Status of properties, please wait...');
+                $.post(baseUrl + 'property/bulk_action', { 
+                    action: 'bulk_action', 
+                    filter: data.filter, 
+                    bulk_action: 'change_status', 
+                    status: data.bulkStatus 
+                }, function(res) {
+                    if (res.success) {
+                        loading('success', 'Action Complete');
+                        vm.filterList();
+                        $('#bulk-change-status-modal').modal('hide');
+                    }
+                }, 'json');
             }
         }
     });
