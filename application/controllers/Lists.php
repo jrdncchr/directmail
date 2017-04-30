@@ -74,12 +74,12 @@ class Lists extends MY_Controller {
                         $list['created_by'] = $this->logged_user->id;
                         $list['active'] = 1;
                     }
+                     $this->load->model('property_model');
                     $list['company_id'] = $this->logged_user->company_id;
                     $result = $this->list_model->save($list);
                     if ($result['success']) {
                         $adjust = $this->input->post('adjust');
                         if (filter_var($adjust, FILTER_VALIDATE_BOOLEAN)) {
-                            $this->load->model('property_model');
                             $adjust_result = $this->property_model->adjust_mailing($list);
                             $result['message'] = "Save successful and the properties mailing dates are now adjusted!";
                         } else {
@@ -200,7 +200,7 @@ class Lists extends MY_Controller {
                             'l.company_id' => $this->logged_user->company_id
                         ), false);
                     $this->load->library('list_library');
-                    $this->data['result'] = $this->list_library->bulk_import($id);
+                    $this->data['result'] = $this->list_library->bulk_import($this->data['list']);
                     $this->_renderL('lists/bulk_import_result');
                     return;
                 break;

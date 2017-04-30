@@ -419,6 +419,29 @@ class Property_model extends CI_Model {
         }
     }
 
+    public function generate_mailings($list_type, $no_of_letters, $property, $last_mail_date = null, $last_letter_no = 0) {
+        $this->load->library('property_library');
+        if (is_null($last_mail_date)) {
+            $last_mail_date = date('Y-m-d');
+        } else {
+            $last_mail_date = date('Y-m-d', strtotime($last_mail_date));
+        }
+        $mailing_dates = [];
+        for ($i = 0; $i < $no_of_letters; $i++) {
+            $last_letter_no = $last_letter_no + 1;
+            $new_mailing = [
+                'property_id' => $property['id'],
+                'company_id' => $property['company_id'],
+                'letter_no' => $last_letter_no,
+                'mailing_date' => $last_mail_date
+            ]; 
+            $mailing_dates[] = $new_mailing;
+            $last_mail_date = $this->property_library->get_next_mailing_date(
+                    $list_type, $last_mail_date);
+        }
+        return $mailing_dates;
+    }
+
     public function delete_mailings($where) {
         $this->db->where($where);
         return $this->db->delete('property_mailing'); 
@@ -524,6 +547,68 @@ class Property_model extends CI_Model {
             }
         } 
         return true;
+    }
+
+    public function get_last_inserted_row($company_id) 
+    {
+        $this->db->order_by('id', 'desc');
+        $this->db->limit(1);
+        return $this->db->get_where('property', ['company_id' => $company_id])->row();
+    }
+
+    public function save_bulk_import($properties, $mailing_dates, $comments, $histories, $replacements)
+    {
+        $this->db->trans_start();
+        $this->insert_batch($properties, 'property');
+        $this->insert_batch($mailing_dates, 'property_mailing');
+        $this->insert_batch($comments, 'property_comment');
+        $this->insert_batch($histories, 'property_history');
+        $this->insert_batch($replacements, 'property_replacement');
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
+    public function insert_batch($data, $table)
+    {
+        $start = 0;
+        $end = 200;
+        $offset = 200;
+        $size = sizeof($data);
+
+        while ($start < $size) {
+            $batch = array_slice($data, $start, $offset);
+            $insert_string =  $this->insert_batch_string($table, $batch, true);
+            $this->db->query($insert_string);
+            $start = $end+1;
+            $end += 200;
+            if ($end > $size) {
+                $offset = $size;
+            }
+        } 
+        return true;
+    }
+
+    function insert_batch_string($table = '', $data = [], $ignore = false) {
+        $sql = '';
+
+        if ($table && !empty($data)){
+            $rows = [];
+
+            foreach ($data as $row) {
+                $insert_string = $this->db->insert_string($table, $row);
+                if (empty($rows) && $sql =='') {
+                    $sql = substr($insert_string, 0, stripos($insert_string, 'VALUES'));
+                }
+                $rows[] = trim(substr($insert_string, stripos($insert_string,'VALUES') + 6));
+            }
+
+            $sql .= ' VALUES ' . implode(',', $rows);
+
+            if ($ignore) {
+                $sql = str_ireplace('INSERT INTO', 'INSERT IGNORE INTO', $sql);
+            } 
+        }
+        return $sql;
     }
 
 } 

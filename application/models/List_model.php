@@ -52,29 +52,13 @@ class List_model extends CI_Model {
     public function delete($list_id, $company_id)
     {
         $result = array('success' => false);
+        $CI =& get_instance();
+        $CI->load->model('property_model');
+        $properties = $CI->property_model->get_by_list_id($list_id, $company_id);
+        $CI->property_model->bulk_delete_properties($company_id, $properties);
         if ($this->db->delete('list', ['id' => $list_id, 'company_id' => $company_id])) {
             $result['success'] = true;
         }
-
-       //  $CI =& get_instance();
-       //  $CI->load->model('property_model');
-       //  $properties = $CI->property_model->get_by_list_id($list_id, $company_id);
-
-       //  $this->db->trans_begin();
-       //  foreach ($properties as $property) {
-       //      $this->db->delete('property_mailing', ['property_id' => $property->id]);
-       //      $this->db->delete('property_comment', ['property_id' => $property->id]);
-       //      $this->db->delete('property_history', ['property_id' => $property->id]);
-       //  }
-       //  $this->db->delete('property', ['list_id' => $list_id, 'company_id' => $company_id]);
-       //  $this->db->delete('list', ['id' => $list_id, 'company_id' => $company_id]);
-
-       // if ($this->db->trans_status() === FALSE) {
-       //      $this->db->trans_rollback();
-       //  } else {
-       //      $this->db->trans_commit();
-       //      $result['success'] = true;
-       //  }
         return $result;
     }
 

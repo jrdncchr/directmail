@@ -188,11 +188,15 @@
                         name : data.list.name,
                         show_property: data.list.show_property == "1" && data.list.show_property ? 1 : 0,
                         show_pr: data.list.show_pr == "1" &&  data.list.show_pr ? 1 : 0,
-                        show_attorney: data.list.show_attorney == "1" && data.list.show_pr ? 1 : 0,
-                        show_mail: data.list.show_mail == "1" && data.list.show_pr ? 1 : 0,
+                        show_attorney: data.list.show_attorney == "1" && data.list.show_attorney ? 1 : 0,
+                        show_mail: data.list.show_mail == "1" && data.list.show_mail ? 1 : 0,
                         mailing_type: data.list.mailing_type,
                         no_of_letters: data.list.no_of_letters
                     };
+                    if (list.mailing_type == '' || list.no_of_letters == '') {
+                        loading('danger', 'Please select a mailing type and no. of letters for this list.');
+                        return false;
+                    }
                     if (data.list.id > 0) {
                         list.id = data.list.id;
                     }

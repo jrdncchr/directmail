@@ -12,27 +12,31 @@ class List_library {
         $this->CI->load->library('session');
     }
 
-    public function bulk_import($list_id)
+    public function bulk_import($list)
     {
-        set_time_limit(0);
-        ini_set('max_execution_time', 30000);
-        ini_set('memory_limit', '8192M');
+        // set_time_limit(0);
+        // ini_set('max_execution_time', 30000);
+        // ini_set('memory_limit', '8192M');
 
         $result = array(
             'similars' => array(),
             'saved' => array()
         );
         $path = $_FILES["file"]["tmp_name"];
-
         $objPHPExcel = PHPExcel_IOFactory::load($path);
         $sheet = $objPHPExcel->getSheet(0);
         $highestRow = $sheet->getHighestRow();
         $highestColumn = $sheet->getHighestColumn();
         $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
+         $this->CI->load->model('property_model');
+
+        $property_id = $this->CI->property_model->get_last_inserted_row($this->CI->logged_user->company_id)->id + 1;
 
         $properties = array();
         for ($row = 2; $row <= $highestRow; ++ $row) {
             $property = array();
+            $property['id'] = $property_id;
+            $property_id++;
             $property['row'] = $row;
             $property['created_by'] = $this->CI->logged_user->id;
             $property['last_update'] = date('Y-m-d H:i:s');
@@ -78,17 +82,21 @@ class List_library {
                     case 31 : $property['skip_traced'] = $val != 1 ? 0 : 1; break;
                 }
             }
-            if ($property['list_id'] == $list_id) {
+            if ($property['list_id'] == $list->id) {
                 $properties[] = $property;
             }
         }
 
-        $this->CI->load->model('list_model');
-        $list = $this->CI->list_model->get(array('l.id' => $list_id), false);
-
-        $this->CI->load->model('property_model');
         $result['duplicates'] = [];
+        $result['saved'] = [];
+        $inserts = [];
+        $mailing_dates = [];
+        $comments = [];
+        $histories = [];
+        $replacements = [];
+
         foreach ($properties as $property) {
+             $property['property_link'] = base_url() . 'lists/property/' . $list->id . '/info/' . $property['id'];
 
             // check if its a duplicate or similar to a property
             $check_property = $this->CI->property_model->check_property_exists($property, $this->CI->logged_user->company_id);
@@ -97,60 +105,64 @@ class List_library {
                 $similar->permission = $this->CI->_checkListPermission($similar->list_id, 'retrieve');
                 $similar->url = base_url() . "lists/property/". $similar->list_id . "/info/" . $similar->id;
                 $similar->list = $this->CI->list_model->get(['l.id' => $similar->list_id], false);
-                $similar->list->url = base_url() . "lists/info/" . $similar->list_id;
-                $property['status'] = 'duplicate';
-            }
-            // setup data to be saved properly on there corresponding table 
-            $row = $property['row'];
-            unset($property['row']);
-            $mailing_date = $property['mailing_date'];
-            unset($property['mailing_date']);
-            $comment = [
-                'comment' => $property['comment'],
-                'type' => 'comment',
-                'user_id' => $this->CI->logged_user->id
-            ];
-            unset($property['comment']);
-            // save to property
-            $save = $this->CI->property_model->save($property);
-            if ($save['success']) {
-                $property['id'] = $save['id'];
-                // save to property_mailing
-                $this->CI->property_model->add_mailings(
-                    $list->mailing_type, 
-                    $list->no_of_letters, 
-                    $property,
-                    $mailing_date
-                );
-                // save to property_comment
-                $comment['property_id'] = $property['id'];
-                $this->CI->property_model->save_comment($comment);
-                // add property history
-                $history = [
-                    'property_id' => $property['id'],
-                    'message' => 'Added using bulk import by ' . '[' . $this->CI->logged_user->id . '] ' 
-                        . $this->CI->logged_user->first_name . ' ' . $this->CI->logged_user->last_name 
-                        . ', property status is ' . $property['status']
-                ];
-                $this->CI->property_model->add_history($history);
-                
-                $property['mailing_date'] = $mailing_date;
-                $property['comment'] = $comment;
-                $property['row'] = $row;
-                $property['property_link'] = base_url() . 'lists/property/' . $list_id . '/info/' . $property['id'];
-                if ($check_property['exist']) {
-                    $property['similar'] = $similar;
-                    $result['duplicates'][] = $property;
-                    $replacement = [
-                        'property_id' => $property['id'],
-                        'target_property_id' => $similar->id
-                    ];
-                    $this->CI->property_model->save_replacement($replacement);
-                } else {
-                    $result['saved'][] = $property;
+                if ($similar->list) {
+                    $similar->list->url = base_url() . "lists/info/" . $similar->list_id;   
                 }
+                $property['status'] = 'duplicate';
+                $property['similar'] = $similar;
+                $result['duplicates'][] = $property;
+
+                // replacements
+                $replacement = [
+                    'property_id' => $property['id'],
+                    'target_property_id' => $similar->id
+                ];
+                $replacements[] = $replacement;
+            } else {
+                $result['saved'][] = $property;
             }
+
+            // mailing adtes
+            $property_mailing_dates = $this->CI->property_model->generate_mailings(
+                $list->mailing_type, 
+                $list->no_of_letters, 
+                $property,
+                $property['mailing_date']
+            ); 
+            $mailing_dates = array_merge($mailing_dates, $property_mailing_dates);
+
+            // comments
+            if ($property['comment']  && $property['comment'] !== '') {
+                $comment = [
+                    'property_id' => $property['id'],
+                    'comment' => $property['comment'],
+                    'type' => 'comment',
+                    'user_id' => $this->CI->logged_user->id
+                ];
+                $comments[] = $comment;
+            }
+
+            // history
+            $history = [
+                'property_id' => $property['id'],
+                'message' => 'Added using bulk import by user id ' . $this->CI->logged_user->id,
+                'company_id' => $this->CI->logged_user->company_id
+            ];
+            $histories[] = $history;
+
+            unset($property['row']);
+            unset($property['mailing_date']);
+            unset($property['comment']);
+            unset($property['similar']);
+            unset($property['property_link']);
+            $inserts[] = $property;
         }
+
+        // insertion by batch
+        if (!$this->CI->property_model->save_bulk_import($inserts, $mailing_dates, $comments, $histories, $replacements)) {
+            exit('Something went wrong with the import.');
+        }
+
         return $result;
     }
 

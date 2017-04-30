@@ -15,22 +15,22 @@ class Approval extends MY_Controller {
             $action = $this->input->post('action');
             switch ($action) {
                 case 'list':
-                    $filter = $this->input->post('filter');
-                    $this->load->library('property_library');
-                    $filter = $this->property_library->setup_search_filter($filter);
-                    $this->load->model('property_model');
-                    $lists = $this->property_model->get_duplicate_properties($filter, 
-                        $this->logged_user->company_id);
-                    foreach ($lists as $l) {
-                        $l->url = "";
-                        if ($this->_checkListPermission($l->list_id, 'retrieve')) {
-                            $l->url = base_url() . 'lists/property/' . $l->list_id . '/info/' . $l->id;
-                        }
-                        if ($this->_checkListPermission($l->target_list_id, 'retrieve')) {
-                            $l->target_url = base_url() . 'lists/property/' . $l->target_list_id . '/info/' . $l->target_id;
-                        }
-                    }
-                    echo json_encode(array('data' => $lists));
+                    // $filter = $this->input->post('filter');
+                    // $this->load->library('property_library');
+                    // $filter = $this->property_library->setup_search_filter($filter);
+                    // $this->load->model('property_model');
+                    // $lists = $this->property_model->get_duplicate_properties($filter, 
+                    //     $this->logged_user->company_id);
+                    // foreach ($lists as $l) {
+                    //     $l->url = "";
+                    //     if ($this->_checkListPermission($l->list_id, 'retrieve')) {
+                    //         $l->url = base_url() . 'lists/property/' . $l->list_id . '/info/' . $l->id;
+                    //     }
+                    //     if ($this->_checkListPermission($l->target_list_id, 'retrieve')) {
+                    //         $l->target_url = base_url() . 'lists/property/' . $l->target_list_id . '/info/' . $l->target_id;
+                    //     }
+                    // }
+                    echo json_encode(array('data' => []));
                     break;
                 case 'replace_action':
                     $replace_action = $this->input->post('replace_action');
