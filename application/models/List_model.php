@@ -182,4 +182,5 @@ class List_model extends CI_Model {
     {
         $this->db->truncate('list_testimonial');
     }
+    
 } 

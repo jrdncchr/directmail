@@ -422,5 +422,6 @@
                 { className: "dt-align-toggle", "targets": [0] }
             ]
         });
+        
     }
 </script>

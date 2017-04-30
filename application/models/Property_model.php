@@ -610,5 +610,6 @@ class Property_model extends CI_Model {
         }
         return $sql;
     }
+    
 
 } 

@@ -372,4 +372,5 @@ class Lists extends MY_Controller {
         return $mailings;
     }
 
+
 }
