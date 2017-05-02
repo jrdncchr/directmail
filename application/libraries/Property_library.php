@@ -253,7 +253,7 @@ class Property_Library {
         return $properties;
     }
 
-    public function _get_filtered_properties_from_session()
+    public function _get_filtered_properties_from_session($type)
     {
         $filter = $this->CI->session->userdata('list_filter');
         if (isset($filter)) {
@@ -267,8 +267,9 @@ class Property_Library {
                     $filter['status_not_in'] = ['draft', 'duplicate'];
                     break;
             }
+            $filter['download_type'] = $type;
             $properties = $this->CI->property_model->get_properties(
-                $this->logged_user->company_id, 
+                $this->CI->logged_user->company_id, 
                 $where, 
                 $filter
             );

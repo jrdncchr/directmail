@@ -12,12 +12,12 @@ class Download extends MY_Controller {
     public function download($type, $save = 0)
     {
         $this->load->library('property_library');
-        $properties = $this->property_library->_get_filtered_properties_from_session();
+        $properties = $this->property_library->_get_filtered_properties_from_session($type);
         if ($properties) {
             if ($save == 1 && sizeof($properties) > 0) {
                 $history = [
                     'type' => str_replace('_', '-', $type),
-                    'filters' => json_encode($filter),
+                    'filters' => json_encode($this->session->userdata('list_filter')),
                     'downloaded_by_user_id' => $this->logged_user->id,
                     'company_id' => $this->logged_user->company_id
                 ];

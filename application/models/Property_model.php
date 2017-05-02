@@ -202,7 +202,7 @@ class Property_model extends CI_Model {
     {
         $where['p.company_id'] = $company_id;
         $select = 'p.*, l.name as list_name, l.id as list_id';
-        if (isset($filter['date_range'])) {
+        if (isset($filter['date_range']) || isset($filter['letter_no']) || (isset($filter['download_type']) && $filter['download_type'] == 'downloads_letters')) {
             $select = 'p.*, l.name as list_name, l.id as list_id, pm.mailing_date, pm.letter_no';
         }
         $this->db->select($select);
@@ -240,7 +240,7 @@ class Property_model extends CI_Model {
         if (isset($filter['post_letters'])) {
             $this->db->where('pm.mailing_date < ', date('Y-m-d'));
         }
-        if (isset($filter['date_range']) || isset($filter['letter_no'])) {
+        if (isset($filter['date_range']) || isset($filter['letter_no']) || (isset($filter['download_type']) && $filter['download_type'] == 'downloads_letters')) {
             $this->db->join('property_mailing pm', 'pm.property_id = p.id', 'left');
         }
         if (isset($filter['post_letters']))  {
