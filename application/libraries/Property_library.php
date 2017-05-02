@@ -176,6 +176,10 @@ class Property_Library {
 	function setup_search_filter($filter) 
 	{
 	    if (sizeof($filter) > 0) {
+
+		    $CI =& get_instance();
+			$CI->session->set_userdata('list_filter', $filter);
+
 	        if (isset($filter['list']) && in_array('all', $filter['list'])) {
 	            unset($filter['list']);
 	        }
@@ -224,8 +228,6 @@ class Property_Library {
 	        }
 	    }
 	    $filter = $filter ? $filter : [];
-	    $CI =& get_instance();
-		$CI->session->set_userdata('list_filter', $filter);
 	    return $filter;
 	}
 
@@ -256,6 +258,7 @@ class Property_Library {
     public function _get_filtered_properties_from_session($type)
     {
         $filter = $this->CI->session->userdata('list_filter');
+        $filter = $this->setup_search_filter($filter);
         if (isset($filter)) {
             $where = [
                 'p.deleted' => 0,
@@ -263,6 +266,11 @@ class Property_Library {
             ];
             switch ($type) {
                 case 'downloads_letters' :
+                	if (!isset($filter['date_range'])) {
+                        $filter['date_range'] = "pm.mailing_date = '" . date('Y-m-d') . "'";
+                    }
+                    $filter['status_not_in'] = ['draft', 'duplicate'];
+                    break;
                 case 'downloads_post_letters' :
                     $filter['status_not_in'] = ['draft', 'duplicate'];
                     break;
