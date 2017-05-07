@@ -283,7 +283,8 @@ class Property_Library {
                 $filter
             );
             if (isset($filter['remove_duplicates_using_priority']) && filter_var($filter['remove_duplicates_using_priority'], FILTER_VALIDATE_BOOLEAN)) {
-                ini_set('max_execution_time', 300);
+                set_time_limit(0);
+                ini_set('max_execution_time', 30000);
                 $properties = $this->_remove_duplicates_using_priority($properties)['properties'];
             }
             return $properties;
