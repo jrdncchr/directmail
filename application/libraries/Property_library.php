@@ -276,13 +276,14 @@ class Property_Library {
                     break;
             }
             $filter['download_type'] = $type;
-            
+
             $properties = $this->CI->property_model->get_properties(
                 $this->CI->logged_user->company_id, 
                 $where, 
                 $filter
             );
             if (isset($filter['remove_duplicates_using_priority']) && filter_var($filter['remove_duplicates_using_priority'], FILTER_VALIDATE_BOOLEAN)) {
+                ini_set('max_execution_time', 300);
                 $properties = $this->_remove_duplicates_using_priority($properties)['properties'];
             }
             return $properties;
