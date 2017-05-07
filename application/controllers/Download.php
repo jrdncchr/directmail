@@ -38,7 +38,11 @@ class Download extends MY_Controller {
             switch ($action) {
                 case 'list':
                     $this->load->library('property_library');
-                    $properties = $this->property_library->_get_filtered_properties();
+                    $where = array( 
+                        'p.deleted' => 0,
+                        'p.active' => 1
+                    );
+                    $properties = $this->property_library->_get_filtered_properties($where)['properties'];
                     foreach ($properties as $p) {
                         $p->url = "";
                         $p->list_url = "";
@@ -105,21 +109,19 @@ class Download extends MY_Controller {
 
     public function post_letters()
     {
+
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
             $action = $this->input->post('action');
             switch ($action) {
                 case 'list':
-                    $filter = $this->input->post('filter');
-                    $filter['post_letters'] = true;
+                    $_POST['filter']['post_letters'] = true;
+                    $_POST['filter']['status_not_in'] = ['draft', 'duplicate'];
                     $this->load->library('property_library');
-                    $filter = $this->property_library->setup_search_filter($filter);
-                    $this->load->model('property_model');
                     $where = array(
                         'p.deleted' => 0
                     );
-                    $filter['status_not_in'] = ['draft', 'duplicate'];
-                    $properties = $this->property_model->get_properties($this->logged_user->company_id, $where, $filter);
-                    foreach ($properties as $p) {
+                    $properties = $this->property_library->_get_filtered_properties($where);
+                    foreach ($properties['properties'] as &$p) {
                         $p->url = "";
                         $p->list_url = "";
                         if ($this->_checkListPermission($p->list_id, 'retrieve')) {
@@ -127,7 +129,17 @@ class Download extends MY_Controller {
                             $p->list_url = base_url() . 'lists/info/' . $p->list_id;
                         }
                     }
-                    echo json_encode(array('data' => $properties));
+                    // if (isset($properties['duplicates'])) {
+                    //     foreach ($properties['duplicates'] as &$p) {
+                    //         $p->url = "";
+                    //         $p->list_url = "";
+                    //         if ($this->_checkListPermission($p->list_id, 'retrieve')) {
+                    //             $p->url = base_url() . 'lists/property/' . $p->list_id . '/info/' . $p->id;
+                    //             $p->list_url = base_url() . 'lists/info/' . $p->list_id;
+                    //         }
+                    //     }
+                    // }
+                    echo json_encode(array('data' => $properties['properties']));
                     break;
                 default:
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));

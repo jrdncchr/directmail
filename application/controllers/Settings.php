@@ -43,4 +43,25 @@ class Settings extends MY_Controller {
         }
     }
 
+    public function list_priority()
+    {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $action = $this->input->post('action');
+            switch ($action) {
+                case 'save':
+                    $order = $this->input->post('order');
+                    $this->load->model('list_model');
+                    $result = $this->list_model->bulk_update($this->logged_user->company_id, $order);
+                    echo json_encode($result);
+                    break;
+                default:
+                    echo json_encode(array('result' => false, 'message' => 'Action not found.'));
+            }
+        } else {
+            $this->load->model('list_model');
+            $this->data['lists'] = $this->list_model->get_list_by_priority($this->logged_user->company_id);
+            $this->_renderL('settings/list_priority');
+        }
+    }
+
 }

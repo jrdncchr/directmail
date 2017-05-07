@@ -23,6 +23,22 @@ class List_model extends CI_Model {
         return $list ? $result->result() : $result->row();
     }
 
+    public function get_list_by_priority($company_id)
+    {
+        $this->db->order_by('priority', 'date_created');
+        return $this->db->get_where('list', ['company_id' => $company_id, 'deleted' => 0])->result();
+    }
+
+    public function bulk_update($company_id, $data)
+    {
+        $result['success'] = false;
+        $this->db->where('company_id', $company_id);
+        if ($this->db->update_batch('list', $data, 'id')) {
+            $result['success'] = true;
+        }
+        return $result;
+    }
+
     public function save($list)
     {
         if (isset($list['id']) && $list['id'] > 0) {

@@ -17,14 +17,14 @@ class Property_Library {
     {
         $bulk_action = $this->CI->input->post('bulk_action');
         if ($bulk_action == 'delete') {
-            $properties = $this->_get_filtered_properties();
+            $properties = $this->_get_filtered_properties()['properties'];
             return $this->CI->property_model->bulk_delete_properties(
                 $this->CI->logged_user->company_id, 
                 $properties
             );
         } else if ($bulk_action == 'change_status') {
             $status = $this->CI->input->post('status');
-            $properties = $this->_get_filtered_properties();
+            $properties = $this->_get_filtered_properties()['properties'];
             return $this->CI->property_model->bulk_change_status_properties(
                 $this->CI->logged_user->company_id, 
                 $properties,
@@ -239,20 +239,20 @@ class Property_Library {
 	    return $nmd;
 	}
 
-    public function _get_filtered_properties()
+    public function _get_filtered_properties($where)
     {
         $filter = $this->CI->input->post('filter');
         $filter = $this->setup_search_filter($filter);
-        $where = array( 
-            'p.deleted' => 0,
-            'p.active' => 1
-        );
         $properties = $this->CI->property_model->get_properties(
             $this->CI->logged_user->company_id, 
             $where, 
             $filter
         );
-        return $properties;
+        $result['properties'] = $properties;
+        if (isset($filter['remove_duplicates_using_priority']) && filter_var($filter['remove_duplicates_using_priority'], FILTER_VALIDATE_BOOLEAN)) {
+            $result = $this->_remove_duplicates_using_priority($properties);
+        }
+        return $result;
     }
 
     public function _get_filtered_properties_from_session($type)
@@ -276,14 +276,64 @@ class Property_Library {
                     break;
             }
             $filter['download_type'] = $type;
+            
             $properties = $this->CI->property_model->get_properties(
                 $this->CI->logged_user->company_id, 
                 $where, 
                 $filter
             );
+            if (isset($filter['remove_duplicates_using_priority']) && filter_var($filter['remove_duplicates_using_priority'], FILTER_VALIDATE_BOOLEAN)) {
+                $properties = $this->_remove_duplicates_using_priority($properties)['properties'];
+            }
             return $properties;
         }
         return false;
+    }
+
+    public function _remove_duplicates_using_priority($properties)
+    {
+        $duplicates_index = [];
+        $duplicates = [];
+
+        foreach ($properties as $index => $property) {
+            $addr = explode(' ', $property->property_address);
+            if (sizeof($addr) > 1) {
+                $min_addr = strtolower($addr[0] . ' ' . $addr[1]);
+                foreach ($properties as $index2 => $property2) {
+                    if ($property2->id !== $property->id) {
+                        if (strpos(strtolower($property2->property_address), $min_addr) !== false) {
+                            if (($property2->property_city == $property->property_city) && 
+                                ($property2->property_state == $property->property_state) && 
+                                ($property2->property_zipcode == $property->property_zipcode)) {
+                                if ($property2->priority > $property->priority) {
+                                    $duplicates_index[] = $index2;
+                                } else {
+                                    $duplicates_index[] = $index;
+                                }
+                            }
+                        }
+                    }
+                }
+            } 
+        }
+        $duplicates_index = array_unique($duplicates_index);
+        foreach ($duplicates_index as $index) {
+            $duplicates[] = $properties[$index];
+            unset($properties[$index]);
+        }
+
+
+        return array(
+            'properties' => array_values($properties),
+            'duplicates' => array_values($duplicates)
+        );
+    }
+
+    public function _check_if_similar_property($properties, $similars)
+    {
+        return array_filter($properties, function($similars) use ($property_address) { 
+            return in_array(strtolower($property_address), $similars);
+        });
     }
 
 }

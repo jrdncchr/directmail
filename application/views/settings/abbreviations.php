@@ -1,5 +1,5 @@
 <div id="app">
-    <h2><?php echo $page_title; ?></h2>
+    <h2>Abbreviations</h2>
     <ol class="breadcrumb">
         <li><a>Settings</a></li>
         <li><a class="active">Abbreviations</a></li>

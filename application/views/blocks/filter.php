@@ -54,6 +54,18 @@
                         </div>
                     </div>
                     <?php endif; ?>
+                    <?php if (in_array('remove-duplicates-using-priority', $filter_fields)): ?>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="skip-traced" class="control-label col-sm-4">Remove Duplicates using Priority</label>
+                            <div class="col-sm-8">
+                                <div class="checkbox">
+                                    <label><input id="skip-traced" type="checkbox" v-model="filter.remove_duplicates_using_priority" /></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                     <?php if (in_array('resource', $filter_fields)): ?>
                     <div class="col-sm-6">
                         <div class="form-group">

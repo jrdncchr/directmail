@@ -13,6 +13,7 @@
                 'filter_fields' => [
                     'status',
                     'list',
+                    'remove-duplicates-using-priority',
                     'property-name',
                     'property-address'
                 ]
@@ -46,7 +47,8 @@
             list : ['all'],
             property_name : '',
             property_address : '',
-            id: ''
+            id: '',
+            remove_duplicates_using_priority : 0
         },
         bulkStatus: '',
         statusAll: false,

@@ -201,9 +201,9 @@ class Property_model extends CI_Model {
     public function get_properties($company_id, $where = array(), $filter = array(), $order_by = 'p.id')
     {
         $where['p.company_id'] = $company_id;
-        $select = 'p.*, l.name as list_name, l.id as list_id';
+        $select = 'p.*, l.name as list_name, l.id as list_id, l.priority';
         if (isset($filter['date_range']) || isset($filter['letter_no']) || (isset($filter['download_type']) && $filter['download_type'] == 'downloads_letters')) {
-            $select = 'p.*, l.name as list_name, l.id as list_id, pm.mailing_date, pm.letter_no';
+            $select = 'p.*, l.name as list_name, l.id as list_id, pm.mailing_date, pm.letter_no, l.priority';
         }
         $this->db->select($select);
         $this->db->join('list l', 'l.id = p.list_id');

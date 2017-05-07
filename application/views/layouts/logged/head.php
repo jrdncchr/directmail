@@ -22,6 +22,7 @@
 <script src="<?php echo base_url() . 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'resources/js/dataTables.responsive.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'resources/js/responsive.bootstrap.min.js'; ?>"></script>
+<script src="<?php echo base_url() . 'resources/js/jquery.sortable.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'bower_components/vue/dist/vue.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'bower_components/bootstrap/dist/js/bootstrap.min.js'; ?>"></script>
 <script src="<?php echo base_url() . 'bower_components/toastr/toastr.min.js'; ?>"></script>
