@@ -120,7 +120,7 @@
                     <div class="col-sm-12">
                         <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
                         <a v-on:click="download" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
-                        <button v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
+                        <button id="filter-btn" v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
                     </div>
                 </div>
             </div>

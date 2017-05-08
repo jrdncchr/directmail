@@ -89,3 +89,11 @@ function hideModal() {
 function capitalize(str) {
     return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
+
+function filterLoading(spin) {
+    if (spin) {
+        $('#filter-btn').html('<i class="fa fa-spinner fa-spin fa-fw"></i><span class="sr-only">Loading...</span>').prop('disabled', true);
+    } else {
+        $('#filter-btn').html('Filter').prop('disabled', false);
+    }
+}

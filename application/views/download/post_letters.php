@@ -65,6 +65,7 @@
                     return;
                 }
                 loading('info', 'Filtering, please wait...');
+                filterLoading(true);
                 $.post(actionUrl, { action: 'list', filter: data.filter }, function(res) {
                     dt.fnClearTable();
                     if (res.data.length) {
@@ -72,6 +73,7 @@
                     }
                     dt.fnDraw();
                     loading('success', 'Filter Complete');
+                    filterLoading(false);
                 }, 'json');
             },
             clearFilter: function() {
