@@ -203,7 +203,11 @@ class Property_Library {
 	        }
             if (isset($filter['date_range']) && $filter['date_range'] !== '') {
                 $date_split = explode(' - ', $filter['date_range']);
-                $filter['date_range'] = "pm.mailing_date BETWEEN '$date_split[0]' AND '$date_split[1]'"; 
+                if (sizeof($date_split) > 1) {
+                    $filter['date_range'] = "pm.mailing_date BETWEEN '$date_split[0]' AND '$date_split[1]'"; 
+                } else {
+                    $filter['date_range'] = "pm.mailing_date = '$date_split[0]'"; 
+                }
             } else {
                 unset($filter['date_range']);
             }

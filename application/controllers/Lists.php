@@ -9,6 +9,13 @@ class Lists extends MY_Controller {
         $this->data['page_title'] = "Lists";
     }
 
+    public function test()
+    {
+        $this->load->model('property_model');
+        $t = $this->property_model->get_recent_duplicates($this->logged_user->company_id, $this->logged_user->id, 70);
+        var_dump($t);
+    }
+
     public function index()
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {

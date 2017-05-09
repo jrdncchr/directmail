@@ -50,6 +50,12 @@ class Property_model extends CI_Model {
         return $this->db->get_where('property', ['id' => $id, 'company_id' => $company_id])->row();
     }
 
+    public function get_recent_duplicates($company_id, $created_by, $list_id)
+    {
+        return $this->db->query('SELECT * FROM property p WHERE list_id = ' . $list_id . ' AND created_by = ' . $created_by .
+            ' AND status = "duplicate" AND TIMESTAMPDIFF(MINUTE, p.date_created, NOW()) < 40;')->result();
+    }
+
     public function save($property)
     {
         unset($property['target_property_id']);

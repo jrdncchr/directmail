@@ -224,12 +224,7 @@
             multipleDatesSeparator: ' - ',
             dateFormat: 'yyyy-mm-dd',
             onSelect: function(formattedDate, date, inst) {
-                if (formattedDate.length > 11) {
-                    data.filter.download_date = formattedDate;    
-                } else {
-                    data.filter.download_date = '';
-                    $('#download-date').val('');
-                }
+                data.filter.download_date = formattedDate;
             }
         });
     }

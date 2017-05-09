@@ -177,14 +177,18 @@ class Download_model extends CI_Model {
                 $mail['letters'][] = $letter;
             }
             // compute total
-            $total = 0;
+            $mail['total_cost'] = 0;
+            $mail['total_mail_qty'] = 0;
+            $mail['total_leads'] = 0; 
+            $mail['total_buys'] = 0;
             foreach ($mail['letters'] as $letter) {
-                $total += $letter['costs']; 
+                $mail['total_cost'] += $letter['costs']; 
+                $mail['total_mail_qty'] += $letter['mail_qty'];
+                $mail['total_leads'] += $letter['leads'];
+                $mail['total_buys'] += $letter['buys'];
             }
-            $mail['total'] = $total;
             $mailings[] = $mail;
         }
-        
         return $mailings;
     }
 } 

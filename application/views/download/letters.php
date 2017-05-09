@@ -243,12 +243,7 @@
             multipleDatesSeparator: ' - ',
             dateFormat: 'yyyy-mm-dd',
             onSelect: function(formattedDate, date, inst) {
-                if (formattedDate.length > 11) {
-                    data.filter.date_range = formattedDate;    
-                } else {
-                    data.filter.date_range = '';
-                    $('#date-range').val('');
-                }
+                data.filter.date_range = formattedDate;    
             }
         });
     }

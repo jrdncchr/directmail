@@ -20,6 +20,20 @@
             <h2 class="text-center" style="margin-top: 0; margin-bottom: 30px;">Import Complete</h2>
             <section v-show="result.duplicates.length > 0" style="display: none;">
                 <h4><b>{{ result.duplicates.length }}</b> Similar/Duplicate Properties</h4>
+
+                <div class="btn-group" style="margin-bottom: 10px;">
+                    <button type="button" class="btn btn-xs btn-default btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Bulk Action <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" onClick="bulkAction('remove')">Remove</a></li>
+                        <li><a href="#" onClick="bulkAction('replace-address')">Replace (Property Address only)</a></li>
+                        <li><a href="#" onClick="bulkAction('replace-info')">Replace (Property info only)</a></li>
+                        <li><a href="#" onClick="bulkAction('replace-all')">Replace (All including list, mailing, and comments)</a></li>
+                        <li><a href="#" onClick="bulkAction('keep')">Keep (Duplicate will be saved as active.)</a></li>
+                    </ul>
+                </div>
+
                 <table id="duplicates" class="table table-bordered table-hover" width="100%">
                     <thead>
                         <tr>
@@ -103,6 +117,10 @@
                 loading('success', 'Replacement action complete.');
             }
         }, 'json');
+    }
+
+    function bulkAction(action) {
+        alert(action);
     }
 
     $(function() {
