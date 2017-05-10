@@ -81,6 +81,7 @@
 <script>
     var actionUrl = "<?php echo base_url() . 'lists/info'; ?>";
     var dt, duplicateDt;
+    var listId = "<?php echo $list->id; ?>";
 
     var data = {
         result : <?php echo json_encode($result); ?>
@@ -120,7 +121,17 @@
     }
 
     function bulkAction(action) {
-        alert(action);
+        loading('info', 'Bulk action may take a while, please wait...');
+        $.post(actionUrl, {
+            action: 'bulk_action',
+            bulk_action: action,
+            list_id: listId
+        }, function(res) {
+            if (res.success) {
+                duplicateDt.fnClearTable();
+                loading('success', 'Bulk action complete.');
+            }
+        }, 'json');
     }
 
     $(function() {

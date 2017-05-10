@@ -13,6 +13,32 @@ class Property_Library {
 		$this->CI->load->library('session');
 	}
 
+    public function duplicates_bulk_action($action, $list_id) 
+    {
+        $properties = $this->CI->property_model->get_recent_duplicates(
+            $this->CI->logged_user->company_id, 
+            $this->CI->logged_user->id, 
+            $list_id);
+        switch ($action) {
+            case 'remove':
+                return array(
+                    'success' => $this->CI->property_model->bulk_delete_properties(
+                        $this->CI->logged_user->company_id, 
+                        $properties
+                    )
+                );
+                break;
+            case 'replace-address':
+                break;
+            case 'replace-info':
+                break;
+            case 'replace-all':
+                break;
+            case 'keep':
+                break;
+        }
+    }
+
     public function bulk_action()
     {
         $bulk_action = $this->CI->input->post('bulk_action');
@@ -243,7 +269,7 @@ class Property_Library {
 	    return $nmd;
 	}
 
-    public function _get_filtered_properties($where)
+    public function _get_filtered_properties($where = [])
     {
         $filter = $this->CI->input->post('filter');
         $filter = $this->setup_search_filter($filter);

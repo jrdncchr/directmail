@@ -129,6 +129,12 @@ class Lists extends MY_Controller {
                         $property,
                         $target_property_id);
                     break;
+                case 'bulk_action' :
+                    $bulk_action = $this->input->post('bulk_action');
+                    $list_id = $this->input->post('list_id');
+                    $this->load->library('property_library');
+                    $result = $this->property_library->duplicates_bulk_action($bulk_action, $list_id);
+                    break;
             }
             if ($action != 'property_list') {
                 echo json_encode($result);   

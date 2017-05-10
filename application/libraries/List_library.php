@@ -30,7 +30,9 @@ class List_library {
         $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
          $this->CI->load->model('property_model');
 
-        $property_id = $this->CI->property_model->get_last_inserted_row($this->CI->logged_user->company_id)->id + 1;
+        $last_inserted = $this->CI->property_model->get_last_inserted_row()->id;
+        $property_id = $last_inserted == null ? 0 : $last_inserted;
+
 
         $properties = array();
         for ($row = 2; $row <= $highestRow; ++ $row) {

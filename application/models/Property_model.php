@@ -555,11 +555,11 @@ class Property_model extends CI_Model {
         return true;
     }
 
-    public function get_last_inserted_row($company_id) 
+    public function get_last_inserted_row() 
     {
         $this->db->order_by('id', 'desc');
         $this->db->limit(1);
-        return $this->db->get_where('property', ['company_id' => $company_id])->row();
+        return $this->db->get_where('property')->row();
     }
 
     public function save_bulk_import($properties, $mailing_dates, $comments, $histories, $replacements)
