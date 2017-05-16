@@ -52,8 +52,8 @@ class Property_model extends CI_Model {
 
     public function get_recent_duplicates($company_id, $created_by, $list_id)
     {
-        return $this->db->query('SELECT * FROM property p WHERE list_id = ' . $list_id . ' AND created_by = ' . $created_by .
-            ' AND status = "duplicate" AND TIMESTAMPDIFF(MINUTE, p.date_created, NOW()) < 40;')->result();
+        return $this->db->query('SELECT p.*, pc.comment, pm.mailing_date FROM property p LEFT JOIN property_comment pc ON pc.property_id = p.id LEFT JOIN property_mailing pm ON pm.property_id = p.id WHERE list_id = ' . $list_id . ' AND created_by = ' . $created_by .
+            ' AND status = "duplicate" AND TIMESTAMPDIFF(MINUTE, p.date_created, NOW()) < 40 AND pm.letter_no = 1;')->result();
     }
 
     public function save($property)

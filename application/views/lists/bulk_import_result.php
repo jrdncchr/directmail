@@ -18,11 +18,11 @@
     <div class="row">
         <div class="col-sm-12 panel-white">
             <h2 class="text-center" style="margin-top: 0; margin-bottom: 30px;">Import Complete</h2>
-            <section v-show="result.duplicates.length > 0" style="display: none;">
+            <section v-show="result.duplicates.length > 0" style="display: none;" id="duplicates-section">
                 <h4><b>{{ result.duplicates.length }}</b> Similar/Duplicate Properties</h4>
 
                 <div class="btn-group" style="margin-bottom: 10px;">
-                    <button type="button" class="btn btn-xs btn-default btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button type="button" class="btn btn-xs btn-default btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="bulk-action-btn" style="width: 200px;">
                         Bulk Action <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
@@ -49,7 +49,7 @@
                     <tbody></tbody>
                 </table>
             </section>
-            <h4><b>{{ result.saved.length }}</b> Successfully Saved Properties</h4>
+            <h4><b>{{ result.saved.length }}</b> Successfully Saved no duplicate Properties</h4>
             <section v-show="result.saved.length > 0" style="display: none;">
                
                 <div class="table-responsive" style="width: 100%; margin-top: 20px;">
@@ -121,14 +121,18 @@
     }
 
     function bulkAction(action) {
+        spinButton($('#bulk-action-btn'), true);
         loading('info', 'Bulk action may take a while, please wait...');
         $.post(actionUrl, {
             action: 'bulk_action',
             bulk_action: action,
             list_id: listId
         }, function(res) {
+            spinButton($('#bulk-action-btn'), false, 'Bulk Action <span class="caret"></span>');
             if (res.success) {
                 duplicateDt.fnClearTable();
+                data.result.duplicates.length = 0;
+                $('#duplicates-section').hide();
                 loading('success', 'Bulk action complete.');
             }
         }, 'json');

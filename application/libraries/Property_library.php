@@ -29,12 +29,40 @@ class Property_Library {
                 );
                 break;
             case 'replace-address':
+                foreach ($properties as $property) {
+                    $duplicate = $this->CI->property_model->check_property_exists(
+                        (array)$property, 
+                        $this->CI->logged_user->company_id);
+                    $this->replace('replaced_address_only', $property, $duplicate['properties'][0]->id);
+                }
+                return array('success' => true);
                 break;
             case 'replace-info':
+                foreach ($properties as $property) {
+                    $duplicate = $this->CI->property_model->check_property_exists(
+                        (array)$property, 
+                        $this->CI->logged_user->company_id);
+                    $this->replace('replaced_property_info_only', $property, $duplicate['properties'][0]->id);
+                }
+                return array('success' => true);
                 break;
             case 'replace-all':
+                foreach ($properties as $property) {
+                    $duplicate = $this->CI->property_model->check_property_exists(
+                        (array)$property, 
+                        $this->CI->logged_user->company_id);
+                    $this->replace('replaced_all', $property, $duplicate['properties'][0]->id);
+                }
+                return array('success' => true);
                 break;
             case 'keep':
+                return array(
+                    'success' => $this->CI->property_model->bulk_change_status_properties(
+                        $this->CI->logged_user->company_id, 
+                        $properties,
+                        'active'
+                    )
+                );
                 break;
         }
     }
@@ -93,7 +121,7 @@ class Property_Library {
 	public function replace($status, $property, $target_property_id, $replace_list = false)
 	{
 		$message = "";
-		if (!is_array($property)) {
+		if (!is_array($property) && !is_object($property)) {
 			$property = $this->CI->property_model->get(['p.id' => $property], false);
 		} else {
 			$property = (object) $property;
@@ -148,12 +176,14 @@ class Property_Library {
 					$this->CI->property_model->delete_mailings(['property_id' => $target_property->id]);
                 	$this->CI->property_model->delete_comments(['property_id' => $target_property->id]);
 
-                	$comment = [
-		            	'property_id' => $target_property->id,
-		            	'comment' => $property_comments['comment'],
-		            	'user_id' => $this->CI->logged_user->id
-		            ];
-		            $this->CI->property_model->save_comment($comment);
+                    if ($property_comments['comment']) {
+                        $comment = [
+                            'property_id' => $target_property->id,
+                            'comment' => $property_comments['comment'],
+                            'user_id' => $this->CI->logged_user->id
+                        ];
+                        $this->CI->property_model->save_comment($comment);
+                    }
 		            
 					$this->CI->property_model->add_history([
 						'property_id' =>  $target_property->id,
@@ -163,7 +193,7 @@ class Property_Library {
 					]);
 
 					$this->CI->load->model('list_model');
-					$list = $this->CI->list_model->get(array('l.id' => $property['list_id']), false);
+					$list = $this->CI->list_model->get(array('l.id' => $list_id), false);
 					$this->CI->property_model->add_mailings(
 		                $list->mailing_type, 
 		                $list->no_of_letters, 

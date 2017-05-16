@@ -97,3 +97,11 @@ function filterLoading(spin) {
         $('#filter-btn').html('Filter').prop('disabled', false);
     }
 }
+
+function spinButton(btn, spin, text) {
+    if (spin) {
+        btn.html('<i class="fa fa-spinner fa-spin fa-fw"></i><span class="sr-only">Loading...</span>').prop('disabled', true);
+    } else {
+        btn.html(text).prop('disabled', false);
+    }
+}
