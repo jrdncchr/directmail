@@ -2,8 +2,8 @@
     <a class="sidebar-brand" href="<?php echo base_url() . 'dashboard'; ?>" style="font-size: 24px !important;">
         Direct Mail
     </a>
-    <?php foreach ($modules as $m): ?>
-    <?php if ($mc->_checkModulePermission($m->id, 'retrieve')): ?>
+    <?php foreach ($modules as $m):  ?>
+    <?php if ($mc->_checkModulePermission($m->id, 'retrieve') && $m->id != 27 && $m->id != 8): ?>
     <div class="panel panel-sidebar" id="panel-sidebar">
 
         <?php if (sizeof($m->children) > 0 || $m->code == "templates"): ?>
@@ -25,7 +25,7 @@
         <div id="sidebar-<?php echo $m->code; ?>" class="panel-collapse collapse" role="tabpanel">
             <div class="panel-body">
                 <?php foreach ($m->children as $child): ?>
-                    <?php if ($mc->_checkModulesChildPermission($m->id, $child->id, 'retrieve')): ?>
+                    <?php if ($mc->_checkModulesChildPermission($m->id, $child->id, 'retrieve') && $child->id != 19 && $child->id != 20): ?>
                     <a id="sidebar-<?php echo $child->code; ?>-link" href="<?php echo base_url() . $child->link; ?>"><?php echo $child->name; ?></a>
                     <?php endif; ?>
                 <?php endforeach; ?>

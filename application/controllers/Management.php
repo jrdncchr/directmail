@@ -155,6 +155,20 @@ class Management extends MY_Controller {
                         $this->_renderL('management/users_form');
                     }
                     break;
+                case 'login_user' :
+                    if ($this->_checkModulesChildPermission(21, 22, 'update')) {
+                        $this->session->sess_destroy();
+                        $this->load->model('user_model');
+                        $result = $this->user_model->login_by_user_id($this->logged_user->company_id, $id);
+                        if ($result['success']) {
+                        } else {
+                            $this->session->set_flashdata('message', create_alert_message($result));
+                            $this->_render('auth/login');
+                        }
+
+                    }
+                     $this->show_404();
+                    break;
                 default:
                     $this->show_404();
             }

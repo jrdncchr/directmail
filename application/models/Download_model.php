@@ -101,6 +101,11 @@ class Download_model extends CI_Model {
             $filter['from'] = $date_split[0];
             $filter['to'] = $date_split[1];
         }
+
+        $type = 'downloads-post-letters';
+        if ($filter['type'] == 'letter') {
+            $type = 'downloads-letters';
+        }
         
         // generate mailings by list
         foreach ($lists as $list) {
@@ -127,7 +132,9 @@ class Download_model extends CI_Model {
                     WHERE pm.letter_no = " . $this->db->escape($i) . "
                     AND p.company_id = " . $filter['company_id'] . " 
                     AND p.status NOT IN ('stop', 'draft', 'duplicate') 
-                    AND dh.type = 'downloads-letters'";
+                    AND dh.type = '$type'";
+
+
 
                 $sql .= " AND p.list_id = " . $this->db->escape($list->id);
 
@@ -141,7 +148,7 @@ class Download_model extends CI_Model {
                     $sql .= " AND pm.mailing_date BETWEEN NOW()-INTERVAL 12 MONTH AND NOW()";
                 }
 
-                $sql .= "GROUP BY id, variable";
+                $sql .= "GROUP BY id, variable, cost";
 
                 $property_mailings = $this->db->query($sql)->result();
 

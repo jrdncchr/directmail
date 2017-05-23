@@ -67,6 +67,47 @@ class User_model extends CI_Model {
         return $result;
     }
 
+    public function login_by_user_id($company_id, $user_id)
+    {
+         $company_result = $this->db->get_where('company', array(
+            'id' => $company_id, 
+            'deleted' => 0, 
+            'status' => 'active')
+        );
+        if (!$company_result->num_rows()) {
+            $result['message'] = "Company does not exist.";
+            return $result;
+        }
+        $company = $company_result->row();
+
+        $result['message'] = "Incorrect email or password.";
+        // Check User
+        $where = array(
+            'user.id' => $user_id,
+            'user.company_id' => $company->id,
+            'user.deleted' => 0
+        );
+
+        $this->db->select('user.*, roles.super_admin');
+        $this->db->join('roles', 'user.role_id = roles.id', 'left');
+        $user_result = $this->db->get_where('user', $where);
+        if (!$user_result->num_rows()) {
+            return $result;
+        }
+        $user = $user_result->row();
+
+        // Check if confirmed
+        if ($user->confirmed == 0) {
+            $result['message'] = "Verify your email address.";
+            return $result;
+        }
+
+        $user->company = $company;
+        $result = array('success' => true);
+        $this->session->set_userdata('user', $user);
+        return $result;
+    }
+
     public function register($info, $manually_added = false)
     {
         $result = array('success' => false);

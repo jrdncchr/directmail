@@ -10,6 +10,7 @@
         <div class="col-sm-12">
             <?php if (isset($user)): ?>
             <button class="btn btn-xs" style="margin-bottom: 10px;" v-on:click="deleteUser"><i class="fa fa-trash-o"></i> Delete User</button>
+      <!--       <a href="<?php echo base_url() . 'management/users/login_user/' . $user->id; ?>" class="btn btn-xs btn-default" style="margin-bottom: 10px; margin-right: 10px;"><i class="fa fa-user"></i> Login User</a> -->
             <?php else: ?>
             <div class="alert alert-info"><i class="fa fa-question-circle"></i> Password will be sent to the email address after saving.</div>
             <?php endif; ?>

@@ -36,7 +36,7 @@
                                         <div class="col-sm-8">
                                             <select class="form-control" v-model="filter.type" name="type">
                                                 <option value="letter">Letter</option>
-                                                <option value="postcard">Postcard</option>
+                                                <option value="post-letters">Post Letters</option>
                                             </select>
                                         </div>
                                     </div>
