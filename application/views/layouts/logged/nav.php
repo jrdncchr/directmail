@@ -3,7 +3,7 @@
         Direct Mail
     </a>
     <?php foreach ($modules as $m):  ?>
-    <?php if ($mc->_checkModulePermission($m->id, 'retrieve') && $m->id != 27 && $m->id != 8): ?>
+    <?php if ($mc->_checkModulePermission($m->id, 'retrieve') && $m->id != 27 && $m->id != 8 && $m->id != 1): ?>
     <div class="panel panel-sidebar" id="panel-sidebar">
 
         <?php if (sizeof($m->children) > 0 || $m->code == "templates"): ?>

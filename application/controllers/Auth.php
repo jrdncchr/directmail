@@ -7,7 +7,7 @@ class Auth extends MY_Controller {
     {
         parent::__construct();
         if ($this->logged_user !== null) {
-            redirect(base_url() . 'dashboard');
+            redirect(base_url() . 'lists');
         }
     }
 
@@ -23,7 +23,7 @@ class Auth extends MY_Controller {
             $this->load->model('user_model');
             $result = $this->user_model->login($auth);
             if ($result['success']) {
-                redirect(base_url() . 'dashboard');
+                redirect(base_url() . 'lists');
             } else {
                 $this->session->set_flashdata('message', create_alert_message($result));
                 $this->_render('auth/login');
