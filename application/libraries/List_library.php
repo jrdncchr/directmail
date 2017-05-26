@@ -84,7 +84,6 @@ class List_library {
                     case 31 : $property['skip_traced'] = $val != 1 ? 0 : 1; break;
                 }
             }
-            var_dump($property['mailing_date']);exit;
             if ($property['list_id'] == $list->id) {
                 $properties[] = $property;
             }
