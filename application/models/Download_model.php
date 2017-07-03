@@ -131,10 +131,11 @@ class Download_model extends CI_Model {
                     LEFT JOIN download_history dh ON dh.id = dhp.history_id
                     WHERE pm.letter_no = " . $this->db->escape($i) . "
                     AND p.company_id = " . $filter['company_id'] . " 
-                    AND p.status NOT IN ('stop', 'draft', 'duplicate') 
-                    AND dh.type = '$type'";
+                    AND p.status NOT IN ('stop', 'draft', 'duplicate')";
 
-
+                if ($filter['type'] !== 'all') {
+                    $sql .= "AND dh.type = '$type'";
+                }
 
                 $sql .= " AND p.list_id = " . $this->db->escape($list->id);
 

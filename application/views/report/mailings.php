@@ -35,6 +35,7 @@
                                         <label for="type" class="control-label col-sm-4">Type</label>
                                         <div class="col-sm-8">
                                             <select class="form-control" v-model="filter.type" name="type">
+                                                <option value="all">All</option>
                                                 <option value="letter">Letter</option>
                                                 <option value="post-letters">Post Letters</option>
                                             </select>
@@ -80,7 +81,7 @@
         filter : {
             list : ['all'],
             date_range : '',
-            type: 'letter',
+            type: 'all',
             report_type: 'Date Range'
         },
         statusText: 'Active',
