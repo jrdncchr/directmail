@@ -65,7 +65,7 @@ class Backup_model extends CI_Model {
             $path = 'backups/directmail-backup-' .  time() . '.sql';
             $command = 'c:\wamp64\bin\mysql\mysql5.7.14\bin\mysqldump -u root -h localhost directmail property property_comment property_history property_mailing property_replacement download_history download_history_property list list_bullet_point list_category list_paragraph list_testimonial > ' . $path;
         } else {
-            $command = 'mysqldump -u root -h localhost directmail property property_comment property_history property_mailing property_replacement download_history download_history_property list list_bullet_point list_category list_paragraph list_testimonial > ' . $path;
+            $command = 'mysqldump -u directmail -p pogiako123 -h localhost directmail property property_comment property_history property_mailing property_replacement download_history download_history_property list list_bullet_point list_category list_paragraph list_testimonial > ' . $path;
         }
         exec($command);
 
@@ -91,7 +91,7 @@ class Backup_model extends CI_Model {
         if (ENVIRONMENT === 'development') {
             $command = 'c:\wamp64\bin\mysql\mysql5.7.14\bin\mysql -u root -h localhost directmail < ' . $path;
         } else {
-            $command = 'mysql -u root -h localhost directmail < ' . $path;
+            $command = 'mysql -u directmail -p pogiako123 -h localhost directmail < ' . $path;
         }
         exec($command, $output, $return);
         if (!$return) {
