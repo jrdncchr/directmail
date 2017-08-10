@@ -13,11 +13,17 @@ class List_model extends CI_Model {
     /*
      * List
      */
-    public function get($where = array(), $list = true)
+    public function get($where = array(), $list = true, $get_need_actions = false)
     {
         $where['l.deleted'] = 0;
         $where['l.active'] = 1;
         $this->db->select('l.*, u.first_name, u.last_name');
+        if ($get_need_actions) {
+            $this->db->select("(SELECT COUNT(*) FROM property p WHERE p.list_id = l.id AND p.status = 'duplicate') duplicate_count");
+            $this->db->select("(SELECT COUNT(*) FROM property p WHERE p.list_id = l.id AND p.status = 'draft') draft_count");
+            $this->db->where("((SELECT COUNT(*) FROM property p WHERE p.list_id = l.id AND p.status = 'duplicate') > 0 OR (SELECT COUNT(*) FROM property p WHERE p.list_id = l.id AND p.status = 'draft') > 0)");
+        }
+
         $this->db->join('user u', 'u.id = l.created_by', 'left');
         $result = $this->db->get_where('list l', $where);
         return $list ? $result->result() : $result->row();
@@ -41,6 +47,7 @@ class List_model extends CI_Model {
 
     public function save($list)
     {
+        $action_word = "Updated";
         if (isset($list['id']) && $list['id'] > 0) {
             $old = $this->db->get_where('list', array('id' => $list['id']))->row();
             if ($list['name'] != $old->name) {
@@ -54,6 +61,7 @@ class List_model extends CI_Model {
             if ($this->check_list_name_exists($list['name'], $list['company_id'])) {
                 return array('success' => false, 'message' => 'List name already exist.');
             }
+            $action_word = "Created";
             $this->db->insert('list', $list);
             $list['id'] = $this->db->insert_id();
 
@@ -62,6 +70,12 @@ class List_model extends CI_Model {
             $CI->user_model->_create_list_permission($list['created_by'], $list['id']);
             $this->session->unset_userdata('user_list_permissions');
         }
+        // log user action
+        $this->dm_library->insert_user_log([
+            'user_id' => $this->logged_user->id,
+            'log' => "$action_word a list with an ID of " . $list['id'] . " [" . $list['name'] . "].",
+            'link' => base_url() . "lists/info/" . $list['id']
+        ]);
         return array('success' => true, 'id' =>  $list['id']);
     }
 
@@ -70,11 +84,17 @@ class List_model extends CI_Model {
         $result = array('success' => false);
         $CI =& get_instance();
         $CI->load->model('property_model');
+        $list_name = $this->db->get_where('list', ['id' => $list_id, 'company_id' => $company_id])->row()->name;
         $properties = $CI->property_model->get_by_list_id($list_id, $company_id);
         $CI->property_model->bulk_delete_properties($company_id, $properties);
         if ($this->db->delete('list', ['id' => $list_id, 'company_id' => $company_id])) {
             $result['success'] = true;
         }
+        // log user action
+        $this->dm_library->insert_user_log([
+            'user_id' => $this->logged_user->id,
+            'log' => "Deleted a list with an ID of " . $list_id . " [" . $list_name ."]."
+        ]);
         return $result;
     }
 
@@ -197,6 +217,25 @@ class List_model extends CI_Model {
     public function truncate_list_testimonials()
     {
         $this->db->truncate('list_testimonial');
+    }
+
+    public function get_list_properties_count($company_id, $filter)
+    {
+        $where['l.company_id'] = $company_id;
+        $this->db->select(' l.id, l.name, COUNT(p.id) AS property_count');
+        $this->db->join('property p', 'p.list_id = l.id', 'left');
+
+        if (isset($filter['date_range']) && $filter['date_range'] !== '') {
+            $date_split = explode(' - ', $filter['date_range']);
+            $this->db->where("p.date_created BETWEEN '$date_split[0]' AND '$date_split[1]'"); 
+        }
+
+        $this->db->where("l.company_id = $company_id");
+        $this->db->group_by('l.id'); 
+        $this->db->order_by('property_count');
+
+        $list_property = $this->db->get_where('list l', $where)->result();
+        return $list_property;
     }
     
 } 

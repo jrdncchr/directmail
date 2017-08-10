@@ -22,7 +22,13 @@ class Download_model extends CI_Model {
                 'property_id' => $property->id
             ];
         }
-        $this->db->insert_batch('download_history_property', $download_history_properties);
+        $this->db->insert_batch('download_history_property', $download_history_properties); 
+
+       // log user action
+        $this->dm_library->insert_user_log([
+            'user_id' => $this->logged_user->id,
+            'log' => "Downloaded from " . $history['type'] . " with a size of " . sizeof($properties) . " properties."
+        ]);
     }
 
     public function get_download_history($company_id, $filter, $where = [])
@@ -197,6 +203,18 @@ class Download_model extends CI_Model {
             }
             $mailings[] = $mail;
         }
+
+        $log = "Generated a mailing report using the list ID of " .  implode(", ", $filter['list']) .  " in the type of $type.";
+        if (isset($filter['date_range'])) {
+            $log .= " Using date range of: " . $filter['date_range'];
+        }
+
+         // log user action
+        $this->dm_library->insert_user_log([
+            'user_id' => $this->logged_user->id,
+            'log' => $log
+        ]);
+
         return $mailings;
     }
 } 

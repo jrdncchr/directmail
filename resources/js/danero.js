@@ -51,6 +51,20 @@ function loading(type, message) {
     }
 }
 
+
+// ex. 
+//  showModal('yesno', {
+//     title: 'Restore Backup Confirmation',
+//     body: 'Make sure to backup first before restoring, continue?',
+//     callback: function() {
+//         $('#global-modal').modal('hide');
+//         window.open(baseUrl + 'download/download/list/1', '_blank');
+//     },
+//     cancelCallback: function() {
+//         $('#global-modal').modal('hide');
+//         window.open(baseUrl + 'download/download/list', '_blank');
+//     }
+// });
 function showModal(type, config) {
     var modal = $('#global-modal');
     if (type === 'yesno') {
@@ -100,7 +114,7 @@ function filterLoading(spin) {
 
 function spinButton(btn, spin, text) {
     if (spin) {
-        btn.html('<i class="fa fa-spinner fa-spin fa-fw"></i><span class="sr-only">Loading...</span>').prop('disabled', true);
+        btn.html('<i class="fa fa-spinner fa-spin fa-fw"></i><span class="sr-only">Please wait...</span>').prop('disabled', true);
     } else {
         btn.html(text).prop('disabled', false);
     }

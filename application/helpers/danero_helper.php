@@ -25,6 +25,16 @@ function create_alert_message($result)
     ";
 }
 
+function get_start_and_end_date_current_month() 
+{
+    $month_start_ts = strtotime('first day of this month', time());
+    $month_end_ts = strtotime('last day of this month', time());
+    return [
+        'start' => date('Y-m-d', $month_start_ts),
+        'end' => date('Y-m-d', $month_end_ts)
+    ];
+}
+
 function json_response($code = 200, $message = null)
 {
     // clear the old headers

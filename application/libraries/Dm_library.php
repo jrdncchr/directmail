@@ -5,6 +5,13 @@ if (!defined('BASEPATH'))
 
 class Dm_library {
 
+    public function insert_user_log($log) 
+    {
+        $CI =& get_instance();
+        $CI->load->model('user_model');
+        return $CI->user_model->insert_user_log($log);
+    }
+
     public function getStatusesForSelect2($exclude = []) 
     {
         $result = [];

@@ -73,13 +73,21 @@ class Property_model extends CI_Model {
         }
 
         $property['last_update'] = date('Y-m-d H:i:s');
+        $action_word = "Updated";
         if (isset($property['id']) && $property['id'] > 0) {
             $this->db->where('id', $property['id']);
             $this->db->update('property', $property);
         } else {
+            $action_word = "Created";
             $this->db->insert('property', $property);
             $property['id'] = $this->db->insert_id();
         }
+        // log user action
+        $this->dm_library->insert_user_log([
+            'user_id' => $this->logged_user->id,
+            'log' => "$action_word a property with an ID of " . $property['id'] . " status is " . $property['status'] . ".",
+            'link' => base_url() . 'lists/property/' . $property['list_id'] . '/info/' . $property['id']
+        ]);
         return array('success' => true, 'id' =>  $property['id']);
     }
 
@@ -104,6 +112,12 @@ class Property_model extends CI_Model {
             $this->db->where('property_id', $id);
             $this->db->delete('property_comment');
         }
+
+        // log user action
+        $this->dm_library->insert_user_log([
+            'user_id' => $this->logged_user->id,
+            'log' => "Deleted a property with an ID of " . $id . ".",
+        ]);
 
         return array('success' => true);
     }
@@ -141,6 +155,7 @@ class Property_model extends CI_Model {
 
     public function get_mailings($where = array(), $list = true) 
     {
+        $this->db->order_by('letter_no');
         $result = $this->db->get_where('property_mailing', $where);
         return $list ? $result->result() : $result->row();
     }
@@ -293,7 +308,7 @@ class Property_model extends CI_Model {
         $this->db->where('company_id', $company_id);
         $this->db->where('deleted', 0);
         $this->db->where('active', 1);
-        $this->db->where_not_in('status', ['replacement', 'duplicate']);
+        $this->db->where_not_in('status', ['replacement', 'duplicate', 'draft']);
         if (isset($property['id'])) {
             $this->db->where('id !=', $property['id']);
         }
@@ -571,6 +586,7 @@ class Property_model extends CI_Model {
         $this->insert_batch($histories, 'property_history');
         $this->insert_batch($replacements, 'property_replacement');
         $this->db->trans_complete();
+
         return $this->db->trans_status();
     }
 

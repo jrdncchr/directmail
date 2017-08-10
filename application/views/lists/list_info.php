@@ -55,7 +55,7 @@
                 <div class="form-group">
                     <label for="name">* Actions</label>
                     <?php if (($list->id > 0 && $mc->_checkListPermission($list->id, 'update')) || $list->id === 0):  ?>
-                    <button v-on:click="saveList" class="btn btn-sm btn-block btn-main">
+                    <button id="saveListBtn" v-on:click="saveList" class="btn btn-sm btn-block btn-main">
                         <i class="fa fa-save"></i> Save
                     </button>
                     <?php endif; ?>
@@ -100,6 +100,9 @@
                         'resource',
                         'property-name',
                         'property-address'
+                    ],
+                    'options' => [
+                        'download' => true
                     ]
                 ]); 
                 ?>
@@ -220,6 +223,7 @@
                 }
             },
             saveNow: function(list, adjust) {
+                spinButton($('#saveListBtn'), true);
                 loading('info', 'Saving list...');
                 $.post(actionUrl, { 
                     action: 'save_list', 
@@ -232,6 +236,7 @@
                     } else {
                         validator.displayAlertError($('#list-form'), true, res.message);
                     }
+                    spinButton($('#saveListBtn'), false, '<i class="fa fa-save"></i> Save List');
                 }, 'json');
             },
             deleteList: function() {

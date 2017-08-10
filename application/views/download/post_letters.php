@@ -16,6 +16,9 @@
                     'remove-duplicates-using-priority',
                     'property-name',
                     'property-address'
+                ],
+                'options' => [
+                    'download' => true
                 ]
             ]); 
             ?>

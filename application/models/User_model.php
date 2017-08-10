@@ -416,4 +416,31 @@ class User_model extends CI_Model {
             )
         );
     }
-} 
+
+    /*
+     * User Logs
+     */
+    public function get_user_logs($filter = [], $user_id = 0) 
+    {   
+        $this->db->select('ul.*, CONCAT(u.first_name, " ", u.last_name) as name');
+        $this->db->join('user u',  'u.id = ul.user_id', 'left');
+        if (isset($filter['user_id'])) {
+            $this->db->where('user_id', $filter['user_id']);
+        }
+        if (isset($filter['date_range']) && $filter['date_range'] !== '') {
+            $date_split = explode(' - ', $filter['date_range']);
+            $this->db->where("ul.date_created BETWEEN '$date_split[0]' AND '$date_split[1]'"); 
+        }
+        if ($user_id > 0) {
+            $result = $this->db->get_where('user_logs ul', ['user_id' => $user_id])->result();
+        } else {
+            $result = $this->db->get('user_logs ul')->result();
+        }
+        return $result;
+    }
+
+    public function insert_user_log($user_log)
+    {
+        return $this->db->insert('user_logs', $user_log);
+    }
+}

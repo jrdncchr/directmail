@@ -17,6 +17,9 @@
                     'property-address',
                     'date-range',
                     'letter-no'
+                ],
+                'options' => [
+                    'download' => true
                 ]
             ]); 
             ?>

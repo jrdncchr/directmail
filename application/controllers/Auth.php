@@ -23,7 +23,7 @@ class Auth extends MY_Controller {
             $this->load->model('user_model');
             $result = $this->user_model->login($auth);
             if ($result['success']) {
-                redirect(base_url() . 'lists');
+                redirect(base_url() . 'dashboard');
             } else {
                 $this->session->set_flashdata('message', create_alert_message($result));
                 $this->_render('auth/login');

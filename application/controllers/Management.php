@@ -267,4 +267,80 @@ class Management extends MY_Controller {
         }
     }
 
+    public function inserted_properties_counter()
+    {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $action = $this->input->post('action');
+            $this->load->model('list_model');
+            switch ($action) {
+                case 'list':
+                    $filter = $this->input->post('filter');
+                    if (!isset($filter['date_range']) || $filter['date_range'] === '') {
+                        $date_range = get_start_and_end_date_current_month();
+                        $filter['date_range'] = $date_range['start'] . ' - ' . $date_range['end'];
+                    }
+                    $list = $this->list_model->get_list_properties_count($this->logged_user->company_id, $filter);
+                    echo json_encode(array('data' => $list));
+                    break;
+                default:
+                    echo json_encode(array('result' => false, 'message' => 'Action not found.'));
+            }
+        } else {
+            $date_range = get_start_and_end_date_current_month();
+            $this->data['current_date_range'] = $date_range['start'] . ' - ' . $date_range['end'];
+            $this->_renderL('management/inserted_properties_counter');
+        }
+    }
+
+    public function backup_and_restore()
+    {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $action = $this->input->post('action');
+            $this->load->model('backup_model');
+            switch ($action) {
+                case 'list':
+                    $list = $this->backup_model->get();
+                    echo json_encode(array('data' => $list));
+                    break;
+                case 'backup':
+                    $result = $this->backup_model->backup($this->logged_user->id);
+                    echo json_encode($result);
+                    break;
+                case 'restore':
+                    $id = $this->input->post('id');
+                    $result = $this->backup_model->restore($id);
+                    echo json_encode($result);
+                    break;
+                case 'delete':
+                    $id = $this->input->post('id');
+                    $result = $this->backup_model->delete($id);
+                    echo json_encode($result);
+                    break;
+                default:
+                    echo json_encode(array('result' => false, 'message' => 'Action not found.'));
+            }
+        } else {
+            $this->_renderL('management/backup_and_restore');
+        }
+    }
+
+    public function user_logs()
+    {
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $action = $this->input->post('action');
+            $this->load->model('user_model');
+            switch ($action) {
+                case 'list':
+                    $filter = $this->input->post('filter');
+                    $list = $this->user_model->get_user_logs($filter);
+                    echo json_encode(array('data' => $list));
+                    break;
+                default:
+                    echo json_encode(array('result' => false, 'message' => 'Action not found.'));
+            }
+        } else {
+            $this->_renderL('management/user_logs');
+        }
+    }
+
 }

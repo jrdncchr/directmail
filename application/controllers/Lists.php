@@ -9,13 +9,6 @@ class Lists extends MY_Controller {
         $this->data['page_title'] = "Lists";
     }
 
-    public function test()
-    {
-        $this->load->model('property_model');
-        $t = $this->property_model->get_recent_duplicates($this->logged_user->company_id, $this->logged_user->id, 70);
-        var_dump($t);
-    }
-
     public function index()
     {
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
@@ -81,9 +74,10 @@ class Lists extends MY_Controller {
                         $list['created_by'] = $this->logged_user->id;
                         $list['active'] = 1;
                     }
-                     $this->load->model('property_model');
+                    $this->load->model('property_model');
                     $list['company_id'] = $this->logged_user->company_id;
                     $result = $this->list_model->save($list);
+
                     if ($result['success']) {
                         $adjust = $this->input->post('adjust');
                         if (filter_var($adjust, FILTER_VALIDATE_BOOLEAN)) {
@@ -151,7 +145,7 @@ class Lists extends MY_Controller {
                         $list->mailing_type = '';
                         $this->data['list'] = $list;
                         $this->load->library('dm_library');
-                        $this->data['statuses'] = $this->dm_library->getStatusesForSelect2(['duplicate']);
+                        $this->data['statuses'] = $this->dm_library->getStatusesForSelect2();
                         $this->_renderL('lists/list_info');
                         return;            
                     } else {
@@ -186,7 +180,7 @@ class Lists extends MY_Controller {
                                     ->get_testimonials(array('list_id' => $id));
 
                                 $this->load->library('dm_library');
-                                $this->data['statuses'] = $this->dm_library->getStatusesForSelect2(['duplicate']);
+                                $this->data['statuses'] = $this->dm_library->getStatusesForSelect2();
                                 $this->_renderL('lists/list_info');
                                 return;
                             }
@@ -233,7 +227,7 @@ class Lists extends MY_Controller {
                     $property = $this->input->post('form');
                     $property['created_by'] = $this->logged_user->id;
                     $property['company_id'] = $this->logged_user->company_id;
-                    if (isset($property['status']) && $property['status'] == 'duplicate') {
+                    if ((isset($property['status']) && $property['status'] == 'duplicate') || $action == 'draft_property')  {
                         $result = $this->property_model->save($property);
                     } else {
                         // $check_property = $this->property_model->check_property_exists($property, $this->logged_user->company_id);
@@ -247,9 +241,8 @@ class Lists extends MY_Controller {
                         //     $result['success'] = false;
                         //     exit;
                         // }
-                        if ($action !== 'draft_property') {
-                            $property['status'] = $property['status'] == 'draft' ? 'active' : $property['status'];
-                        }
+                        $draftBefore = $property['status'] == 'draft';
+                        $property['status'] = $property['status'] == 'draft' ? 'active' : $property['status'];
                         $result = $this->property_model->save($property);
                         $result['status'] = $property['status'];
                         if ($result['success']) {
@@ -258,7 +251,17 @@ class Lists extends MY_Controller {
                                 'company_id' => $property['company_id'],
                                 'message' => 'Property was ' .  (isset($property['id']) ? 'updated' : 'added') . ' by ' . $this->logged_user->first_name . ' ' . $this->logged_user->last_name
                             ]);
-                            $mailings = $this->input->post('mailings');
+                            if ($draftBefore) {
+                                $this->load->model('list_model');
+                                $list_id = $this->session->userdata('current_list_id');
+                                $list = $this->list_model->get(array(
+                                    'l.id' => $list_id, 
+                                    'l.company_id' => $this->logged_user->company_id
+                                ), false);
+                                $mailings = $this->_generateTempMailings($list->mailing_type, $list->no_of_letters);
+                            } else {
+                                $mailings = $this->input->post('mailings');   
+                            }
                             $this->property_model->save_mailings($result['id'], $mailings);
                         }
                     }
@@ -329,6 +332,7 @@ class Lists extends MY_Controller {
                     echo json_encode(array('result' => false, 'message' => 'Action not found.'));
             }
         } else {
+            $this->session->set_userdata('current_list_id', $list_id);
             switch ($sub) {
                 case 'new':
                 case 'info':
@@ -344,7 +348,13 @@ class Lists extends MY_Controller {
                             $this->load->model('property_model');
                             $property = $this->property_model->get(
                                 array('p.id' => $property_id, 'p.list_id' => $list_id), false);
-                            // $property->pr_url = base_url() . 'lists/property/' . $property->pr_list_id . '/info/' . $property->target_property_id;
+                            if (!$property) {
+                                $this->show_404();
+                                return;
+                            }
+                            if ($property->status == 'duplicate') {
+                                $property->pr_url = base_url() . 'lists/property/' . $property->pr_list_id . '/info/' . $property->target_property_id;
+                            }
                             $this->data['property'] = $property;
                             $this->data['comments'] = $this->property_model->get_comment(array('property_id' => $property_id));
                             $this->data['histories'] = $this->property_model->get_history(array('property_id' => $property_id));

@@ -42,6 +42,16 @@
                         </div>
                     </div>
                     <?php endif; ?>
+                    <?php if (in_array('user_id', $filter_fields)): ?>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">User ID</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" v-model="filter.user_id" />
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                     <?php if (in_array('skip-traced', $filter_fields)): ?>
                     <div class="col-sm-6">
                         <div class="form-group">
@@ -118,8 +128,12 @@
                     </div>
                     <?php endif; ?>
                     <div class="col-sm-12">
+                        <?php if (isset($options) && isset($options['clear']) && $options['clear']): ?>
                         <button v-on:click="clearFilter" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                        <?php endif; ?>
+                        <?php if (isset($options) && $options['download']): ?>
                         <a v-on:click="download" class="btn btn-default btn-sm"><i class="fa fa-download"></i></a>
+                        <?php endif; ?>
                         <button id="filter-btn" v-on:click="filterList" class="btn btn-default btn-sm pull-right" style="width: 200px;">Filter</button>
                     </div>
                 </div>

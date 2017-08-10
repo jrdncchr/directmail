@@ -32,7 +32,7 @@ class List_library {
 
         $last_inserted = $this->CI->property_model->get_last_inserted_row()->id;
         $property_id = $last_inserted == null ? 0 : $last_inserted;
-
+        $property_id++;
 
         $properties = array();
         for ($row = 2; $row <= $highestRow; ++ $row) {
@@ -117,7 +117,8 @@ class List_library {
                 // replacements
                 $replacement = [
                     'property_id' => $property['id'],
-                    'target_property_id' => $similar->id
+                    'target_property_id' => $similar->id,
+                    'company_id' => $this->CI->logged_user->company_id
                 ];
                 $replacements[] = $replacement;
             } else {
@@ -159,11 +160,17 @@ class List_library {
             unset($property['property_link']);
             $inserts[] = $property;
         }
-
         // insertion by batch
         if (!$this->CI->property_model->save_bulk_import($inserts, $mailing_dates, $comments, $histories, $replacements)) {
             exit('Something went wrong with the import.');
         }
+
+        // log user action
+        $this->CI->dm_library->insert_user_log([
+            'user_id' => $this->CI->logged_user->id,
+            'log' => "Bulk import in the list " . $list->id . " [" . $list->name . "]. Resulting to " . sizeof($inserts) . " insertions with . " . sizeof($replacements) . " duplicate properties." ,
+            'link' => base_url() . "lists/info/" . $list->id
+        ]);
 
         return $result;
     }

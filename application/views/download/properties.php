@@ -18,6 +18,9 @@
                     'resource',
                     'property-name',
                     'property-address'
+                ],
+                'options' => [
+                    'download' => true
                 ]
             ]); 
             ?>

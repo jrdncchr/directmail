@@ -57,6 +57,13 @@
                 <span v-show="property.status == 'inactive'" class="label label-default" style="display: none; font-size: 20px;">{{ property.status | capitalize }}</span>
             </div>
 
+            <?php if (isset($property) && ($property->status == 'duplicate')): ?>
+                <div class="alert alert-warning" style="padding-bottom: 10px;">
+                    <b>This property is detected as a duplicate of a property with an ID of <?php echo $property->target_property_id; ?>. </b>
+                    <a class="btn btn-main btn-xs pull-right" href="<?php echo $property->pr_url; ?>">View Property</a>
+                </div>
+            <?php endif; ?>
+
             <!-- Nav tabs -->
               <ul class="nav nav-tabs nav-justified" role="tablist">
                 <li role="presentation" class="active"><a href="#info" aria-controls="info" role="tab" data-toggle="tab">Information</a></li>
@@ -99,6 +106,7 @@
                                     <option value="change">Change</option>
                                     <option value="stop">Stop</option>
                                     <option value="inactive">Inactive</option>
+                                    <option value="duplicate">Duplicate</option>
                                 </select>
                             </div>
                         </div>
