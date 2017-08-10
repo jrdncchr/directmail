@@ -29,7 +29,12 @@ class Backup_model extends CI_Model {
     public function get_last_backup_days_count() 
     {
         $this->db->order_by('id', 'DESC');
-        $last_date = $this->db->get_where('db_backups')->row()->date_created;
+        $last_date = $this->db->get_where('db_backups')->row();
+        if ($last_date) {
+            $last_date = $last_date->date_created;
+        } else {
+            return 0;
+        }
         $now = time(); // or your date as well
         $your_date = strtotime($last_date);
         $datediff = $now - $your_date;
