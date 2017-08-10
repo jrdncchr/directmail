@@ -73,14 +73,21 @@ class Backup_model extends CI_Model {
             $result['success'] = true;
         }
 
+       // log user action
+        $this->dm_library->insert_user_log([
+            'user_id' => $this->logged_user->id,
+            'log' => "Backup the System."
+        ]);
+
         return $result;
     }
 
     public function restore($id)
     {
-        $result = ['success' => false]
+        $result = ['success' => false];        
 
-;        $path = $this->get($id)->path;
+        $backup = $this->get($id);
+        $path = $backup->path;
         if (ENVIRONMENT === 'development') {
             $command = 'c:\wamp64\bin\mysql\mysql5.7.14\bin\mysql -u root -h localhost directmail < ' . $path;
         } else {
@@ -90,6 +97,12 @@ class Backup_model extends CI_Model {
         if (!$return) {
             $result['success'] = true;
         }
+
+       // log user action
+        $this->dm_library->insert_user_log([
+            'user_id' => $this->logged_user->id,
+            'log' => "Restored the system using backup with id of " . $id . " and date backup from " . $backup->date_created
+        ]);
 
         return $result;
     }
