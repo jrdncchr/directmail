@@ -34,8 +34,6 @@
 <script src="<?php echo base_url() . 'resources/js/danero.js'; ?>"></script>
 
 <!-- CSS Styles -->
-<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap/dist/css/bootstrap.min.css'; ?>" />
-<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/font-awesome/css/font-awesome.min.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'bower_components/toastr/toastr.min.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'resources/css/custom-bootstrap.css'; ?>" />
 <link rel="stylesheet" href="<?php echo base_url() . 'resources/css/custom.css'; ?>" />

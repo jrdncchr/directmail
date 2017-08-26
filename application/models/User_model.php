@@ -424,7 +424,7 @@ class User_model extends CI_Model {
     {   
         $this->db->select('ul.*, CONCAT(u.first_name, " ", u.last_name) as name');
         $this->db->join('user u',  'u.id = ul.user_id', 'left');
-        if (isset($filter['user_id'])) {
+        if (isset($filter['user_id']) && $filter['user_id'] > 0) {
             $this->db->where('user_id', $filter['user_id']);
         }
         if (isset($filter['date_range']) && $filter['date_range'] !== '') {
