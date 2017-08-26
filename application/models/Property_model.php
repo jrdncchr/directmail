@@ -234,6 +234,9 @@ class Property_model extends CI_Model {
         if (isset($filter['list'])) {
             $this->db->where_in('p.list_id', $filter['list']);
         }
+        if (isset($filter['list_id'])) {
+            $this->db->where_in('p.list_id', $filter['list_id']);
+        }
         if (isset($filter['resource'])) {
             $this->db->like('p.resource', $filter['resource']);
         }
@@ -513,9 +516,11 @@ class Property_model extends CI_Model {
 
     public function bulk_delete_properties($company_id, $properties)
     {
+        $list_d = 0;
         $property_ids = [];
         foreach ($properties as $property) {
             $property_ids[] = is_array($property) ? $property['id'] : $property->id;
+            $list_id = $property->list_id;
         }
 
         $start = 0;
@@ -542,14 +547,23 @@ class Property_model extends CI_Model {
                 $end = $size;
             }
         } 
+
+        // log user action
+        $this->dm_library->insert_user_log([
+            'user_id' => $this->logged_user->id,
+            'log' => "A bulk delete was performed. $size properties from list id $list_id was deleted.",
+            'link' => base_url() . 'lists/info/' . $list_id
+        ]);
         return true;
     }
 
     public function bulk_change_status_properties($company_id, $properties, $status)
     {
+        $list_d = 0;
         $property_ids = [];
         foreach ($properties as $property) {
             $property_ids[] = is_array($property) ? $property['id'] : $property->id;
+            $list_id = $property->list_id;
         }
 
         $start = 0;
@@ -567,6 +581,12 @@ class Property_model extends CI_Model {
                 $end = $size;
             }
         } 
+        // log user action
+        $this->dm_library->insert_user_log([
+            'user_id' => $this->logged_user->id,
+            'log' => "A bulk change of status was performed. $size properties from list id $list_id was updated to status $status.",
+            'link' => base_url() . 'lists/info/' . $list_id
+        ]);
         return true;
     }
 

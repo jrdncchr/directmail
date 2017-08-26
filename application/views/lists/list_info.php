@@ -169,7 +169,8 @@
             property_name : '',
             property_address : '',
             id: '',
-            skip_traced: 0
+            skip_traced: 0,
+            list_id: <?php echo $list->id; ?>
         },
         bulkStatus: ''
     };
