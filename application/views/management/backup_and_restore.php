@@ -45,6 +45,8 @@
                     body: 'Back up now?',
                     callback: function() {
                         loading('info', 'Backup in process...');
+                        spinButton($('#global-modal-yes'), true, 'Backing up...');
+                        $('#global-modal-no').hide();
                         $.post(actionUrl, { action: 'backup' }, function(res) {
                             if (res.success) {
                                 loading('success', 'Backup successful!');
@@ -52,6 +54,8 @@
                             } else {
                                 loading('error', 'Backup failed, contact administrator.');
                             }
+                            spinButton($('#global-modal-yes'), false, 'Yes');
+                            $('#global-modal-no').show();
                             $('#global-modal').modal('hide');
                         }, 'json');
                     },
@@ -96,14 +100,17 @@
             title: 'Confirmation',
             body: 'Make sure to backup first before restoring. Restore now?',
             callback: function() {
-                $('#global-modal').modal('hide');
-                 loading('info', 'Restoring backup...');
+                loading('info', 'Restoring backup...');
+                spinButton($('#global-modal-yes'), true, 'Restoring...');
+                $('#global-modal-no').hide();
                 $.post(actionUrl, { action: 'restore', id: id }, function(res) {
                     if (res.success) {
                         loading('success', 'Restore complete!');
                     } else {
                         loading('error', 'Action failed, contact administrator.');
                     }
+                    spinButton($('#global-modal-yes'), false, 'Yes');
+                    $('#global-modal-no').show();
                     $('#global-modal').modal('hide');
                 }, 'json');
 
