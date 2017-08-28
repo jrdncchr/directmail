@@ -176,10 +176,10 @@ class Property_Library {
 					$this->CI->property_model->delete_mailings(['property_id' => $target_property->id]);
                 	$this->CI->property_model->delete_comments(['property_id' => $target_property->id]);
 
-                    if ($property_comments['comment']) {
+                    if ($property_comments) {
                         $comment = [
                             'property_id' => $target_property->id,
-                            'comment' => $property_comments['comment'],
+                            'comment' => $property_comments,
                             'user_id' => $this->CI->logged_user->id
                         ];
                         $this->CI->property_model->save_comment($comment);
