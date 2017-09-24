@@ -14,7 +14,7 @@
 			<?php if ($last_backup_days > 6) : ?>
     			<div class="alert">
     				<p class="text-warning">
-    					Your last backup was <b><?php echo $last_backup_days; ?></b> days ago. <a class="btn btn-main pull-right" href="<?php echo base_url() . 'management/backup_and_restor' ?>">Go to Backup Now</a> 
+    					Your last backup was <b><?php echo $last_backup_days; ?></b> days ago. <a class="btn btn-main pull-right" href="<?php echo base_url() . 'management/backup_and_restore' ?>">Go to Backup Now</a> 
     				<p>
     			</div>
 			<?php endif; ?>
