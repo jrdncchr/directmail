@@ -267,6 +267,16 @@ class Property_Library {
             } else {
                 unset($filter['date_range']);
             }
+            if (isset($filter['last_letter_date_range']) && $filter['last_letter_date_range'] !== '') {
+                $date_split = explode(' - ', $filter['last_letter_date_range']);
+                if (sizeof($date_split) > 1) {
+                    $filter['last_letter_date_range'] = "pm.mailing_date BETWEEN '$date_split[0]' AND '$date_split[1]'"; 
+                } else {
+                    $filter['last_letter_date_range'] = "pm.mailing_date = '$date_split[0]'"; 
+                }
+            } else {
+                unset($filter['last_letter_date_range']);
+            }
 	        if (isset($filter['skip_traced']) && !filter_var($filter['skip_traced'], FILTER_VALIDATE_BOOLEAN)) {
 	        	unset($filter['skip_traced']);
 	        }

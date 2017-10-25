@@ -15,7 +15,8 @@
                     'list',
                     'remove-duplicates-using-priority',
                     'property-name',
-                    'property-address'
+                    'property-address',
+                    'last-letter-date-range'
                 ],
                 'options' => [
                     'download' => true
@@ -51,7 +52,8 @@
             property_name : '',
             property_address : '',
             id: '',
-            remove_duplicates_using_priority : 0
+            remove_duplicates_using_priority : 0,
+            last_letter_date_range: ''
         },
         bulkStatus: '',
         statusAll: false,
@@ -155,6 +157,8 @@
         setupSelect2Fields();
         $('#list').val('all').trigger('change');
         $('#status').val(data.filter.status).trigger('change');
+
+        setupDatepickerFields();
     });
 
     function setupSelect2Fields() {
@@ -252,6 +256,18 @@
             "columnDefs": [
                 { className: "dt-align-toggle", "targets": [0] }
             ]
+        });
+    }
+
+    function setupDatepickerFields() {
+        $('#last-letter-date-range').datepicker({
+            language: 'en',
+            range: true,
+            multipleDatesSeparator: ' - ',
+            dateFormat: 'yyyy-mm-dd',
+            onSelect: function(formattedDate, date, inst) {
+                data.filter.last_letter_date_range = formattedDate;    
+            }
         });
     }
 </script>

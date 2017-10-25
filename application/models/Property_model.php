@@ -255,6 +255,9 @@ class Property_model extends CI_Model {
         if (isset($filter['date_range'])) {
             $this->db->where($filter['date_range']);
         }
+        if (isset($filter['last_letter_date_range'])) {
+            $this->db->where($filter['last_letter_date_range']);
+        }
         if (isset($filter['date_range'])) {
             $this->db->where($filter['date_range']);
         }

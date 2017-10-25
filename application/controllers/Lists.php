@@ -383,8 +383,10 @@ class Lists extends MY_Controller {
         $date = date('Y-m-d');
         $this->load->library('property_library');
         for ($i = 1; $i <= $letter_count; $i++) {
-            $next_date = $this->property_library->get_next_mailing_date($type, $date);
-            $date = $next_date;
+            if ($i !== 1) {
+                $next_date = $this->property_library->get_next_mailing_date($type, $date);
+                $date = $next_date;
+            }
 
             $mailings[] = [
                 'letter_no' => $i,

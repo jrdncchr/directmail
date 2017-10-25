@@ -116,6 +116,16 @@
                         </div>
                     </div>
                     <?php endif; ?>
+                    <?php if (in_array('last-letter-date-range', $filter_fields)): ?>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="last-letter-date-range" class="control-label col-sm-4">Last Letter Date Range</label>
+                            <div class="col-sm-8">
+                                <input id="last-letter-date-range" type="text" readonly="true" class="form-control" v-model="filter.last_letter_date_range" />
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                     <?php if (in_array('letter-no', $filter_fields)): ?>
                     <div class="col-sm-6">
                         <div class="form-group">
