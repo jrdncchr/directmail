@@ -41,7 +41,7 @@
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        User
+                        Admin (First User that was created for this company)
                     </div>
                     <div class="panel-body" id="user-form">
                         <div class="row">
@@ -66,6 +66,27 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                       Users
+                    </div>
+                    <div class="panel-body" id="user-form">
+                        <table class="table table-bordered table-hover" width="100%">
+                            <thead>
+                            <tr>
+                                <th width="15%">Role</th>
+                                <th width="20%">Email</th>
+                                <th width="20%">Name</th>
+                                <th width="15%">Contact No.</th>
+                                <th width="20%">Date Joined</th>
+                                <th width="10%">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -73,6 +94,7 @@
 
 <script>
     var actionUrl = "<?php echo base_url() . 'management/companies'; ?>";
+    var dt;
 
     var data = {
         form : {
@@ -122,6 +144,9 @@
                         }, 'json');
                     }
                 });
+            },
+            loginUser: function(userId) {
+                window.location.href = actionUrl + '/login_user/' + userId;
             }
         }
     });
@@ -130,5 +155,35 @@
         $('#sidebar-management-link').addClass('active');
         $('#sidebar-management-companies-link').addClass('active');
         $('#sidebar-management').addClass('in');
+
+        dt = $('table').dataTable({
+            "order": [[ 4, "asc" ]],
+            "bDestroy": true,
+            "filter": true,
+            "ajax": {
+                "type": "POST",
+                "url": actionUrl,
+                "data": {action: "users", company_id: data.form.company.id}
+            },
+            columns: [
+                { data: "role_name",
+                    render: function(data, type, row) {
+                        return data ? data : "No Role";
+                    }
+                },
+                { data: "email" },
+                { data: "name" },
+                { data: "contact_no" },
+                { data: "date_created" },
+                { data: "id",
+                    render: function(data, type, row) {
+                        return "<button class='btn btn-xs btn-default' onclick='vm.loginUser(" + data + ")'>Login User</>";
+                    }
+                }
+            ],
+            "language": {
+                "emptyTable": "There are no users for this company yet."
+            }
+        });
     });
 </script>

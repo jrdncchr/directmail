@@ -213,6 +213,16 @@ class Management extends MY_Controller {
                         }
                         echo json_encode($result);
                         break;
+                    case 'users':
+                        $this->load->model('user_model');
+                        $company_id = $this->input->post('company_id');
+                        $users = $this->user_model->get(
+                        array('u.company_id' => $company_id));
+                        foreach ($users as $u) {
+                            $u->name = $u->last_name . ", " . $u->first_name;
+                        }
+                        echo json_encode(array('data' => $users));
+                        break;
                 }
             } else {
                 switch ($sub) {
@@ -238,7 +248,21 @@ class Management extends MY_Controller {
                             $this->data['company'] = $company_form;
                         }
                         $this->_renderL('management/companies_form');
-                        break; 
+                        break;
+                    case 'login_user': 
+                        $this->session->unset_userdata('user');
+                        $this->session->unset_userdata('role_module_permissions');
+                        $this->session->unset_userdata('user_module_permissions');
+
+                        $this->load->model('user_model');
+                        $user_company_id = $this->user_model->get(['u.id' => $id], false)->company_id;
+                        $logged = $this->user_model->login_by_user_id($user_company_id, $id);
+                        if ($logged['success']) {
+                            redirect(base_url() . "login");
+                        } else {
+                            echo $logged['message'];
+                        }
+                        break;
                 }
             }
             
