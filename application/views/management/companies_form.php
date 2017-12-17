@@ -67,7 +67,7 @@
                     </div>
                 </div>
 
-                <div class="panel panel-default">
+                <div class="panel panel-default" v-show="form.company.id > 0">
                     <div class="panel-heading">
                        Users
                     </div>
